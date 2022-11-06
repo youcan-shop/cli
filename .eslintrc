@@ -1,0 +1,3 @@
+{
+  "extends": "@azuradara/eslint-config-base"
+}

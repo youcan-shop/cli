@@ -1,0 +1,42 @@
+{
+  "name": "@youcan/cli",
+  "version": "0.0.0",
+  "description": "YouCan CLI for developers.",
+  "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
+  "keywords": [],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "youcan": "bin/index.js"
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "release": "bump && pnpm publish",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@azuradara/eslint-config-base": "^0.1.0",
+    "@azuradara/eslint-config-ts": "^0.1.0",
+    "@types/node": "^18.11.9",
+    "bumpp": "^8.2.1",
+    "eslint": "^8.27.0",
+    "esno": "^0.16.3",
+    "pnpm": "^7.14.2",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.8.4",
+    "unbuild": "^0.9.4",
+    "vitest": "^0.24.5"
+  }
+}
