@@ -1,5 +1,3 @@
-import { stdout } from './cli/main';
-import loginCommand from './commands/login';
+import main from './cli/main';
 
-stdout.log('index');
-loginCommand();
+main();

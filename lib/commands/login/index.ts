@@ -39,7 +39,6 @@ function callbackServer(): Promise<string> {
  */
 
 async function exchangeCodeForToken(authorizationCode: string): Promise<string> {
-  return '1234512344';
   const response = await fetch('https://seller-area.youcan.shop/admin/oauth/token', {
     method: 'POST',
     body: {
