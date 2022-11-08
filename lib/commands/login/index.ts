@@ -39,14 +39,24 @@ function callbackServer(): Promise<string> {
  */
 
 async function exchangeCodeForToken(authorizationCode: string): Promise<string> {
+  const formParams = {
+    grant_type: 'authorization_code',
+    client_id: '8',
+    client_secret: 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X',
+    redirect_uri: 'http://localhost:3000/',
+    code: authorizationCode,
+  };
+
+  const form = new URLSearchParams();
+  Object.entries(formParams).forEach(([k, v]) => {
+    form.append(k, v);
+  });
+
   const response = await fetch('https://seller-area.youcan.shop/admin/oauth/token', {
     method: 'POST',
-    body: {
-      grant_type: 'authorization_code',
-      client_id: '1',
-      client_secret: 'secret',
-      redirect_uri: '',
-      code: authorizationCode,
+    body: form,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
   const data = await response.json() as OAuthToken;
