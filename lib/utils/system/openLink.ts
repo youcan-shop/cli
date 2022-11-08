@@ -26,7 +26,7 @@ export default function openLink(url: string) {
   return new Promise<void>((resolve, reject) => {
     try {
       const command = openCommand();
-      execSync(`${command} ${url}`);
+      execSync(`${command} '${url}'`);
       return resolve();
     }
     catch (error) {
