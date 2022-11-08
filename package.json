@@ -21,7 +21,7 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "dev": "unbuild --stub",
+    "dev": "unbuild --stub && node ./dist/index.mjs",
     "release": "bump && pnpm publish",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
