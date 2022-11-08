@@ -63,15 +63,17 @@ async function saveTokenLocally(token: string) {
   await writeToFile(filePath, content);
 }
 
-export default async function loginCommand() {
-  try {
-    await openLink(authorizationUrl);
-    const authorizationCode = await callbackServer();
-    const accessToken = await exchangeCodeForToken(authorizationCode);
-    await saveTokenLocally(accessToken);
-  }
-  catch (err) {
-    // Todo: handle error
-  }
+async function loginAction() {
+  await openLink(authorizationUrl);
+  const authorizationCode = await callbackServer();
+  const accessToken = await exchangeCodeForToken(authorizationCode);
+  await saveTokenLocally(accessToken);
 }
 
+export default {
+  setup(cli: any) {
+    cli.command('auth', 'Login to YouCan')
+      .option('-s, --store', 'A store to log into.')
+      .action(loginAction);
+  },
+};

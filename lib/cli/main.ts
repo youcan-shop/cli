@@ -1,12 +1,19 @@
 import cac from 'cac';
-import loginCommand from '../commands/login';
+import commands from '../commands';
 
 const cli = cac('youcan');
 
 export default function main() {
-  cli.command('auth', 'Login to YouCan').option('-s, --store', 'A store to log into.').action(loginCommand);
-  cli.help();
-  cli.parse();
+  try {
+    Object.values(commands).forEach(command => command.setup(cli));
+
+    cli.help();
+    cli.parse();
+  }
+  catch (err: unknown) {
+    console.error(err);
+    process.exit(1);
+  }
 }
 
 export const stdout = console;
