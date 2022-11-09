@@ -1,11 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import http from 'http';
 import fetch from 'node-fetch';
-import stdout from '../../utils/system/stdout';
-import config from '../../config';
-import { homeDir } from '../../utils/common';
-import writeToFile from '../../utils/system/writeToFile';
 import type { OAuthToken } from './types';
+import stdout from '@/utils/system/stdout';
+import config from '@/config';
+import { homeDir } from '@/utils/common';
+import writeToFile from '@/utils/system/writeToFile';
 import openLink from '@/utils/system/openLink';
 
 const { authorizationUrl, callbackServerPort, callbackServerTimeout } = config;
