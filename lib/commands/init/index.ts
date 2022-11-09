@@ -1,10 +1,12 @@
+import cloneRepository from '@/utils/git/cloneRepository';
 import stdout from '@/utils/system/stdout';
 
 /**
  * YouCan CLI - Init command
  */
-async function initAction() {
+function initAction() {
   stdout.info('initializing a new theme');
+  cloneRepository('git@github.com:NextmediaMa/youcan-cli.git', '/tmp/ycc');
 }
 
 export default {
