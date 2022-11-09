@@ -79,7 +79,7 @@ async function loginAction() {
 
 export default {
   setup(cli: any) {
-    cli.command('auth', 'Login to YouCan')
+    cli.command('auth', '🔓 Login to YouCan')
       .option('-s, --store', 'A store to log into.')
       .action(loginAction);
   },

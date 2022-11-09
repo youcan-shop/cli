@@ -7,7 +7,8 @@ import fs from 'fs';
 export default function deleteFile(filePath: string) {
   return new Promise<void>((resolve, reject) => {
     try {
-      fs.unlinkSync(filePath);
+      if (fs.existsSync(filePath))
+        fs.unlinkSync(filePath);
       return resolve();
     }
     catch (error) {
