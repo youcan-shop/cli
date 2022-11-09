@@ -1,9 +1,8 @@
 import fs from 'fs';
 
 /**
- * @param filePath - The path to the file to write to.
+ * @param filePath - The path of the file to delete.
 */
-
 export default function deleteFile(filePath: string) {
   return new Promise<void>((resolve, reject) => {
     try {

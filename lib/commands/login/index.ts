@@ -5,6 +5,7 @@ import openLink from '../../utils/system/openLink';
 import config from '../../config';
 import { homeDir } from '../../utils/common';
 import writeToFile from '../../utils/system/writeToFile';
+import stdout from '../../utils/system/stdout';
 import type { OAuthToken } from './types';
 
 const { authorizationUrl, callbackServerPort, callbackServerTimeout } = config;
@@ -15,20 +16,22 @@ const { authorizationUrl, callbackServerPort, callbackServerTimeout } = config;
 */
 function callbackServer(): Promise<string> {
   return new Promise((resolve, reject) => {
+    let timeOut: ReturnType<typeof setTimeout>;
     const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
       const { url } = req;
       const code = url?.split('=')[1] || '';
-      if (!code) reject(new Error('authorization code is required.'));
 
+      if (!code) reject(new Error('authorization code is required.'));
+      clearTimeout(timeOut);
       res.end('You can close this window now.');
       server.close();
       resolve(code);
     });
-    server.listen(callbackServerPort);
-    setTimeout(() => {
-      server.close();
-      reject(new Error('Timeout'));
-    }, callbackServerTimeout);
+    server.listen(callbackServerPort, () => {
+      timeOut = setTimeout(() => {
+        reject(new Error('Timeout'));
+      }, callbackServerTimeout);
+    });
   });
 }
 
@@ -68,10 +71,14 @@ async function saveTokenLocally(token: string) {
   const filePath = `${homeDir}/.youcan`;
   const content = `token=${token}`;
   await writeToFile(filePath, content);
+  stdout.info('You\'re successfully logged in 🎉');
 }
 
+/**
+ * YouCan CLI - Login Command
+ */
 async function loginAction() {
-  await openLink(authorizationUrl);
+  await openLink(authorizationUrl());
   const authorizationCode = await callbackServer();
   const accessToken = await exchangeCodeForToken(authorizationCode);
   await saveTokenLocally(accessToken);
