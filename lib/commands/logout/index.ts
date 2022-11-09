@@ -1,6 +1,6 @@
-import { homeDir } from '../../utils/common';
-import deleteFile from '../../utils/system/deleteFile';
-import stdout from '../../utils/system/stdout';
+import { homeDir } from '@/utils/common';
+import deleteFile from '@/utils/system/deleteFile';
+import stdout from '@/utils/system/stdout';
 
 /**
  * YouCan CLI - Logout command
