@@ -6,7 +6,6 @@ const cli = cac('youcan');
 export default function main() {
   try {
     Object.values(commands).forEach(command => command.setup(cli));
-
     cli.help();
     cli.parse();
   }
