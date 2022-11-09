@@ -27,6 +27,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@rollup/plugin-alias": "^4.0.2",
     "cac": "^6.7.14",
     "node-fetch": "^3.2.10"
   },

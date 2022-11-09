@@ -7,13 +7,5 @@ import fs from 'fs';
 */
 
 export default function writeToFile(filePath: string, content: string) {
-  return new Promise<void>((resolve, reject) => {
-    try {
-      fs.writeFileSync(filePath, content, { encoding: 'utf8' });
-      return resolve();
-    }
-    catch (error) {
-      return reject(error);
-    }
-  });
+  return fs.writeFileSync(filePath, content, { encoding: 'utf8', flag: 'w' });
 }

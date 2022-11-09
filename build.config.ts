@@ -1,3 +1,4 @@
+import path from 'path';
 import { defineBuildConfig } from 'unbuild';
 
 export default defineBuildConfig({
@@ -13,5 +14,9 @@ export default defineBuildConfig({
   declaration: true,
   rollup: {
     emitCJS: true,
+  },
+  failOnWarn: false,
+  alias: {
+    '@': path.resolve(__dirname, 'lib'),
   },
 });

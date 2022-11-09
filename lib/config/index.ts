@@ -4,7 +4,5 @@ export default {
   oauthClientId: '8',
   oauthClientSecret: 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X',
   oauthRedirectUri: 'http://localhost:3000/',
-  authorizationUrl() {
-    return `https://seller-area.youcan.shop/admin/oauth/authorize?response_type=code&client_id=${this.oauthClientId}&redirect_url=${this.oauthRedirectUri}&state=`;
-  },
+  authorizationUrl: 'https://seller-area.youcan.shop/admin/oauth/authorize?response_type=code&client_id=8&redirect_url=http://localhost:3000/&state=',
 };

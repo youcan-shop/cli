@@ -1,12 +1,12 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import http from 'http';
 import fetch from 'node-fetch';
-import openLink from '../../utils/system/openLink';
+import stdout from '../../utils/system/stdout';
 import config from '../../config';
 import { homeDir } from '../../utils/common';
 import writeToFile from '../../utils/system/writeToFile';
-import stdout from '../../utils/system/stdout';
 import type { OAuthToken } from './types';
+import openLink from '@/utils/system/openLink';
 
 const { authorizationUrl, callbackServerPort, callbackServerTimeout } = config;
 
@@ -47,14 +47,10 @@ async function exchangeCodeForToken(authorizationCode: string): Promise<string> 
     redirect_uri: config.oauthRedirectUri,
     code: authorizationCode,
   };
-  const form = new URLSearchParams();
 
-  Object.entries(formParams).forEach(([k, v]) => {
-    form.append(k, v);
-  });
   const response = await fetch('https://seller-area.youcan.shop/admin/oauth/token', {
     method: 'POST',
-    body: form,
+    body: new URLSearchParams(formParams),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
@@ -78,7 +74,9 @@ async function saveTokenLocally(token: string) {
  * YouCan CLI - Login Command
  */
 async function loginAction() {
-  await openLink(authorizationUrl());
+  if (!openLink(authorizationUrl))
+    stdout.log(`Please open this link in your browser: ${authorizationUrl}`);
+
   const authorizationCode = await callbackServer();
   const accessToken = await exchangeCodeForToken(authorizationCode);
   await saveTokenLocally(accessToken);

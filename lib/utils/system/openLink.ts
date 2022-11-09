@@ -23,14 +23,12 @@ function openCommand(): string {
  * @param url - URL to open
  */
 export default function openLink(url: string) {
-  return new Promise<void>((resolve, reject) => {
-    try {
-      const command = openCommand();
-      execSync(`${command} '${url}'`);
-      return resolve();
-    }
-    catch (error) {
-      return reject(error);
-    }
-  });
+  try {
+    const command = openCommand();
+    execSync(`${command} '${url}'`);
+    return true;
+  }
+  catch (error) {
+    return false;
+  }
 }
