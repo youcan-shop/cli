@@ -10,7 +10,7 @@
       "import": "./dist/index.mjs"
     }
   },
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "bin": {
     "youcan": "bin/index.js"
@@ -21,10 +21,15 @@
   ],
   "scripts": {
     "build": "unbuild",
-    "dev": "unbuild --stub",
+    "dev": "unbuild --stub && node ./dist/index.mjs",
     "release": "bump && pnpm publish",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
+  },
+  "dependencies": {
+    "@rollup/plugin-alias": "^4.0.2",
+    "cac": "^6.7.14",
+    "node-fetch": "^3.2.10"
   },
   "devDependencies": {
     "@azuradara/eslint-config-base": "^0.1.3",

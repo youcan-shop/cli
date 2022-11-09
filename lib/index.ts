@@ -1,3 +1,3 @@
-import { stdout } from './cli/main';
+import main from './cli/main';
 
-stdout.log('index');
+main();
