@@ -1,17 +1,18 @@
 {
   "name": "@youcan/cli",
+  "type": "module",
   "version": "0.0.0",
   "description": "YouCan CLI for developers.",
   "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
   "keywords": [],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
     }
   },
-  "main": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/dts/index.d.ts",
   "bin": {
     "youcan": "bin/index.js"
   },
@@ -20,14 +21,13 @@
     "dist"
   ],
   "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --stub && node ./dist/index.mjs",
-    "release": "bump && pnpm publish",
+    "build": "tsc --noEmit && rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js --watch",
+    "release": "bumpp && pnpm publish",
     "typecheck": "tsc --noEmit",
     "lint": "eslint ."
   },
   "dependencies": {
-    "@rollup/plugin-alias": "^4.0.2",
     "cac": "^6.7.14",
     "node-fetch": "^3.2.10"
   },
@@ -40,8 +40,10 @@
     "esno": "^0.16.3",
     "pnpm": "^7.14.2",
     "rimraf": "^3.0.2",
+    "rollup": "^3.2.5",
+    "rollup-plugin-dts": "^5.0.0",
+    "rollup-plugin-typescript2": "^0.34.1",
     "typescript": "^4.8.4",
-    "unbuild": "^0.9.4",
     "vitest": "^0.24.5"
   }
 }

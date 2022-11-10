@@ -1,3 +1,1 @@
-function start() {
-  return import("../dist/cli/main.mjs");
-}
+import('../dist/index.js')
