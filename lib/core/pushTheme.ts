@@ -16,15 +16,16 @@ export default async function pushTheme(themeFolderName: string): Promise<string
   const userToken = await getUserToken();
   const zippedTheme = await zipFolder('./', themeFolderName);
   const themeFolderRs = await fileFromPath(zippedTheme);
-  const formData = new FormData();
   const { themeAuthor, themeVersion, themeSupportUrl, themeDocumentationUrl } = config.starterTheme;
 
+  const formData = new FormData();
   formData.append('archive', themeFolderRs);
   formData.append('theme_name', themeFolderName);
   formData.append('theme_author', themeAuthor);
   formData.append('theme_version', themeVersion);
   formData.append('theme_support_url', themeSupportUrl);
   formData.append('theme_documentation_url', themeDocumentationUrl);
+
   const response = await fetch('https://api.youcan.shop/themes/init', {
     method: 'POST',
     body: formData,
@@ -33,9 +34,9 @@ export default async function pushTheme(themeFolderName: string): Promise<string
       Authorization: `Bearer ${userToken}`,
     },
   });
+  const { id } = await response.json() as InitThemeResponse;
 
   deleteFile(zippedTheme);
-  const { id } = await response.json() as InitThemeResponse;
   return id;
 }
 

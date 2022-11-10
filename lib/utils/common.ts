@@ -7,9 +7,11 @@ export const homeDir = os.homedir();
  * @returns string - youcan token
  */
 export async function getUserToken(): Promise<string> {
-  const filePath = `${homeDir}/.youcan`;
+  const filePath = `${homeDir}/.youcan.json`;
+
+  if (!fs.existsSync(filePath))
+    throw new Error('You are not logged in. Please login first.');
+
   const data = await fs.promises.readFile(filePath, 'utf8');
-  if (!data) throw new Error('Token not found please login first.');
-  const token = data.split('=')[1];
-  return token;
+  return JSON.parse(data).token;
 }

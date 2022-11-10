@@ -64,9 +64,12 @@ async function exchangeCodeForToken(authorizationCode: string): Promise<string> 
  * @param token - The token to save.
  */
 async function saveTokenLocally(token: string) {
-  const filePath = `${homeDir}/.youcan`;
-  const content = `token=${token}`;
-  await writeToFile(filePath, content);
+  const filePath = `${homeDir}/.youcan.json`;
+  const content = {
+    token,
+  };
+
+  await writeToFile(filePath, JSON.stringify(content));
   stdout.info('You\'re successfully logged in 🎉');
 }
 

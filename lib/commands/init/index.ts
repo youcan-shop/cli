@@ -9,11 +9,14 @@ import writeToFile from '@/utils/system/writeToFile';
  */
 async function initAction(options: any) {
   const { themeRepository, themeName } = config.starterTheme;
-  stdout.info('Cloning the starter theme...');
   const themeFolderName = options.name || themeName;
+
+  stdout.info('Cloning the starter theme...');
   cloneRepository(themeRepository, themeFolderName);
+
   const themeId = await pushTheme(themeFolderName);
   writeToFile(`${themeFolderName}/.youcan`, `theme=${themeId}`);
+
   stdout.info('The theme has been initiated 🥳');
 }
 
