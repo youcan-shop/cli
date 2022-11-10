@@ -1,19 +1,27 @@
+import config from '@/config';
+import pushTheme from '@/core/pushTheme';
 import cloneRepository from '@/utils/git/cloneRepository';
 import stdout from '@/utils/system/stdout';
+import writeToFile from '@/utils/system/writeToFile';
 
 /**
  * YouCan CLI - Init command
  */
-function initAction() {
-  stdout.info('initializing a new theme');
-  cloneRepository('git@github.com:NextmediaMa/youcan-cli.git', '/tmp/ycc');
+async function initAction(options: any) {
+  const { themeRepository, themeName } = config.starterTheme;
+  stdout.info('Cloning the starter theme...');
+  const themeFolderName = options.name || themeName;
+  cloneRepository(themeRepository, themeFolderName);
+  const themeId = await pushTheme(themeFolderName);
+  writeToFile(`${themeFolderName}/.youcan`, `theme=${themeId}`);
+  stdout.info('The theme has been initiated 🥳');
 }
 
 export default {
   setup(cli: any) {
     cli.command('init', '📥 Create a new theme or clone existing one.')
-      .option('-n, --name', 'What to name the theme, cloned files will be unpacked into a folder with this name.')
-      .option('-t, --theme', 'A theme to clone, can either be a store theme identifier or a base theme identifier, or name.')
+      .option('-n, --name <name>', 'What to name the theme, cloned files will be unpacked into a folder with this name.')
+      .option('-t, --theme <theme>', 'A theme to clone, can either be a store theme identifier or a base theme identifier, or name.')
       .action(initAction);
   },
 };
