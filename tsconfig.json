@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "es2018",
     "module": "esnext",
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "moduleResolution": "node",
     "esModuleInterop": true,
     "strict": true,
@@ -11,8 +13,15 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "declaration": true,
     "paths": {
-      "@/*": ["./lib/*"]
+      "@/*": [
+        "./lib/*"
+      ]
     }
-  }
+  },
+  "include": [
+    "lib",
+    "rollup.config.js"
+  ]
 }
