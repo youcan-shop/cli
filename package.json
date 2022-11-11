@@ -23,9 +23,9 @@
   "scripts": {
     "build": "tsc --noEmit && rollup --config rollup.config.js",
     "dev": "rollup --config rollup.config.js --watch",
+    "lint": "eslint .",
     "release": "bumpp && pnpm publish",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "archiver": "^5.3.1",
@@ -34,6 +34,7 @@
     "formdata-node": "^5.0.0",
     "kleur": "^4.1.5",
     "node-fetch": "^3.2.10",
+    "prompts": "^2.4.2",
     "ramda": "^0.28.0"
   },
   "devDependencies": {
@@ -49,7 +50,6 @@
     "eslint": "^8.27.0",
     "esno": "^0.16.3",
     "pnpm": "^7.14.2",
-    "prompts": "^2.4.2",
     "rimraf": "^3.0.2",
     "rollup": "^3.2.5",
     "rollup-plugin-dts": "^5.0.0",
