@@ -32,8 +32,6 @@ export default class Client {
 
   public async updateFile(themeId: string, data: UpdateThemeFileRequestData) {
     const form = new FormData();
-    console.log(data);
-    return;
     Object.entries(data).forEach(([key, value]) => form.append(key, value));
 
     await post(

@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 import archiver from 'archiver';
 /**
  * Zip folder and save it to a given path and return zip folder path
@@ -6,7 +7,7 @@ import archiver from 'archiver';
 export default async function zipFolder(folderPath: string, folderName: string): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
-      const zipPath = `${folderPath}${folderName}.zip`;
+      const zipPath = path.resolve(folderPath, `${folderName}.zip`);
       const output = fs.createWriteStream(zipPath);
       const archive = archiver('zip', {
         zlib: { level: 9 },
@@ -20,7 +21,7 @@ export default async function zipFolder(folderPath: string, folderName: string):
       });
 
       archive.pipe(output);
-      archive.directory(`${folderPath}${folderName}`, false);
+      archive.directory(path.resolve(folderPath, folderName), false);
       archive.finalize();
     }
     catch (err) {
