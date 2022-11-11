@@ -51,7 +51,7 @@ async function exchangeAuthCode(authorizationCode: string): Promise<string> {
     code: authorizationCode,
   };
 
-  const res = await post<TokenResponse>('https://seller-area.youcan.shop/admin/oauth/token', {
+  const res = await post<TokenResponse>(config.OAUTH_ACCESS_TOKEN_URL, {
     method: 'POST',
     body: new URLSearchParams(formParams),
     headers: {
@@ -68,9 +68,9 @@ const loginCommand: CommandDefinition = {
   description: 'Log into a YouCan store',
 
   action: async () => {
-    if (!openLink(config.SELLER_AREA_WEB_BASE_URI)) {
+    if (!openLink(config.OAUTH_AUTH_CODE_URL)) {
       stdout.log('Open this link in your browser to continue authentication:');
-      stdout.info(config.OAUTH_PROVIDER_URL);
+      stdout.info(config.OAUTH_AUTH_CODE_URL);
     }
 
     const authCode = await listenForAuthCodeCallback();
