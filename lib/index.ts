@@ -1,3 +1,3 @@
-import main from './cli/main';
+import cli from './cli';
 
-main();
+cli.init();
