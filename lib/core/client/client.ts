@@ -33,7 +33,6 @@ export default class Client {
   public async updateFile(themeId: string, data: UpdateThemeFileRequestData) {
     const form = new FormData();
     Object.entries(data).forEach(([key, value]) => form.append(key, value));
-
     await post(
       `${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/update`,
       this.withDefaults({ body: form }),
