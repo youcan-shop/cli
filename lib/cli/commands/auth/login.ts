@@ -43,7 +43,7 @@ function listenForAuthCodeCallback(): Promise<string> {
  * @param authorizationCode string
  */
 async function exchangeAuthCode(authorizationCode: string): Promise<string> {
-  const formParams = {
+  const formParams: Record<string, any> = {
     grant_type: 'authorization_code',
     client_id: config.OAUTH_CLIENT_ID,
     client_secret: config.OAUTH_CLIENT_SECRET,

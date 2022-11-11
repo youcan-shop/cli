@@ -13,7 +13,13 @@ export interface UpdateThemeFileRequestData {
   file_type: string
   file_name: string
   file_content: string
-  file_operation: 'save' | 'delete'
+  file_operation: 'save'
+}
+
+export interface DeleteThemeFileRequestData {
+  file_type: string
+  file_name: string
+  file_operation: 'delete'
 }
 
 export interface InitThemeResponse {
