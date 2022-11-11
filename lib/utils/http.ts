@@ -12,15 +12,15 @@ export const DEFAULT_HTTP_CLIENT_OPTIONS = {
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(endpoint, mergeDeepLeft(options, DEFAULT_HTTP_CLIENT_OPTIONS));
   if (!response.ok)
-    throw new Error('Failed to fetch resource', { cause: response });
+    throw new Error('Failed to fetch resource', { cause: await response.text() });
 
   return response.json() as Promise<T>;
 }
 
 export async function get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  return request<T>(endpoint, mergeDeepLeft({ method: 'GET' }, options));
+  return request<T>(endpoint, { ...options, method: 'GET' });
 }
 
 export async function post<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  return request<T>(endpoint, mergeDeepLeft({ method: 'POST' }, options));
+  return request<T>(endpoint, { ...options, method: 'POST' });
 }

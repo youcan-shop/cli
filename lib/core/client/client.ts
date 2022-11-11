@@ -8,14 +8,6 @@ import config from '@/config';
 export default class Client {
   private accessToken: string | null = null;
 
-  private readonly DEFAULT_REQUEST_OPTIONS: RequestInit = {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${this.accessToken}`,
-    },
-    hostname: config.SELLER_AREA_API_BASE_URI,
-  };
-
   public constructor() {}
 
   public setAccessToken(token: string) {
@@ -30,12 +22,21 @@ export default class Client {
     const form = new FormData();
     Object.entries(data).forEach(([key, value]) => form.append(key, value));
 
-    const { id } = await post<InitThemeResponse>('/themes/init', this.withDefaults({ body: form }));
+    const { id } = await post<InitThemeResponse>(
+      `${config.SELLER_AREA_API_BASE_URI}/themes/init`,
+      this.withDefaults({ body: form }),
+    );
 
     return id;
   }
 
   private withDefaults(override: RequestInit): RequestInit {
-    return mergeDeepLeft(override, this.DEFAULT_REQUEST_OPTIONS) as RequestInit;
+    return mergeDeepLeft(override, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+      hostname: config.SELLER_AREA_API_BASE_URI,
+    }) as RequestInit;
   }
 }

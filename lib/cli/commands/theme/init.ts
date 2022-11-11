@@ -10,6 +10,7 @@ import stdout from '@/utils/system/stdout';
 import type { InitThemeRequest } from '@/core/client/types';
 import zipFolder from '@/utils/system/zipFolder';
 import writeToFile from '@/utils/system/writeToFile';
+import pushTheme from '@/core/pushTheme';
 
 const inquiries: PromptObject[] = [
   {
