@@ -7,5 +7,5 @@ import fs from 'fs';
 */
 
 export default function writeToFile(filePath: string, content: string) {
-  return fs.writeFileSync(filePath, content, { encoding: 'utf8', flag: 'w' });
+  return fs.writeFileSync(filePath, content, { encoding: 'utf-8', flag: 'w' });
 }
