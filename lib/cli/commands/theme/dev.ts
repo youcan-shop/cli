@@ -1,10 +1,16 @@
 import { cwd } from 'process';
 import { readFileSync } from 'fs';
 import chokidar from 'chokidar';
+import kleur from 'kleur';
 import type { CLI, CommandDefinition } from '../types';
 import stdout from '@/utils/system/stdout';
 import { getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
+
+function logFileEvent(key: string, path: string) {
+  const tag = `[${kleur.bold().green(key)}]`;
+  return stdout.log(`${tag} ${path}`);
+}
 
 export default function command(cli: CLI): CommandDefinition {
   return {
@@ -32,6 +38,8 @@ export default function command(cli: CLI): CommandDefinition {
           if (!config.THEME_FILE_TYPES.includes(filetype))
             return;
 
+          logFileEvent('updated', path);
+
           cli.client.updateFile(themeId, {
             file_type: filetype,
             file_name: filename,
@@ -45,7 +53,9 @@ export default function command(cli: CLI): CommandDefinition {
           if (!config.THEME_FILE_TYPES.includes(filetype))
             return;
 
-          cli.client.updateFile(themeId, {
+          logFileEvent('deleted', path);
+
+          cli.client.deleteFile(themeId, {
             file_type: filetype,
             file_name: filename,
             file_operation: 'delete',
