@@ -1,4 +1,5 @@
 import { cwd } from 'process';
+import path from 'path';
 import type { PromptObject } from 'prompts';
 import prompts from 'prompts';
 import { fileFromPath } from 'formdata-node/file-from-path';
@@ -8,6 +9,7 @@ import cloneRepository from '@/utils/git/cloneRepository';
 import stdout from '@/utils/system/stdout';
 import type { InitThemeRequest } from '@/core/client/types';
 import zipFolder from '@/utils/system/zipFolder';
+import writeToFile from '@/utils/system/writeToFile';
 
 const inquiries: PromptObject[] = [
   {
@@ -64,6 +66,8 @@ export default function command(cli: CLI): CommandDefinition {
       const themeFolderRs = await fileFromPath(zippedTheme);
 
       const id = await cli.client.initTheme({ ...info, archive: themeFolderRs });
+      writeToFile(path.resolve(cwd(), '.youcan'), JSON.stringify({ theme_id: id }));
+
       stdout.info(`The theme has been initiated with id ${id}`);
     },
   };
