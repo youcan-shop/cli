@@ -4,8 +4,7 @@ import { mergeDeepLeft } from 'ramda';
 
 export const DEFAULT_HTTP_CLIENT_OPTIONS = {
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'multipart/form-data',
+    Accept: 'application/json',
   },
 };
 
