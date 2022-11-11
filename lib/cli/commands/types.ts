@@ -1,3 +1,6 @@
+import type { CAC } from 'cac';
+import type Client from '@/core/client';
+
 export interface CommandOptionDefinition {
   name: string
   description: string
@@ -14,4 +17,9 @@ export interface CommandDefinition {
   description: string
   action: ReturnType<any>
   options?: CommandOptionDefinition[]
+}
+
+export interface CLI {
+  handler: CAC
+  client: Client
 }

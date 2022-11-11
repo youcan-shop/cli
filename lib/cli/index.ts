@@ -9,19 +9,21 @@ const cli = {
   client: new Client(),
   handler: cac('youcan'),
 
-  registerCommand(command: CommandDefinition) {
-    const instance = this.handler
-      .command(command.name, command.description)
-      .action(command.action);
+  registerCommand(command: (cli: typeof this) => CommandDefinition) {
+    const definition = command(this);
 
-    command.aliases?.forEach(a => instance.alias(a));
-    command.options?.forEach(o => instance.option(o.name, o.description, o.config));
+    const instance = this.handler
+      .command(definition.name, definition.description)
+      .action(definition.action);
+
+    definition.aliases?.forEach(a => instance.alias(a));
+    definition.options?.forEach(o => instance.option(o.name, o.description, o.config));
   },
 
   async init() {
     await this.prepareClient();
 
-    Object.values(commands).forEach((command: CommandDefinition) => this.registerCommand(command));
+    Object.values(commands).forEach(command => this.registerCommand(command));
 
     this.handler.on('command:*', () => {
       this.handler.outputHelp();
@@ -35,11 +37,8 @@ const cli = {
     if (!existsSync(config.CLI_GLOBAL_CONFIG_DIR))
       await fspromise.mkdir(config.CLI_GLOBAL_CONFIG_DIR);
 
-    if (!existsSync(config.CLI_GLOBAL_CONFIG_PATH)) {
-      await fspromise.writeFile(config.CLI_GLOBAL_CONFIG_PATH, '', { flag: 'wx', encoding: 'utf-8' });
-
-      return;
-    }
+    if (!existsSync(config.CLI_GLOBAL_CONFIG_PATH))
+      return await fspromise.writeFile(config.CLI_GLOBAL_CONFIG_PATH, '', { flag: 'wx', encoding: 'utf-8' });
 
     const data = await fspromise
       .readFile(config.CLI_GLOBAL_CONFIG_PATH, 'utf-8')
@@ -49,7 +48,7 @@ const cli = {
       });
 
     if ('access_token' in data)
-      this.client.setAccessToken(data.token);
+      this.client.setAccessToken(data.access_token);
   },
 };
 

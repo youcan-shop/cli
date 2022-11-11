@@ -19,7 +19,7 @@ export default {
 
   OAUTH_CLIENT_ID: 8,
   OAUTH_CALLBACK_PORT: 3_000,
-  OAUTH_CALLBACK_SERVER_TIMEOUT: 10_000,
+  OAUTH_CALLBACK_SERVER_TIMEOUT: 5 * 60 * 100,
   OAUTH_CALLBACK_URL: 'http://localhost:3000/',
   OAUTH_CLIENT_SECRET: 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X',
   OAUTH_AUTH_CODE_URL: 'https://seller-area.youcan.shop/admin/oauth/authorize?response_type=code&client_id=8&redirect_url=http://localhost:3000/&state=',

@@ -1,12 +1,12 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { createServer } from 'http';
-import { promises as fspromise } from 'fs';
-import type { CommandDefinition } from '@/cli/commands/types';
+import type { CLI, CommandDefinition } from '@/cli/commands/types';
 import config from '@/config';
 import openLink from '@/utils/system/openLink';
 import stdout from '@/utils/system/stdout';
 import { post } from '@/core/http';
 import type { TokenResponse } from '@/commands/login/types';
+import writeToFile from '@/utils/system/writeToFile';
 
 /**
  * Spin up a local server to handle the OAuth redirect. Times out after 10 seconds.
@@ -62,28 +62,28 @@ async function exchangeAuthCode(authorizationCode: string): Promise<string> {
   return res.access_token;
 }
 
-const loginCommand: CommandDefinition = {
-  name: 'login',
-  group: 'auth',
-  description: 'Log into a YouCan store',
+export default function command(_cli: CLI): CommandDefinition {
+  return {
+    name: 'login',
+    group: 'auth',
+    description: 'Log into a YouCan store',
 
-  action: async () => {
-    if (!openLink(config.OAUTH_AUTH_CODE_URL)) {
-      stdout.log('Open this link in your browser to continue authentication:');
-      stdout.info(config.OAUTH_AUTH_CODE_URL);
-    }
+    action: async () => {
+      if (!openLink(config.OAUTH_AUTH_CODE_URL)) {
+        stdout.log('Open this link in your browser to continue authentication:');
+        stdout.info(config.OAUTH_AUTH_CODE_URL);
+      }
 
-    const authCode = await listenForAuthCodeCallback();
+      const authCode = await listenForAuthCodeCallback();
 
-    // TODO: don't overwrite entire config file
-    await fspromise.writeFile(
-      config.CLI_GLOBAL_CONFIG_PATH,
-      JSON.stringify({ access_token: await exchangeAuthCode(authCode) }),
-      { flag: 'w', encoding: 'utf-8' },
-    );
+      // TODO: don't overwrite entire config file
+      writeToFile(
+        config.CLI_GLOBAL_CONFIG_PATH,
+        JSON.stringify({ access_token: await exchangeAuthCode(authCode) }),
+      );
 
-    stdout.info('You have been successfully logged in.');
-  },
-};
+      stdout.info('You have been successfully logged in.');
+    },
+  };
+}
 
-export default loginCommand;
