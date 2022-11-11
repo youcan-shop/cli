@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import http from 'http';
 import fetch from 'node-fetch';
-import type { OAuthToken } from './types';
+import type { TokenResponse } from './types';
 import stdout from '@/utils/system/stdout';
 import config from '@/config';
 import { homeDir } from '@/utils/common';
@@ -55,7 +55,7 @@ async function exchangeCodeForToken(authorizationCode: string): Promise<string> 
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
-  const data = await response.json() as OAuthToken;
+  const data = await response.json() as TokenResponse;
   return data.access_token;
 }
 

@@ -6,6 +6,7 @@ specifiers:
   '@types/archiver': ^5.3.1
   '@types/file-saver': ^2.0.5
   '@types/node': ^18.11.9
+  '@types/prompts': ^2.4.1
   '@types/ramda': ^0.28.19
   '@types/rimraf': ^3.0.2
   archiver: ^5.3.1
@@ -34,7 +35,6 @@ dependencies:
   formdata-node: 5.0.0
   kleur: 4.1.5
   node-fetch: 3.2.10
-  prompts: 2.4.2
   ramda: 0.28.0
 
 devDependencies:
@@ -43,12 +43,14 @@ devDependencies:
   '@types/archiver': 5.3.1
   '@types/file-saver': 2.0.5
   '@types/node': 18.11.9
+  '@types/prompts': 2.4.1
   '@types/ramda': 0.28.19
   '@types/rimraf': 3.0.2
   bumpp: 8.2.1
   eslint: 8.27.0
   esno: 0.16.3
   pnpm: 7.14.2
+  prompts: 2.4.2
   rimraf: 3.0.2
   rollup: 3.2.5
   rollup-plugin-dts: 5.0.0_oa2candk7eitu7usnsurwiyuuu
@@ -312,6 +314,12 @@ packages:
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
+    dev: true
+
+  /@types/prompts/2.4.1:
+    resolution: {integrity: sha512-1Mqzhzi9W5KlooNE4o0JwSXGUDeQXKldbGn9NO4tpxwZbHXYd+WcKpCksG2lbhH7U9I9LigfsdVsP2QAY0lNPA==}
+    dependencies:
+      '@types/node': 18.11.9
     dev: true
 
   /@types/ramda/0.28.19:
@@ -2106,6 +2114,7 @@ packages:
   /kleur/3.0.3:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
+    dev: true
 
   /kleur/4.1.5:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
@@ -2500,6 +2509,7 @@ packages:
     dependencies:
       kleur: 3.0.3
       sisteransi: 1.0.5
+    dev: true
 
   /punycode/2.1.1:
     resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}
@@ -2725,6 +2735,7 @@ packages:
 
   /sisteransi/1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
+    dev: true
 
   /slash/3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}

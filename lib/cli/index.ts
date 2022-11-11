@@ -19,6 +19,8 @@ const cli = {
   },
 
   async init() {
+    await this.prepareClient();
+
     Object.values(commands).forEach((command: CommandDefinition) => this.registerCommand(command));
 
     this.handler.on('command:*', () => {
@@ -27,8 +29,6 @@ const cli = {
 
     this.handler.help();
     this.handler.parse();
-
-    await this.prepareClient();
   },
 
   async prepareClient() {
@@ -41,7 +41,10 @@ const cli = {
 
     const data = await fspromise
       .readFile(config.CLI_GLOBAL_CONFIG_PATH, 'utf-8')
-      .then(b => JSON.parse(b));
+      .then((b) => {
+        try { return JSON.parse(b); }
+        catch { return {}; }
+      });
 
     if ('access_token' in data)
       this.client.setAccessToken(data.token);
