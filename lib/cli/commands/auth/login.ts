@@ -1,11 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { createServer } from 'http';
+import type { TokenResponse } from './types';
 import type { CLI, CommandDefinition } from '@/cli/commands/types';
 import config from '@/config';
 import openLink from '@/utils/system/openLink';
 import stdout from '@/utils/system/stdout';
-import { post } from '@/core/http';
-import type { TokenResponse } from '@/commands/login/types';
+import { post } from '@/utils/http';
 import writeToFile from '@/utils/system/writeToFile';
 
 /**

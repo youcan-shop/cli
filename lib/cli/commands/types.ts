@@ -1,5 +1,5 @@
 import type { CAC } from 'cac';
-import type Client from '@/core/client';
+import type Client from '@/core/client/client';
 
 export interface CommandOptionDefinition {
   name: string

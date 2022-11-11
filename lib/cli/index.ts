@@ -2,7 +2,7 @@ import { existsSync, promises as fspromise } from 'fs';
 import { cac } from 'cac';
 import * as commands from './commands';
 import type { CommandDefinition } from './commands/types';
-import Client from '@/core/client';
+import Client from '@/core/client/client';
 import config from '@/config';
 
 const cli = {
