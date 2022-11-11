@@ -2,7 +2,6 @@ import { cwd } from 'process';
 import { readFileSync } from 'fs';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
-import { path } from 'ramda';
 import type { CLI, CommandDefinition } from '../types';
 import stdout from '@/utils/system/stdout';
 import { getCurrentThemeId } from '@/utils/common';
