@@ -32,8 +32,10 @@ const cli = {
   },
 
   async prepareClient() {
-    if (!existsSync(config.CLI_GLOBAL_CONFIG_PATH)) {
+    if (!existsSync(config.CLI_GLOBAL_CONFIG_DIR))
       await fspromise.mkdir(config.CLI_GLOBAL_CONFIG_DIR);
+
+    if (!existsSync(config.CLI_GLOBAL_CONFIG_PATH)) {
       await fspromise.writeFile(config.CLI_GLOBAL_CONFIG_PATH, '', { flag: 'wx', encoding: 'utf-8' });
 
       return;
