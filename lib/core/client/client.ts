@@ -1,7 +1,7 @@
 import { FormData } from 'formdata-node';
 import type { RequestInit } from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';
-import type { InitThemeRequest as InitThemeRequestData, InitThemeResponse } from './types';
+import type { InitThemeRequest as InitThemeRequestData, InitThemeResponse, UpdateThemeFileRequestData } from './types';
 import { post } from '@/utils/http';
 import config from '@/config';
 
@@ -28,6 +28,18 @@ export default class Client {
     );
 
     return id;
+  }
+
+  public async updateFile(themeId: string, data: UpdateThemeFileRequestData) {
+    const form = new FormData();
+    console.log(data);
+    return;
+    Object.entries(data).forEach(([key, value]) => form.append(key, value));
+
+    await post(
+      `${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/update`,
+      this.withDefaults({ body: form }),
+    );
   }
 
   private withDefaults(override: RequestInit): RequestInit {
