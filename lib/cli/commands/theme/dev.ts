@@ -88,7 +88,7 @@ export default function command(cli: CLI): CommandDefinition {
             logFileEvent({
               path,
               event,
-              size: stats!.size,
+              size: stats?.size ?? 0,
               roundtrip: new Date().getTime() - start,
             });
           }
@@ -97,7 +97,7 @@ export default function command(cli: CLI): CommandDefinition {
             logFileEvent({
               path,
               event: 'error',
-              size: stats!.size,
+              size: stats?.size ?? 0,
               roundtrip: new Date().getTime() - start,
             });
 
