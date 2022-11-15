@@ -78,6 +78,7 @@ export default function command(cli: CLI): CommandDefinition {
             socket.emit('theme:update', {
               theme_id: themeId,
             });
+
             switch (event) {
               case 'add':
               case 'change':
