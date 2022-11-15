@@ -5,3 +5,4 @@ export { default as LogoutCommand } from './auth/logout';
 // theme
 export { default as InitCommand } from './theme/init';
 export { default as DevCommand } from './theme/dev';
+export { default as PreviewCommand } from './theme/preview';

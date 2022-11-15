@@ -2,6 +2,7 @@ import os from 'os';
 import type { PathLike } from 'fs';
 import fs from 'fs';
 import path from 'path';
+import { cwd } from 'process';
 export const homeDir = os.homedir();
 
 /**
@@ -27,3 +28,4 @@ export async function getCurrentThemeId(dir: PathLike): Promise<string> {
   return await fs.promises.readFile(filepath, 'utf-8')
     .then(b => JSON.parse(b).theme_id);
 }
+
