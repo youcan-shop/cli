@@ -2,7 +2,6 @@ import os from 'os';
 import type { PathLike } from 'fs';
 import fs from 'fs';
 import path from 'path';
-import { cwd } from 'process';
 export const homeDir = os.homedir();
 
 /**
