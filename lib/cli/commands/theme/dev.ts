@@ -1,8 +1,8 @@
 import { cwd } from 'process';
-import { readFileSync } from 'fs';
 import { clear } from 'console';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
+import { fileFromPathSync } from 'formdata-node/file-from-path';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
@@ -71,7 +71,7 @@ export default function command(cli: CLI): CommandDefinition {
                   file_type: filetype,
                   file_name: filename,
                   file_operation: 'save',
-                  file_content: readFileSync(path, { encoding: 'utf-8', flag: 'r' }),
+                  file_content: fileFromPathSync(path),
                 });
 
                 break;
