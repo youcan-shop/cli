@@ -76,9 +76,7 @@ export default function command(cli: CLI): CommandDefinition {
             if (!['add', 'change', 'unlink'].includes(event))
               return;
 
-            socket.emit('theme:update', {
-              theme_id: themeId,
-            });
+            socket.emit('theme-change');
 
             switch (event) {
               case 'add':
