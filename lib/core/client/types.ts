@@ -12,7 +12,7 @@ export interface InitThemeRequest {
 export interface UpdateThemeFileRequestData {
   file_type: string
   file_name: string
-  file_content: string
+  file_content: File
   file_operation: 'save'
 }
 
