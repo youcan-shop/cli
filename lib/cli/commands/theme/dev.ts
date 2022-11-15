@@ -50,6 +50,7 @@ export default function command(cli: CLI): CommandDefinition {
 
       if (!themeId)
         return stdout.error('No theme detected in the current directory.');
+      socket.emit('theme:dev', { themeId });
 
       clear();
       stdout.log('Watching theme files for changes.. \n');
@@ -74,7 +75,9 @@ export default function command(cli: CLI): CommandDefinition {
             if (!['add', 'change', 'unlink'].includes(event))
               return;
 
-            socket.emit('theme-change');
+            socket.emit('theme:update', {
+              theme_id: themeId,
+            });
 
             switch (event) {
               case 'add':
