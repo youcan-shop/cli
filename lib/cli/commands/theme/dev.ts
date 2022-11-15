@@ -2,12 +2,19 @@ import { cwd } from 'process';
 import { clear } from 'console';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
+import io from 'socket.io-client';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
 import { getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
+
+const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
+
+socket.on('connect', () => {
+  stdout.log('Connected to preview server');
+});
 
 const sizeFormatter = Intl.NumberFormat('en', {
   notation: 'compact',
@@ -66,6 +73,8 @@ export default function command(cli: CLI): CommandDefinition {
 
             if (!['add', 'change', 'unlink'].includes(event))
               return;
+
+            socket.emit('theme-change');
 
             switch (event) {
               case 'add':
