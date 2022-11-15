@@ -20,5 +20,5 @@ export default {
 
   THEME_FILE_TYPES: ['layouts', 'templates', 'sections', 'locales', 'assets', 'snippets'],
 
-  PREVIEW_SERVER_PORT: 7565,
+  PREVIEW_SERVER_PORT: 7564,
 };
