@@ -2,7 +2,7 @@ import { FormData } from 'formdata-node';
 import type { RequestInit } from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';
 import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, UpdateThemeFileRequestData } from './types';
-import { post } from '@/utils/http';
+import { get, post } from '@/utils/http';
 import config from '@/config';
 
 export default class Client {
@@ -28,6 +28,14 @@ export default class Client {
     );
 
     return id;
+  }
+
+  public async listThemes() {
+    return await get(`${config.SELLER_AREA_API_BASE_URI}/themes`, this.withDefaults({}));
+  }
+
+  public async deleteTheme(themeId: string) {
+    return await post(`${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/delete`, this.withDefaults({}));
   }
 
   public async updateFile(themeId: string, data: UpdateThemeFileRequestData) {
