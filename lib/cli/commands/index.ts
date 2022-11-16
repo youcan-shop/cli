@@ -8,3 +8,4 @@ export { default as DevCommand } from './theme/dev';
 export { default as DeleteCommand } from './theme/delete';
 export { default as PullCommand } from './theme/pull';
 export { default as PreviewCommand } from './theme/preview';
+export { default as DeleteCommand } from './theme/delete';
