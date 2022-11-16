@@ -26,8 +26,8 @@ export default function command(cli: CLI): CommandDefinition {
         message: 'Select a theme to delete',
         choices,
       });
-
-      cli.client.deleteTheme(themeId);
+      if (!themeId) return stdout.error('No theme selected');
+      await cli.client.deleteTheme(themeId);
       stdout.info('Theme deleted');
     },
   };
