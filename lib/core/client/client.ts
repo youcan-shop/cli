@@ -6,12 +6,16 @@ import { get, post } from '@/utils/http';
 import config from '@/config';
 
 export default class Client {
-  public accessToken: string | null = null;
+  private accessToken: string | null = null;
 
   public constructor() {}
 
   public setAccessToken(token: string) {
     this.accessToken = token;
+  }
+
+  public getAccessToken() {
+    return this.accessToken;
   }
 
   public isAuthenticated(): boolean {

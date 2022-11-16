@@ -38,7 +38,7 @@ export default function command(cli: CLI): CommandDefinition {
 
       stdout.info('Pulling your theme...');
       await downloadFile(`${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}`, fileNameZip, {
-        Authorization: `Bearer ${cli.client.accessToken}`,
+        Authorization: `Bearer ${cli.client.getAccessToken()}`,
         Accept: 'application/json',
       });
 
