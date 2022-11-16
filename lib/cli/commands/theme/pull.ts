@@ -1,10 +1,13 @@
+import { cwd } from 'process';
 import prompts from 'prompts';
 import decompress from 'decompress';
 import type { CLI, CommandDefinition } from '../types';
 import type { listThemesResponse } from './types';
 import stdout from '@/utils/system/stdout';
-import { downloadFile } from '@/utils/system/download';
-import config from '@/config';
+import { saveHttpFile } from '@/utils/system/saveFile';
+import { getCurrentThemeId } from '@/utils/common';
+import writeToFile from '@/utils/system/writeToFile';
+import deleteFile from '@/utils/system/deleteFile';
 
 export default function command(cli: CLI): CommandDefinition {
   return {
@@ -23,29 +26,42 @@ export default function command(cli: CLI): CommandDefinition {
         title: theme.name,
         value: theme.id,
       }));
+      let themeId;
+      const cwdThemeId = await getCurrentThemeId(cwd());
 
-      const { themeId } = await prompts({
-        type: 'select',
-        name: 'themeId',
-        message: 'Select a theme to pull',
-        choices,
-      });
+      stdout.log(`${cwdThemeId}`);
 
-      if (!themeId) return stdout.error('No theme selected');
+      if (!cwdThemeId) {
+        const promt = await prompts({
+          type: 'select',
+          name: 'themeId',
+          message: 'Select a theme to pull',
+          choices,
+        });
+        themeId = promt.themeId;
+      }
+      else {
+        themeId = cwdThemeId;
+      }
+
+      if (!themeId) return stdout.error('No theme found');
 
       const fileName = `${themeId}`;
       const fileNameZip = `${fileName}.zip`;
 
       stdout.info('Pulling your theme...');
-      await downloadFile(`${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}`, fileNameZip, {
-        Authorization: `Bearer ${cli.client.getAccessToken()}`,
-        Accept: 'application/json',
-      });
+      const response = await cli.client.pullTheme(themeId);
+      await saveHttpFile(response, fileNameZip);
 
       stdout.info('Unpacking...');
-      decompress(fileNameZip, fileName).then(() => {
-        stdout.info(`Theme has been pulled to ${fileName}`);
-      });
+      const unpackingFolder = cwdThemeId ? cwd() : `${cwd()}/${fileName}`;
+      await decompress(fileNameZip, unpackingFolder);
+
+      deleteFile(fileNameZip);
+
+      writeToFile(`${unpackingFolder}/.youcan`, JSON.stringify({ theme_id: themeId }));
+
+      stdout.info(`Theme has been pulled to ${fileName}`);
     },
   };
 }

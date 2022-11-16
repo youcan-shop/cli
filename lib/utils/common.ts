@@ -18,11 +18,11 @@ export async function getUserToken(): Promise<string> {
   return JSON.parse(data).token;
 }
 
-export async function getCurrentThemeId(dir: PathLike): Promise<string> {
+export async function getCurrentThemeId(dir: PathLike): Promise<string | null> {
   const filepath = path.resolve(dir.toString(), '.youcan');
 
   if (!fs.existsSync(filepath))
-    throw new Error('No theme detected in the current directory');
+    return null;
 
   return await fs.promises.readFile(filepath, 'utf-8')
     .then(b => JSON.parse(b).theme_id);

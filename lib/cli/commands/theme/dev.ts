@@ -41,6 +41,9 @@ export default function command(cli: CLI): CommandDefinition {
 
       const themeId = await getCurrentThemeId(cwd());
 
+      if (!themeId)
+        return stdout.error('No theme detected in the current directory.');
+
       clear();
       stdout.log('Watching theme files for changes.. \n');
 
