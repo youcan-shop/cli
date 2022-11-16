@@ -2,11 +2,8 @@ import { cwd } from 'process';
 import { clear } from 'console';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
-<<<<<<< HEAD
 import io from 'socket.io-client';
-=======
 import { fileFromPathSync } from 'formdata-node/file-from-path';
->>>>>>> 5432ef3 (cli > update file upload method (#11))
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';

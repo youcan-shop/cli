@@ -4,3 +4,16 @@ export interface FileEventOptions {
   roundtrip: number
   event: string
 }
+
+export interface ThemeMetaData {
+  id: string
+  name: string
+  size: number
+  version: string
+  live: boolean
+}
+
+export interface listThemesResponse {
+  dev: ThemeMetaData[]
+  published: ThemeMetaData[]
+}

@@ -6,3 +6,4 @@ export { default as LogoutCommand } from './auth/logout';
 export { default as InitCommand } from './theme/init';
 export { default as DevCommand } from './theme/dev';
 export { default as PreviewCommand } from './theme/preview';
+export { default as DeleteCommand } from './theme/delete';
