@@ -29,8 +29,6 @@ export default function command(cli: CLI): CommandDefinition {
       let themeId;
       const cwdThemeId = await getCurrentThemeId(cwd());
 
-      stdout.log(`${cwdThemeId}`);
-
       if (!cwdThemeId) {
         const promt = await prompts({
           type: 'select',
