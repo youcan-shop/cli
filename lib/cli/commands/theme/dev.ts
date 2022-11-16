@@ -4,7 +4,6 @@ import chokidar from 'chokidar';
 import kleur from 'kleur';
 import io from 'socket.io-client';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
-import io from 'socket.io-client';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';

@@ -1,15 +1,11 @@
 import { createServer } from 'http';
-import { cwd } from 'process';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
-import fetch from 'node-fetch';
 import type { CLI, CommandDefinition } from '@/cli/commands/types';
 import stdout from '@/utils/system/stdout';
 import config from '@/config';
 import openLink from '@/utils/system/openLink';
 import previewPage from '@/pages/preview';
-import { get } from '@/utils/http';
-import { getCurrentThemeId } from '@/utils/common';
 
 async function listenForThemeChange() {
   const httpServer = createServer(async (request, response) => {
