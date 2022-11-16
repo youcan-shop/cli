@@ -1,7 +1,10 @@
 import prompts from 'prompts';
+import decompress from 'decompress';
 import type { CLI, CommandDefinition } from '../types';
 import type { listThemesResponse } from './types';
 import stdout from '@/utils/system/stdout';
+import { downloadFile } from '@/utils/system/download';
+import config from '@/config';
 
 export default function command(cli: CLI): CommandDefinition {
   return {
@@ -27,9 +30,22 @@ export default function command(cli: CLI): CommandDefinition {
         message: 'Select a theme to pull',
         choices,
       });
+
       if (!themeId) return stdout.error('No theme selected');
 
-      await cli.client.deleteTheme(themeId);
+      const fileName = `${themeId}`;
+      const fileNameZip = `${fileName}.zip`;
+
+      stdout.info('Pulling your theme...');
+      await downloadFile(`${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}`, fileNameZip, {
+        Authorization: `Bearer ${cli.client.accessToken}`,
+        Accept: 'application/json',
+      });
+
+      stdout.info('Unpacking...');
+      decompress(fileNameZip, fileName).then(() => {
+        stdout.info(`Theme has been pulled to ${fileName}`);
+      });
     },
   };
 }

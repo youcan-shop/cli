@@ -6,7 +6,7 @@ import { get, post } from '@/utils/http';
 import config from '@/config';
 
 export default class Client {
-  private accessToken: string | null = null;
+  public accessToken: string | null = null;
 
   public constructor() {}
 
