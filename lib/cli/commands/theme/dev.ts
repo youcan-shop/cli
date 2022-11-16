@@ -4,6 +4,7 @@ import chokidar from 'chokidar';
 import kleur from 'kleur';
 import io from 'socket.io-client';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
+import io from 'socket.io-client';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
@@ -45,6 +46,11 @@ export default function command(cli: CLI): CommandDefinition {
     action: async () => {
       if (!cli.client.isAuthenticated())
         return stdout.error('You must be logged into a store to use this command.');
+      const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
+
+      socket.on('connect', () => {
+        stdout.log('Connected to preview server');
+      });
 
       const themeId = await getCurrentThemeId(cwd());
 
