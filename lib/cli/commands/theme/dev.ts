@@ -9,6 +9,7 @@ import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
 import { getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
+import previewTheme from '@/core/themes/preview';
 
 const sizeFormatter = Intl.NumberFormat('en', {
   notation: 'compact',
@@ -35,8 +36,10 @@ export default function command(cli: CLI): CommandDefinition {
     name: 'dev',
     group: 'theme',
     description: 'starts a dev server and watches over the current directory',
-
-    action: async () => {
+    options: [
+      { name: '-p, --preview', description: 'opens a preview window' },
+    ],
+    action: async (options: Record<string, string>) => {
       if (!cli.client.isAuthenticated())
         return stdout.error('You must be logged into a store to use this command.');
 
@@ -45,12 +48,13 @@ export default function command(cli: CLI): CommandDefinition {
       if (!themeId)
         return stdout.error('No theme detected in the current directory.');
 
-      const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
+      if (options.preview)
+        previewTheme(themeId);
 
+      const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
       socket.on('connect', () => {
         stdout.log('Connected to preview server');
       });
-
       socket.emit('theme:dev', { themeId });
 
       clear();
