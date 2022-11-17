@@ -27,3 +27,4 @@ export async function getCurrentThemeId(dir: PathLike): Promise<string | null> {
   return await fs.promises.readFile(filepath, 'utf-8')
     .then(b => JSON.parse(b).theme_id);
 }
+

@@ -3,11 +3,13 @@ import { clear } from 'console';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
+import io from 'socket.io-client';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
 import { getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
+import previewTheme from '@/core/themes/preview';
 
 const sizeFormatter = Intl.NumberFormat('en', {
   notation: 'compact',
@@ -29,13 +31,25 @@ function logFileEvent(options: FileEventOptions) {
   return stdout.log(`${tag} ${kleur.underline().white(options.path)} - ${sizeFormatter.format(options.size)} | ${options.roundtrip}ms \n`);
 }
 
+function connectPreviewServer() {
+  const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
+  socket.on('connect', () => {
+    stdout.log('Connected to preview server');
+  });
+  return socket;
+}
+
 export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'dev',
     group: 'theme',
     description: 'starts a dev server and watches over the current directory',
+    options: [
+      { name: '-p, --preview', description: 'opens a preview window' },
+    ],
+    action: async (options: Record<string, string>) => {
+      let socket: ReturnType<typeof io>;
 
-    action: async () => {
       if (!cli.client.isAuthenticated())
         return stdout.error('You must be logged into a store to use this command.');
 
@@ -43,6 +57,12 @@ export default function command(cli: CLI): CommandDefinition {
 
       if (!themeId)
         return stdout.error('No theme detected in the current directory.');
+
+      if (options.preview) {
+        socket = connectPreviewServer();
+        socket.emit('theme:dev', { themeId });
+        previewTheme(themeId);
+      }
 
       clear();
       stdout.log('Watching theme files for changes.. \n');
@@ -87,6 +107,8 @@ export default function command(cli: CLI): CommandDefinition {
 
                 break;
             }
+
+            if (socket) socket.emit('theme:update', { themeId });
 
             logFileEvent({
               path,
