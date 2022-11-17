@@ -34,6 +34,14 @@ export default class Client {
     return id;
   }
 
+  public async listThemes() {
+    return await get(`${config.SELLER_AREA_API_BASE_URI}/themes`, this.withDefaults({}));
+  }
+
+  public async deleteTheme(themeId: string) {
+    return await post(`${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/delete`, this.withDefaults({}));
+  }
+
   public async updateFile(themeId: string, data: UpdateThemeFileRequestData) {
     const form = new FormData();
     Object.entries(data).forEach(([key, value]) => form.append(key, value));
