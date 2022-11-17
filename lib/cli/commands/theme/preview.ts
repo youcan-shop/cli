@@ -25,9 +25,11 @@ async function listenForThemeChange(themeId: string) {
   const previewPage = await openPreviewPageInPuppeteer(themeId);
 
   io.on('connection', (socket: Socket) => {
-    socket.on('theme:update', () => {
+    socket.on('theme:update', async () => {
       stdout.log('Theme change detected, reloading...');
-      previewPage.reload();
+      const start = Date.now();
+      await previewPage.reload();
+      stdout.info(`Reloaded in ${Date.now() - start}ms`);
     });
   });
 

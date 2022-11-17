@@ -76,10 +76,6 @@ export default function command(cli: CLI): CommandDefinition {
             if (!['add', 'change', 'unlink'].includes(event))
               return;
 
-            socket.emit('theme:update', {
-              theme_id: themeId,
-            });
-
             switch (event) {
               case 'add':
               case 'change':
@@ -100,6 +96,10 @@ export default function command(cli: CLI): CommandDefinition {
 
                 break;
             }
+
+            socket.emit('theme:update', {
+              theme_id: themeId,
+            });
 
             logFileEvent({
               path,

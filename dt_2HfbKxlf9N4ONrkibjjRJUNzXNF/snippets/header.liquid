@@ -1,0 +1,42 @@
+{%-style-%}
+.custom-navbar{
+    background-color: {{ settings.header-background-color.hex }}!important;
+}
+{%-endstyle-%}
+
+<!-- Start Header/Navigation -->
+<nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Furni navigation bar">
+
+    <div class="container">
+        <a class="navbar-brand" href="/">
+        {%-if settings.header-logo-%}
+            {% assign store_name = store.name %}
+            {{ settings.header-logo.src | image_tag: width:50, alt:store_name }}
+        {%-else-%}
+            {{ store.name }}<span>.</span>
+        {%-endif-%}
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni"
+            aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsFurni">
+            <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+                {% for item in main-link-list.links %}
+                    <li class="{%-if item.active-%}nav-item active{%-endif-%}"><a class="nav-link" href="{{ item.url }}">{{ item.title }}</a></li>
+                {% endfor %}
+            </ul>
+
+            <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+                {%-comment-%}
+                <li><a class="nav-link" href="#"><img src="{{ 'user.svg' | asset_url }}"></a></li>
+                {%-endcomment-%}
+                <li><a class="nav-link" href="/"><img src="{{ 'cart.svg' | asset_url }}"></a></li>
+            </ul>
+        </div>
+    </div>
+
+</nav>
+<!-- End Header/Navigation -->
