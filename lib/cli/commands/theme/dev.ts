@@ -31,6 +31,14 @@ function logFileEvent(options: FileEventOptions) {
   return stdout.log(`${tag} ${kleur.underline().white(options.path)} - ${sizeFormatter.format(options.size)} | ${options.roundtrip}ms \n`);
 }
 
+function connectPreviewServer() {
+  const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
+  socket.on('connect', () => {
+    stdout.log('Connected to preview server');
+  });
+  return socket;
+}
+
 export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'dev',
@@ -40,6 +48,8 @@ export default function command(cli: CLI): CommandDefinition {
       { name: '-p, --preview', description: 'opens a preview window' },
     ],
     action: async (options: Record<string, string>) => {
+      let socket: ReturnType<typeof io>;
+
       if (!cli.client.isAuthenticated())
         return stdout.error('You must be logged into a store to use this command.');
 
@@ -48,14 +58,11 @@ export default function command(cli: CLI): CommandDefinition {
       if (!themeId)
         return stdout.error('No theme detected in the current directory.');
 
-      if (options.preview)
+      if (options.preview) {
+        socket = connectPreviewServer();
+        socket.emit('theme:dev', { themeId });
         previewTheme(themeId);
-
-      const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
-      socket.on('connect', () => {
-        stdout.log('Connected to preview server');
-      });
-      socket.emit('theme:dev', { themeId });
+      }
 
       clear();
       stdout.log('Watching theme files for changes.. \n');
@@ -101,9 +108,7 @@ export default function command(cli: CLI): CommandDefinition {
                 break;
             }
 
-            socket.emit('theme:update', {
-              theme_id: themeId,
-            });
+            if (socket) socket.emit('theme:update', { themeId });
 
             logFileEvent({
               path,

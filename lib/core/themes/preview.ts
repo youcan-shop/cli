@@ -11,8 +11,12 @@ async function openPreviewPage(themeId: string) {
     defaultViewport: null,
     userDataDir: '/tmp/youcan_puppeteer',
   });
+  browser.on('disconnected', () => {
+    stdout.info('Browser closed');
+    return process.exit(0);
+  });
   const page = await browser.newPage();
-  await page.goto(`https://seller-area.youcan.shop/admin/themes/${themeId}/preview?template=index`);
+  await page.goto(`${config.SELLER_AREA_WEB_BASE_URI}/admin/themes/${themeId}/preview?template=index`);
   return page;
 }
 
