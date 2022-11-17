@@ -28,7 +28,7 @@ async function listenForThemeChange(themeId: string) {
     socket.on('theme:update', async () => {
       stdout.log('Theme change detected, reloading...');
       const start = Date.now();
-      await previewPage.reload();
+      await previewPage.reload({ waitUntil: 'domcontentloaded' });
       stdout.info(`Reloaded in ${Date.now() - start}ms`);
     });
   });
