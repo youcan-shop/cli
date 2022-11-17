@@ -1,0 +1,89 @@
+<!-- Start Product Section -->
+<div class="product-section">
+    <div class="container">
+        <div class="row">
+        {%-for block in section.blocks-%}
+            {%-case block.type-%}
+                {%-when 'first-column'-%}
+                <!-- Start Column 1 -->
+                <div class="col-md-12 col-lg-3 mb-5 mb-lg-0" {{ block.youcan_attributes }}>
+                    <h2 class="mb-4 section-title">{{ block.settings.title }}</h2>
+                    <p class="mb-4">{{ block.settings.description }}</p>
+                    <p><a href="{{ block.settings.cta-button-link }}" class="btn">{{ block.settings.cta-button-text }}</a></p>
+                </div> 
+                <!-- End Column 1 -->
+
+                {%-when 'product'-%}
+                {%-if block.settings.product-%}
+                    <!-- Start Product -->
+                    <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0" {{ block.youcan_attributes }}>
+                        <a class="product-item" href="{{ block.settings.product.url }}">
+                            <img onerror="this.src = '{{ 'product-1.png' | asset_url }}'" src="{{ block.settings.product.thumbnail | asset_url }}" class="img-fluid product-thumbnail">
+                            <h3 class="product-title">{{ block.settings.product.name }}</h3>
+                            <strong class="product-price">{{ block.settings.product.price | money }}</strong>
+
+                            <span class="icon-cross">
+                                <img src="{{ 'cross.svg' | asset_url }}" class="img-fluid">
+                            </span>
+                        </a>
+                    </div> 
+                    <!-- End Product -->
+                {%-endif-%}
+
+            {%-endcase-%}
+        {%-endfor-%}
+
+        </div>
+    </div>
+</div>
+<!-- End Product Section -->
+
+{%-schema-%}
+{
+    "label": "Discover products",
+    "blocks": [
+        {
+            "label": "Left block",
+            "type": "first-column",
+            "settings": [
+                {
+                    "type": "text",
+                    "id": "title",
+                    "label": "Title",
+                    "default": "Crafted with excellent material."
+                },
+                {
+                    "type": "text",
+                    "id": "description",
+                    "label": "description",
+                    "default": "Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique."
+                },
+                {
+                    "type": "text",
+                    "id": "cta-button-text",
+                    "label": "CTA button text",
+                    "default": "Explore"
+                },
+                {
+                    "type": "url",
+                    "id": "cta-button-link",
+                    "label": "CTA button link",
+                    "default": "/collections"
+                }
+            ]
+        },
+        {
+            "label": "Product",
+            "limit": 3,
+            "type": "product",
+            "settings": [
+                {
+                    "type": "product",
+                    "id": "product",
+                    "label": "Product"
+                }
+            ]
+        }
+    ]
+}
+{%-endschema-%}

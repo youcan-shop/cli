@@ -1,0 +1,87 @@
+{%-style-%}
+.hero{
+    background-color: {{ section.settings.hero-background-color.hex }}!important;
+}
+{%-endstyle-%}
+
+<div class="hero">
+	<div class="container">
+		<div class="row justify-content-between">
+			<div class="col-lg-5">
+				<div class="intro-excerpt">
+					<h1>{{ section.settings.hero-title }}</h1>
+					<p class="mb-4">{{ section.settings.hero-description }}</p>
+					<p>
+                        <a href="{{ section.settings.hero-cta-button-link }}" class="btn btn-secondary me-2">{{ section.settings.hero-cta-button-text }}</a>
+                        <a href="{{ section.settings.hero-cta-secondary-link }}" class="btn btn-white-outline">{{ section.settings.hero-cta-secondary-text }}</a>
+                    </p>
+				</div>
+			</div>
+			<div class="col-lg-7">
+				<div class="hero-img-wrap">
+                        {%-if section.settings.hero-image-%}
+                            <img src="{{ section.settings.hero-image.src }}" class="img-fluid">
+                        {%-else-%}
+                            <img src="{{ 'couch.png' | asset_url }}" class="img-fluid">
+                        {%-endif-%}
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{%-schema-%}
+{
+	"label": "Hero section",
+    "settings": [
+        {
+            "type": "color",
+            "id": "hero-background-color",
+            "label": "Hero background color",
+            "default": "#a3a3a3"
+        },
+        {
+            "type": "text",
+            "id": "hero-title",
+            "label": "Hero title",
+            "default": "ooooos"
+        },
+        {
+            "type": "richtext",
+            "id": "hero-description",
+            "label": "Hero description",
+            "default": "Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor tristique."
+        },
+        {
+            "type": "text",
+            "id": "hero-cta-button-text",
+            "label": "CTA button text",
+            "default": "code now"
+        },
+        {
+            "type": "url",
+            "id": "hero-cta-button-link",
+            "label": "CTA button link",
+            "default": "/collections"
+        },
+        {
+            "type": "text",
+            "id": "hero-cta-secondary-text",
+            "label": "CTA secondary text",
+            "default": "Explore me"
+        },
+        {
+            "type": "url",
+            "id": "hero-cta-secondary-link",
+            "label": "CTA secondary link",
+            "default": "javascript:window.scrollTo(0, 600);"
+        },
+        {
+            "type": "image_picker",
+            "id": "hero-image",
+            "label": "Hero Image"
+        }
+    ]
+}
+{%-endschema-%}

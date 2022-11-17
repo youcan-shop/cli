@@ -1,0 +1,124 @@
+<!-- Start Footer Section -->
+<footer class="footer-section">
+    <div class="container relative">
+
+        <div class="sofa-img">
+            {%-if settings.footer-pre-image-%}
+                {{ settings.footer-pre-image.src | image_tag: alt:store_name }}
+            {%-else-%}
+                <img src="{{ 'sofa.png' | asset_url }}" alt="Sofa" class="img-fluid">
+            {%-endif-%}
+        </div>
+
+        {%-comment-%}
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="subscription-form">
+                    <h3 class="d-flex align-items-center"><span class="me-1"><img src="{{ 'envelope-outline.svg' | asset_url }}"
+                                alt="Image" class="img-fluid"></span><span>Subscribe to Newsletter</span></h3>
+
+                    <form action="#" class="row g-3">
+                        <div class="col-auto">
+                            <input type="text" class="form-control" placeholder="Enter your name">
+                        </div>
+                        <div class="col-auto">
+                            <input type="email" class="form-control" placeholder="Enter your email">
+                        </div>
+                        <div class="col-auto">
+                            <button class="btn btn-primary">
+                                <span class="fa fa-paper-plane"></span>
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        {%-endcomment-%}
+
+        <div class="row g-5 mb-5">
+            <div class="col-lg-4">
+                <div class="mb-4 footer-logo-wrap">
+                    <a href="/" class="footer-logo">
+                        {%-if settings.footer-logo-%}
+                            {% assign store_name = store.name %}
+                            {{ settings.footer-logo.src | image_tag: width:50, alt:store_name }}
+                        {%-else-%}
+                            {{ store.name }}<span>.</span>
+                        {%-endif-%}
+                    </a>
+                </div>
+                <p class="mb-4">
+                    {%-if settings.footer-store-description-%}
+                        {{ settings.footer-store-description }}
+                    {%-else-%}
+                        {{ store.description }}
+                    {%-endif-%}
+                </p>
+
+                <ul class="list-unstyled custom-social">
+                    {%-if settings.footer-facebook-%}
+                        <li><a href="{{ settings.footer-facebook }}"><span class="fa fa-brands fa-facebook-f"></span></a></li>
+                    {%-endif-%}
+
+                    {%-if settings.footer-twitter-%}
+                        <li><a href="{{ settings.footer-twitter }}"><span class="fa fa-brands fa-twitter"></span></a></li>
+                    {%-endif-%}
+
+                    {%-if settings.footer-instagram-%}
+                        <li><a href="{{ settings.footer-instagram }}"><span class="fa fa-brands fa-instagram"></span></a></li>
+                    {%-endif-%}
+
+                    {%-if settings.footer-linkedin-%}
+                        <li><a href="{{ settings.footer-linkedin }}"><span class="fa fa-brands fa-linkedin"></span></a></li>
+                    {%-endif-%}
+                </ul>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="row links-wrap">
+                    <div class="col-6 col-sm-6 col-md-3">
+                        <ul class="list-unstyled">
+                        {%-for item in main-link-list.links-%}
+                            <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+                        {%-endfor-%}
+                        </ul>
+                    </div>
+
+                    {%-for linklist in link-lists-%}
+                        {%-if linklist.links | count > 0  and linklist != main-link-list-%}
+                            <div class="col-6 col-sm-6 col-md-3">
+                                <ul class="list-unstyled">
+                                {%-for item in linklist.links-%}
+                                    <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+                                {%-endfor-%}
+                                </ul>
+                            </div>
+                        {%-endif-%}
+                    {%-endfor-%}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="border-top copyright">
+            <div class="row pt-4">
+                <div class="col-lg-6">
+                    <p class="mb-2 text-center text-lg-start">{{ settings.footer-copyright }}</p>
+                </div>
+
+                {%-comment-%}
+                <div class="col-lg-6 text-center text-lg-end">
+                    <ul class="list-unstyled d-inline-flex ms-auto">
+                        <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                {%-endcomment-%}
+
+            </div>
+        </div>
+
+    </div>
+</footer>
+<!-- End Footer Section -->
