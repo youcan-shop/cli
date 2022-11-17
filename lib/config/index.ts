@@ -18,5 +18,5 @@ export default {
   CLI_GLOBAL_CONFIG_DIR: path.resolve(homedir(), '.youcan'),
   CLI_GLOBAL_CONFIG_PATH: path.resolve(homedir(), '.youcan', 'config.json'),
 
-  THEME_FILE_TYPES: ['layouts', 'templates', 'sections', 'locales', 'assets', 'snippets'],
+  THEME_FILE_TYPES: ['layouts', 'templates', 'sections', 'locales', 'assets', 'snippets', 'config'],
 };

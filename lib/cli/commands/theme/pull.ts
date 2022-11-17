@@ -38,9 +38,8 @@ export default function command(cli: CLI): CommandDefinition {
         });
         themeId = promt.themeId;
       }
-      else {
-        themeId = cwdThemeId;
-      }
+
+      themeId = themeId || cwdThemeId;
 
       if (!themeId) return stdout.error('No theme found');
 
