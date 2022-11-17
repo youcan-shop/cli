@@ -1,27 +1,33 @@
 import { createServer } from 'http';
+import { cwd } from 'process';
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
+import puppeteer from 'puppeteer';
 import type { CLI, CommandDefinition } from '@/cli/commands/types';
 import stdout from '@/utils/system/stdout';
 import config from '@/config';
-import openLink from '@/utils/system/openLink';
-import previewPage from '@/pages/preview';
+import { getCurrentThemeId } from '@/utils/common';
 
-async function listenForThemeChange() {
-  const httpServer = createServer(async (request, response) => {
-    response.writeHead(200, {
-      'Content-Type': 'text/html',
-    },
-    );
-
-    response.end(previewPage);
+async function openPreviewPageInPuppeteer(themeId: string) {
+  const browser = await puppeteer.launch({
+    headless: false,
+    defaultViewport: null,
   });
+  const page = await browser.newPage();
+  await page.goto(`https://seller-area.youcan.shop/admin/themes/${themeId}/preview?template=index`);
+  return page;
+}
+
+async function listenForThemeChange(themeId: string) {
+  const httpServer = createServer();
   const io = new Server(httpServer);
 
+  const previewPage = await openPreviewPageInPuppeteer(themeId);
+
   io.on('connection', (socket: Socket) => {
-    socket.on('theme:update', (data: any) => {
+    socket.on('theme:update', () => {
       stdout.log('Theme change detected, reloading...');
-      io.emit('theme:reload', data);
+      previewPage.reload();
     });
   });
 
@@ -39,10 +45,14 @@ export default function command(cli: CLI): CommandDefinition {
       if (!cli.client.isAuthenticated())
         return stdout.error('You must be logged into a store to use this command.');
 
-      openLink(`http://localhost:${config.PREVIEW_SERVER_PORT}`);
-      listenForThemeChange();
+      const themeId = await getCurrentThemeId(cwd());
 
-      stdout.info('The preview link is:');
+      if (!themeId)
+        return stdout.error('No theme detected in the current directory.');
+
+      listenForThemeChange(themeId);
+
+      stdout.info('Preview browser opened, waiting for theme changes...');
     },
   };
 }

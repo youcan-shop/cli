@@ -10,12 +10,6 @@ import stdout from '@/utils/system/stdout';
 import { getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
 
-const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
-
-socket.on('connect', () => {
-  stdout.log('Connected to preview server');
-});
-
 const sizeFormatter = Intl.NumberFormat('en', {
   notation: 'compact',
   style: 'unit',
@@ -50,6 +44,13 @@ export default function command(cli: CLI): CommandDefinition {
 
       if (!themeId)
         return stdout.error('No theme detected in the current directory.');
+
+      const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
+
+      socket.on('connect', () => {
+        stdout.log('Connected to preview server');
+      });
+
       socket.emit('theme:dev', { themeId });
 
       clear();
