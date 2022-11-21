@@ -7,6 +7,7 @@ import openLink from '@/utils/system/openLink';
 import stdout from '@/utils/system/stdout';
 import { post } from '@/utils/http';
 import writeToFile from '@/utils/system/writeToFile';
+import messages from '@/config/messages';
 
 /**
  * Spin up a local server to handle the OAuth redirect. Times out after 10 seconds.
@@ -70,7 +71,7 @@ export default function command(_cli: CLI): CommandDefinition {
 
     action: async () => {
       if (!openLink(config.OAUTH_AUTH_CODE_URL)) {
-        stdout.log('Open this link in your browser to continue authentication:');
+        stdout.log(messages.LOGIN_OPEN_LINK);
         stdout.info(config.OAUTH_AUTH_CODE_URL);
       }
 
@@ -82,7 +83,7 @@ export default function command(_cli: CLI): CommandDefinition {
         JSON.stringify({ access_token: await exchangeAuthCode(authCode) }),
       );
 
-      stdout.info('You have been successfully logged in.');
+      stdout.info(messages.LOGIN_SUCCESS);
     },
   };
 }

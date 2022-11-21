@@ -4,6 +4,7 @@ import { Server } from 'socket.io';
 import puppeteer from 'puppeteer';
 import stdout from '@/utils/system/stdout';
 import config from '@/config';
+import messages from '@/config/messages';
 
 async function openPreviewPage(themeId: string) {
   const browser = await puppeteer.launch({
@@ -28,10 +29,10 @@ export default async function previewTheme(themeId: string) {
 
   io.on('connection', (socket: Socket) => {
     socket.on('theme:update', async () => {
-      stdout.log('Theme change detected, reloading...');
+      stdout.log(messages.PREVIEW_THEME_UPDATED);
       const start = Date.now();
       await previewPage.reload({ waitUntil: 'domcontentloaded' });
-      stdout.info(`Reloaded in ${Date.now() - start}ms`);
+      stdout.info(`${messages.PREVIEW_RELOADED}${Date.now() - start}ms`);
     });
   });
 

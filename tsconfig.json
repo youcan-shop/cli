@@ -22,6 +22,7 @@
   },
   "include": [
     "lib",
+    "test",
     "rollup.config.js"
   ]
 }
