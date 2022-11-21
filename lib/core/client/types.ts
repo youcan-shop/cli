@@ -25,3 +25,9 @@ export interface DeleteThemeFileRequestData {
 export interface InitThemeResponse {
   id: string
 }
+
+export interface StoreInfoResponse {
+  name: string
+  slug: string
+  domain: string
+}
