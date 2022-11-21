@@ -58,10 +58,13 @@ export default function command(cli: CLI): CommandDefinition {
       if (!themeId)
         return stdout.error('No theme detected in the current directory.');
 
+      const { domain } = await cli.client.getStoreInfo();
+
       if (options.preview) {
         socket = connectPreviewServer();
         socket.emit('theme:dev', { themeId });
-        previewTheme(themeId);
+
+        previewTheme(`https://${domain}/themes/${themeId}/preview`);
       }
 
       clear();

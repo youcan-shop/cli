@@ -2,7 +2,7 @@ import { FormData } from 'formdata-node';
 import type { RequestInit } from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';
 import fetch from 'node-fetch';
-import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, UpdateThemeFileRequestData } from './types';
+import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, StoreInfoResponse, UpdateThemeFileRequestData } from './types';
 import { get, post } from '@/utils/http';
 import config from '@/config';
 
@@ -66,7 +66,11 @@ export default class Client {
     );
   }
 
-  private withDefaults(override: RequestInit): RequestInit {
+  public async getStoreInfo(): Promise<StoreInfoResponse> {
+    return await get<StoreInfoResponse>(`${config.SELLER_AREA_API_BASE_URI}/me`, this.withDefaults());
+  }
+
+  private withDefaults(override: RequestInit = {}): RequestInit {
     return mergeDeepLeft(override, {
       headers: {
         Accept: 'application/json',
