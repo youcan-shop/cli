@@ -2,11 +2,12 @@ import fs from 'fs';
 import { execa } from 'execa';
 import { describe, expect, it } from 'vitest';
 import config from '@/config';
+import messages from '@/config/messages';
 
 describe('login command', () => {
   it('It should print OAuth success message ', async () => {
     const { stdout } = await execa('node', ['./dist/index.js', 'login']);
-    expect(stdout).toContain('You have been successfully logged in.');
+    expect(stdout).toContain(messages.LOGIN_SUCCESS);
   });
 
   it('should create .youcan.json file inside ~/.youcan folder', () => {
