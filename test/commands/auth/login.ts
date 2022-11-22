@@ -17,6 +17,6 @@ export default () => {
   it('.youcan file should contain access_token', () => {
     const youcanConfig = fs.readFileSync(config.CLI_GLOBAL_CONFIG_PATH, 'utf-8');
     const parsed = JSON.parse(youcanConfig);
-    expect(parsed).toContain('access_token');
+    expect(parsed).haveOwnProperty('access_token');
   });
 };

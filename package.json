@@ -26,7 +26,7 @@
     "lint": "eslint .",
     "release": "bumpp && pnpm publish",
     "typecheck": "tsc --noEmit",
-    "test": "vitest ./test"
+    "test": "vitest ./test "
   },
   "dependencies": {
     "archiver": "^5.3.1",
@@ -52,6 +52,7 @@
     "@types/prompts": "^2.4.1",
     "@types/ramda": "^0.28.19",
     "@types/rimraf": "^3.0.2",
+    "@vitest/coverage-c8": "^0.25.2",
     "@vitest/ui": "^0.25.2",
     "bumpp": "^8.2.1",
     "eslint": "^8.27.0",
