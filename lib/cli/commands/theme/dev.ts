@@ -96,10 +96,12 @@ export default function command(cli: CLI): CommandDefinition {
       const { domain } = await cli.client.getStoreInfo();
 
       clear();
+
       const loadingSpinner = new LoadingSpinner('Syncing changes...');
       loadingSpinner.start();
       await syncChanges(cli, themeId);
       loadingSpinner.stop();
+
       if (options.preview) {
         socket = connectPreviewServer();
         socket.emit('theme:dev', { themeId });
