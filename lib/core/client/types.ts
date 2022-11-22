@@ -31,3 +31,29 @@ export interface StoreInfoResponse {
   slug: string
   domain: string
 }
+
+export interface ThemeFileInfo {
+  id: string
+  type: string
+  name: string
+  file_name: string
+  updated: boolean
+  deleted: boolean
+  size: number
+  hash: string
+}
+
+export interface ThemeMetaResponse {
+  theme_name: string
+  theme_author: string
+  theme_version: string
+  theme_support_url: string
+  theme_documentation_url: string
+  config: ThemeFileInfo[]
+  layout: ThemeFileInfo[]
+  sections: ThemeFileInfo[]
+  templates: ThemeFileInfo[]
+  locales: ThemeFileInfo[]
+  snippets: ThemeFileInfo[]
+  assets: ThemeFileInfo[]
+}

@@ -2,7 +2,7 @@ import { FormData } from 'formdata-node';
 import type { RequestInit } from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';
 import fetch from 'node-fetch';
-import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, StoreInfoResponse, UpdateThemeFileRequestData } from './types';
+import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, StoreInfoResponse, ThemeMetaResponse, UpdateThemeFileRequestData } from './types';
 import { get, post } from '@/utils/http';
 import config from '@/config';
 
@@ -33,6 +33,10 @@ export default class Client {
     );
 
     return id;
+  }
+
+  public async getThemeMeta(themeId: string): Promise<ThemeMetaResponse> {
+    return await get(`${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/metadata`, this.withDefaults({}));
   }
 
   public async pullTheme(themeId: string) {
