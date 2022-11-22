@@ -37,7 +37,7 @@ export class LoadingSpinner {
 
   start() {
     process.stdout.write('\x1B[?25l');
-    const frames = ['Y', 'O', 'U', 'C', 'A', 'N'];
+    const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
     let i = 0;
     this.timer = setInterval(() => {
       process.stdout.write(`\r${frames[i = ++i % frames.length]} ${this.message}`);
