@@ -13,7 +13,7 @@ async function openPreviewPage(themeId: string) {
     userDataDir: '/tmp/youcan_puppeteer',
   });
   browser.on('disconnected', () => {
-    stdout.info('Browser closed');
+    stdout.info(messages.PREVIEW_BROWSER_CLOSED);
     return process.exit(0);
   });
   const page = await browser.newPage();
@@ -29,10 +29,7 @@ export default async function previewTheme(themeId: string) {
 
   io.on('connection', (socket: Socket) => {
     socket.on('theme:update', async () => {
-      stdout.log(messages.PREVIEW_THEME_UPDATED);
-      const start = Date.now();
       await previewPage.reload({ waitUntil: 'domcontentloaded' });
-      stdout.info(`${messages.PREVIEW_RELOADED}${Date.now() - start}ms`);
     });
   });
 

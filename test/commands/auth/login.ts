@@ -1,10 +1,10 @@
 import fs from 'fs';
 import { execa } from 'execa';
-import { describe, expect, it } from 'vitest';
+import { expect, it } from 'vitest';
 import config from '@/config';
 import messages from '@/config/messages';
 
-describe('login command', () => {
+export default () => {
   it('It should print OAuth success message ', async () => {
     const { stdout } = await execa('node', ['./dist/index.js', 'login']);
     expect(stdout).toContain(messages.LOGIN_SUCCESS);
@@ -16,6 +16,7 @@ describe('login command', () => {
 
   it('.youcan file should contain access_token', () => {
     const youcanConfig = fs.readFileSync(config.CLI_GLOBAL_CONFIG_PATH, 'utf-8');
-    expect(youcanConfig).toContain('access_token');
+    const parsed = JSON.parse(youcanConfig);
+    expect(parsed).toContain('access_token');
   });
-});
+};
