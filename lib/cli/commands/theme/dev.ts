@@ -55,17 +55,25 @@ async function syncChanges(cli: CLI, themeId: string) {
           file_name: file.file_name,
           file_operation: 'delete',
         });
+        stdout.log(`Deleted ${filePath}`);
+
+        continue;
       }
 
-      const localChecksum = await checksum.file(filePath);
-      if (localChecksum !== file.hash) {
-        await cli.client.updateFile(themeId, {
-          file_type: file.type,
-          file_name: file.file_name,
-          file_operation: 'save',
-          file_content: fileFromPathSync(filePath),
-        });
-      }
+      checksum.file(filePath, async (err: any, localChecksum: string) => {
+        if (err)
+          throw err;
+
+        if (localChecksum !== file.hash) {
+          await cli.client.updateFile(themeId, {
+            file_type: file.type,
+            file_name: file.file_name,
+            file_operation: 'save',
+            file_content: fileFromPathSync(filePath),
+          });
+          stdout.log(`Updated ${filePath}`);
+        }
+      });
     }
   }
 }
@@ -91,6 +99,8 @@ export default function command(cli: CLI): CommandDefinition {
 
       const { domain } = await cli.client.getStoreInfo();
 
+      clear();
+
       stdout.log('Syncing changes...');
       await syncChanges(cli, themeId);
 
@@ -101,7 +111,6 @@ export default function command(cli: CLI): CommandDefinition {
         previewTheme(`https://${domain}/themes/${themeId}/preview`);
       }
 
-      clear();
       stdout.info(`Watching for changes in ${kleur.bold().white(cwd())}...`);
 
       chokidar

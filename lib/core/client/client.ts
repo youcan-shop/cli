@@ -36,7 +36,7 @@ export default class Client {
   }
 
   public async getThemeMeta(themeId: string): Promise<ThemeMetaResponse> {
-    return await get(`${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/meta`, this.withDefaults({}));
+    return await get(`${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/metadata`, this.withDefaults({}));
   }
 
   public async pullTheme(themeId: string) {
