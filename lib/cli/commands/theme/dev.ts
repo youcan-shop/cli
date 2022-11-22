@@ -1,15 +1,18 @@
 import { cwd } from 'process';
 import { clear } from 'console';
+import { existsSync } from 'fs';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
 import io from 'socket.io-client';
+import checksum from 'checksum';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
 import { getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
 import previewTheme from '@/core/themes/preview';
+import type { ThemeFileInfo } from '@/core/client/types';
 
 const sizeFormatter = Intl.NumberFormat('en', {
   notation: 'compact',
@@ -39,6 +42,34 @@ function connectPreviewServer() {
   return socket;
 }
 
+async function syncChanges(cli: CLI, themeId: string) {
+  const meta: Record<string, any> = await cli.client.getThemeMeta(themeId);
+  for (const fileType of config.THEME_FILE_TYPES) {
+    const files: ThemeFileInfo[] = meta[fileType];
+    for (const file of files) {
+      const filePath = `${file.type}/${file.file_name}`;
+
+      if (!existsSync(filePath)) {
+        await cli.client.deleteFile(themeId, {
+          file_type: file.type,
+          file_name: file.file_name,
+          file_operation: 'delete',
+        });
+      }
+
+      const localChecksum = await checksum.file(filePath);
+      if (localChecksum !== file.hash) {
+        await cli.client.updateFile(themeId, {
+          file_type: file.type,
+          file_name: file.file_name,
+          file_operation: 'save',
+          file_content: fileFromPathSync(filePath),
+        });
+      }
+    }
+  }
+}
+
 export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'dev',
@@ -60,6 +91,9 @@ export default function command(cli: CLI): CommandDefinition {
 
       const { domain } = await cli.client.getStoreInfo();
 
+      stdout.log('Syncing changes...');
+      await syncChanges(cli, themeId);
+
       if (options.preview) {
         socket = connectPreviewServer();
         socket.emit('theme:dev', { themeId });
@@ -68,7 +102,7 @@ export default function command(cli: CLI): CommandDefinition {
       }
 
       clear();
-      stdout.log('Watching theme files for changes.. \n');
+      stdout.info(`Watching for changes in ${kleur.bold().white(cwd())}...`);
 
       chokidar
         .watch(config.THEME_FILE_TYPES, {
