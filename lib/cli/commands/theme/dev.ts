@@ -1,18 +1,18 @@
 import { cwd } from 'process';
 import { clear } from 'console';
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
+import crypto from 'crypto';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
 import io from 'socket.io-client';
-import checksum from 'checksum';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
-import { getCurrentThemeId } from '@/utils/common';
+import { LoadingSpinner, getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
 import previewTheme from '@/core/themes/preview';
-import type { ThemeFileInfo } from '@/core/client/types';
+import type { ThemeMetaResponse } from '@/core/client/types';
 
 const sizeFormatter = Intl.NumberFormat('en', {
   notation: 'compact',
@@ -43,9 +43,10 @@ function connectPreviewServer() {
 }
 
 async function syncChanges(cli: CLI, themeId: string) {
-  const meta: Record<string, any> = await cli.client.getThemeMeta(themeId);
+  const meta = await cli.client.getThemeMeta(themeId);
+
   for (const fileType of config.THEME_FILE_TYPES) {
-    const files: ThemeFileInfo[] = meta[fileType];
+    const files: any = meta[fileType as keyof ThemeMetaResponse];
     for (const file of files) {
       const filePath = `${file.type}/${file.file_name}`;
 
@@ -55,25 +56,20 @@ async function syncChanges(cli: CLI, themeId: string) {
           file_name: file.file_name,
           file_operation: 'delete',
         });
-        stdout.log(`Deleted ${filePath}`);
-
         continue;
       }
+      const fileStream = readFileSync(filePath);
+      const localHash = crypto.createHash('sha1');
+      localHash.update(fileStream);
 
-      checksum.file(filePath, async (err: any, localChecksum: string) => {
-        if (err)
-          throw err;
-
-        if (localChecksum !== file.hash) {
-          await cli.client.updateFile(themeId, {
-            file_type: file.type,
-            file_name: file.file_name,
-            file_operation: 'save',
-            file_content: fileFromPathSync(filePath),
-          });
-          stdout.log(`Updated ${filePath}`);
-        }
-      });
+      if (localHash.digest('hex') !== file.hash) {
+        await cli.client.updateFile(themeId, {
+          file_type: file.type,
+          file_name: file.file_name,
+          file_operation: 'save',
+          file_content: fileFromPathSync(filePath),
+        });
+      }
     }
   }
 }
@@ -100,10 +96,10 @@ export default function command(cli: CLI): CommandDefinition {
       const { domain } = await cli.client.getStoreInfo();
 
       clear();
-
-      stdout.log('Syncing changes...');
+      const loadingSpinner = new LoadingSpinner('Syncing changes...');
+      loadingSpinner.start();
       await syncChanges(cli, themeId);
-
+      loadingSpinner.stop();
       if (options.preview) {
         socket = connectPreviewServer();
         socket.emit('theme:dev', { themeId });
