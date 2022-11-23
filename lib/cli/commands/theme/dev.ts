@@ -1,5 +1,7 @@
 import { cwd } from 'process';
 import { clear } from 'console';
+import { existsSync, readFileSync } from 'fs';
+import crypto from 'crypto';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
@@ -7,9 +9,10 @@ import io from 'socket.io-client';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
-import { getCurrentThemeId } from '@/utils/common';
+import { LoadingSpinner, getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
 import previewTheme from '@/core/themes/preview';
+import type { ThemeMetaResponse } from '@/core/client/types';
 import messages from '@/config/messages';
 
 const sizeFormatter = Intl.NumberFormat('en', {
@@ -40,6 +43,38 @@ function connectPreviewServer() {
   return socket;
 }
 
+async function syncChanges(cli: CLI, themeId: string) {
+  const meta = await cli.client.getThemeMeta(themeId);
+
+  for (const fileType of config.THEME_FILE_TYPES) {
+    const files: any = meta[fileType as keyof ThemeMetaResponse];
+    for (const file of files) {
+      const filePath = `${file.type}/${file.file_name}`;
+
+      if (!existsSync(filePath)) {
+        await cli.client.deleteFile(themeId, {
+          file_type: file.type,
+          file_name: file.file_name,
+          file_operation: 'delete',
+        });
+        continue;
+      }
+      const fileStream = readFileSync(filePath);
+      const localHash = crypto.createHash('sha1');
+      localHash.update(fileStream);
+
+      if (localHash.digest('hex') !== file.hash) {
+        await cli.client.updateFile(themeId, {
+          file_type: file.type,
+          file_name: file.file_name,
+          file_operation: 'save',
+          file_content: fileFromPathSync(filePath),
+        });
+      }
+    }
+  }
+}
+
 export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'dev',
@@ -59,14 +94,23 @@ export default function command(cli: CLI): CommandDefinition {
       if (!themeId)
         return stdout.error(messages.DEV_NO_THEME_DETECTED);
 
+      const { domain } = await cli.client.getStoreInfo();
+
+      clear();
+
+      const loadingSpinner = new LoadingSpinner('Syncing changes...');
+      loadingSpinner.start();
+      await syncChanges(cli, themeId);
+      loadingSpinner.stop();
+
       if (options.preview) {
         socket = connectPreviewServer();
         socket.emit('theme:dev', { themeId });
-        previewTheme(themeId);
+
+        previewTheme(`https://${domain}/themes/${themeId}/preview`);
       }
 
-      clear();
-      stdout.log(messages.DEV_WATCHING_FILES);
+      stdout.info(`Watching for changes in ${kleur.bold().white(cwd())}...`);
 
       chokidar
         .watch(config.THEME_FILE_TYPES, {

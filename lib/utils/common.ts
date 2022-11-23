@@ -28,3 +28,29 @@ export async function getCurrentThemeId(dir: PathLike): Promise<string | null> {
     .then(b => JSON.parse(b).theme_id);
 }
 
+export class LoadingSpinner {
+  timer: NodeJS.Timer | null;
+  constructor(private message: string) {
+    this.message = message;
+    this.timer = null;
+  }
+
+  start() {
+    process.stdout.write('\x1B[?25l');
+    const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+    let i = 0;
+    this.timer = setInterval(() => {
+      process.stdout.write(`\r${frames[i = ++i % frames.length]} ${this.message}`);
+    }
+    , 100);
+  }
+
+  stop() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
+    process.stdout.write('\x1B[?25h');
+    process.stdout.write('\r');
+  }
+}

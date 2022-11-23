@@ -26,7 +26,7 @@
     "lint": "eslint .",
     "release": "bumpp && pnpm publish",
     "typecheck": "tsc --noEmit",
-    "test": "vitest ./test "
+    "check": "pnpm typecheck && pnpm lint && pnpm run test"
   },
   "dependencies": {
     "archiver": "^5.3.1",
