@@ -13,6 +13,7 @@ import { LoadingSpinner, getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
 import previewTheme from '@/core/themes/preview';
 import type { ThemeMetaResponse } from '@/core/client/types';
+import messages from '@/config/messages';
 
 const sizeFormatter = Intl.NumberFormat('en', {
   notation: 'compact',
@@ -37,7 +38,7 @@ function logFileEvent(options: FileEventOptions) {
 function connectPreviewServer() {
   const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
   socket.on('connect', () => {
-    stdout.log('Connected to preview server');
+    stdout.log(messages.DEV_PREVIEW_SERVER_CONNECTED);
   });
   return socket;
 }
@@ -86,12 +87,12 @@ export default function command(cli: CLI): CommandDefinition {
       let socket: ReturnType<typeof io>;
 
       if (!cli.client.isAuthenticated())
-        return stdout.error('You must be logged into a store to use this command.');
+        return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
 
       const themeId = await getCurrentThemeId(cwd());
 
       if (!themeId)
-        return stdout.error('No theme detected in the current directory.');
+        return stdout.error(messages.DEV_NO_THEME_DETECTED);
 
       const { domain } = await cli.client.getStoreInfo();
 

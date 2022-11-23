@@ -11,6 +11,7 @@ import type { InitThemeRequest } from '@/core/client/types';
 import zipFolder from '@/utils/system/zipFolder';
 import writeToFile from '@/utils/system/writeToFile';
 import deleteFile from '@/utils/system/deleteFile';
+import messages from '@/config/messages';
 
 const inquiries: PromptObject[] = [
   {
@@ -45,6 +46,14 @@ const inquiries: PromptObject[] = [
   },
 ];
 
+const defaultInquiries = {
+  theme_name: 'Starter',
+  theme_author: 'YouCan',
+  theme_version: '1.0.0',
+  theme_support_url: 'https://developer.youcan.shop',
+  theme_documentation_url: 'https://developer.youcan.shop',
+};
+
 export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'init',
@@ -52,15 +61,16 @@ export default function command(cli: CLI): CommandDefinition {
     description: 'Create a new theme or clone existing one.',
     options: [
       { name: '-t, --theme <theme>', description: 'A git repository to clone instead of the starter theme.' },
+      { name: '-d, --default', description: 'Use default values for theme name, author, version, support url and documentation url.' },
     ],
 
     action: async (options: Record<string, string>) => {
       if (!cli.client.isAuthenticated())
-        return stdout.error('You must be logged into a store to use this command.');
+        return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
 
-      const info = await prompts(inquiries) as Omit<InitThemeRequest, 'archive'>;
+      const info = options.default ? defaultInquiries : await prompts(inquiries) as Omit<InitThemeRequest, 'archive'>;
 
-      stdout.info('Cloning your theme from github');
+      stdout.info(messages.INIT_CLONE_START);
       cloneRepository(options.theme || config.STARTER_THEME_GIT_REPOSITORY, info.theme_name);
 
       const zippedTheme = await zipFolder(cwd(), info.theme_name);
@@ -71,7 +81,7 @@ export default function command(cli: CLI): CommandDefinition {
 
       deleteFile(zippedTheme);
 
-      stdout.info(`The theme has been initiated with id ${id}`);
+      stdout.info(`${messages.INIT_SUCCESS}${id}`);
     },
   };
 }

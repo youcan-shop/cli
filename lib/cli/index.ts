@@ -20,6 +20,10 @@ const cli = {
     definition.options?.forEach(o => instance.option(o.name, o.description, o.config));
   },
 
+  getAvailableCommands() {
+    return Object.values(commands);
+  },
+
   async init() {
     await this.prepareClient();
 

@@ -8,6 +8,7 @@ import { saveHttpFile } from '@/utils/system/saveFile';
 import { getCurrentThemeId } from '@/utils/common';
 import writeToFile from '@/utils/system/writeToFile';
 import deleteFile from '@/utils/system/deleteFile';
+import messages from '@/config/messages';
 
 export default function command(cli: CLI): CommandDefinition {
   return {
@@ -18,7 +19,7 @@ export default function command(cli: CLI): CommandDefinition {
 
     action: async () => {
       if (!cli.client.isAuthenticated())
-        return stdout.error('You must be logged into a store to use this command.');
+        return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
 
       const { dev } = await cli.client.listThemes() as listThemesResponse;
 
@@ -41,16 +42,16 @@ export default function command(cli: CLI): CommandDefinition {
 
       themeId = themeId || cwdThemeId;
 
-      if (!themeId) return stdout.error('No theme found');
+      if (!themeId) return stdout.error(messages.PULL_NO_THEME_FOUND);
 
       const fileName = `${themeId}`;
       const fileNameZip = `${fileName}.zip`;
 
-      stdout.info('Pulling your theme...');
+      stdout.info(messages.PULL_PULLING_THEME);
       const response = await cli.client.pullTheme(themeId);
       await saveHttpFile(response, fileNameZip);
 
-      stdout.info('Unpacking...');
+      stdout.info(messages.PULL_UNPACKING_THEME);
       const unpackingFolder = cwdThemeId ? cwd() : `${cwd()}/${fileName}`;
       await decompress(fileNameZip, unpackingFolder);
 
@@ -58,7 +59,7 @@ export default function command(cli: CLI): CommandDefinition {
 
       writeToFile(`${unpackingFolder}/.youcan`, JSON.stringify({ theme_id: themeId }));
 
-      stdout.info(`Theme has been pulled to ${fileName}`);
+      stdout.info(`${messages.PULL_THEME_PULLED} ${fileName}`);
     },
   };
 }

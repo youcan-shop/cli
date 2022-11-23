@@ -26,6 +26,7 @@
     "lint": "eslint .",
     "release": "bumpp && pnpm publish",
     "typecheck": "tsc --noEmit",
+    "test": "vitest",
     "check": "pnpm typecheck && pnpm lint && pnpm run test"
   },
   "dependencies": {
@@ -33,6 +34,7 @@
     "cac": "^6.7.14",
     "chokidar": "^3.5.3",
     "decompress": "^4.2.1",
+    "execa": "^6.1.0",
     "formdata-node": "^5.0.0",
     "kleur": "^4.1.5",
     "node-fetch": "^3.2.10",
@@ -51,6 +53,8 @@
     "@types/prompts": "^2.4.1",
     "@types/ramda": "^0.28.19",
     "@types/rimraf": "^3.0.2",
+    "@vitest/coverage-c8": "^0.25.2",
+    "@vitest/ui": "^0.25.2",
     "bumpp": "^8.2.1",
     "eslint": "^8.27.0",
     "esno": "^0.16.3",
@@ -60,6 +64,7 @@
     "rollup-plugin-dts": "^5.0.0",
     "rollup-plugin-typescript2": "^0.34.1",
     "typescript": "^4.8.4",
+    "vite": "^3.2.4",
     "vitest": "^0.24.5"
   }
 }

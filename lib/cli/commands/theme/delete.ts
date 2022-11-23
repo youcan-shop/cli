@@ -2,6 +2,7 @@ import prompts from 'prompts';
 import type { CLI, CommandDefinition } from '../types';
 import type { listThemesResponse } from './types';
 import stdout from '@/utils/system/stdout';
+import messages from '@/config/messages';
 
 export default function command(cli: CLI): CommandDefinition {
   return {
@@ -12,7 +13,7 @@ export default function command(cli: CLI): CommandDefinition {
 
     action: async () => {
       if (!cli.client.isAuthenticated())
-        return stdout.error('You must be logged into a store to use this command.');
+        return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
       const { dev } = await cli.client.listThemes() as listThemesResponse;
 
       const choices = dev.map(theme => ({
@@ -26,9 +27,9 @@ export default function command(cli: CLI): CommandDefinition {
         message: 'Select a theme to delete',
         choices,
       });
-      if (!themeId) return stdout.error('No theme selected');
+      if (!themeId) return stdout.error(messages.DELETE_NO_THEME_SELECTED);
       await cli.client.deleteTheme(themeId);
-      stdout.info('Theme deleted');
+      stdout.info(messages.DELETE_THEME_DELETED);
     },
   };
 }
