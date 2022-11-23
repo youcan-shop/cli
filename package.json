@@ -25,7 +25,8 @@
     "dev": "rollup --config rollup.config.js --watch",
     "lint": "eslint .",
     "release": "bumpp && pnpm publish",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm typecheck && pnpm lint && pnpm run test"
   },
   "dependencies": {
     "archiver": "^5.3.1",
