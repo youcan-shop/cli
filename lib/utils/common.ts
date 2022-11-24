@@ -18,6 +18,11 @@ export async function getUserToken(): Promise<string> {
   return JSON.parse(data).token;
 }
 
+/**
+ * Get current theme id from .youcan file in theme directory
+ * @param dir - path to theme directory
+ * @returns Promise<string|null> - theme id
+**/
 export async function getCurrentThemeId(dir: PathLike): Promise<string | null> {
   const filepath = path.resolve(dir.toString(), '.youcan');
 
@@ -28,6 +33,10 @@ export async function getCurrentThemeId(dir: PathLike): Promise<string | null> {
     .then(b => JSON.parse(b).theme_id);
 }
 
+/**
+ * Show a loading spinner with the given message
+ * @property message - The message to show
+ */
 export class LoadingSpinner {
   timer: NodeJS.Timer | null;
   constructor(private message: string) {

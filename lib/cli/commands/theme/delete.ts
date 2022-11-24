@@ -14,8 +14,8 @@ export default function command(cli: CLI): CommandDefinition {
     action: async () => {
       if (!cli.client.isAuthenticated())
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
-      const { dev } = await cli.client.listThemes() as listThemesResponse;
 
+      const { dev } = await cli.client.listThemes() as listThemesResponse;
       const choices = dev.map(theme => ({
         title: theme.name,
         value: theme.id,
@@ -24,10 +24,11 @@ export default function command(cli: CLI): CommandDefinition {
       const { themeId } = await prompts({
         type: 'select',
         name: 'themeId',
-        message: 'Select a theme to delete',
+        message: messages.DELETE_PROMPTS_SELECT_THEME,
         choices,
       });
       if (!themeId) return stdout.error(messages.DELETE_NO_THEME_SELECTED);
+
       await cli.client.deleteTheme(themeId);
       stdout.info(messages.DELETE_THEME_DELETED);
     },

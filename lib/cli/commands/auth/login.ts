@@ -10,7 +10,8 @@ import writeToFile from '@/utils/system/writeToFile';
 import messages from '@/config/messages';
 
 /**
- * Spin up a local server to handle the OAuth redirect. Times out after 10 seconds.
+ * Spin up a local server to handle the OAuth redirect,
+ * Times out after the value specified in config file.
  * @returns A promise that resolves when the code is received.
 */
 function listenForAuthCodeCallback(): Promise<string> {
@@ -22,9 +23,9 @@ function listenForAuthCodeCallback(): Promise<string> {
       const code = url?.split('=')[1] || '';
 
       if (!code)
-        reject(new Error('authorization code is required.'));
+        reject(new Error(messages.LOGIN_CODE_REQUIRED));
 
-      res.end('You can close this window now.');
+      res.end(messages.LOGIN_CODE_SUCCESS);
       clearTimeout(timeOut);
       server.close();
 
@@ -33,7 +34,7 @@ function listenForAuthCodeCallback(): Promise<string> {
 
     server.listen(config.OAUTH_CALLBACK_PORT, () => {
       timeOut = setTimeout(() => {
-        reject(new Error('Timeout'));
+        reject(new Error(messages.LOGIN_TIMEOUT));
       }, config.OAUTH_CALLBACK_SERVER_TIMEOUT);
     });
   });

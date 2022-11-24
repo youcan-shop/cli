@@ -1,8 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import archiver from 'archiver';
+
 /**
  * Zip folder and save it to a given path and return zip folder path
+ * @param folderPath
+ * @param folderName
  */
 export default async function zipFolder(folderPath: string, folderName: string): Promise<string> {
   return new Promise((resolve, reject) => {
