@@ -5,7 +5,9 @@ import crypto from 'crypto';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
 import { fileFromPathSync } from 'formdata-node/file-from-path';
+import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
+import type { DefaultEventsMap } from 'socket.io/dist/typed-events';
 import type { CLI, CommandDefinition } from '../types';
 import type { FileEventOptions } from './types';
 import stdout from '@/utils/system/stdout';
@@ -35,14 +37,25 @@ function logFileEvent(options: FileEventOptions) {
   return stdout.log(`${tag} ${kleur.underline().white(options.path)} - ${sizeFormatter.format(options.size)} | ${options.roundtrip}ms \n`);
 }
 
-function connectPreviewServer() {
+/**
+ * Connect to the preview server to communicate with the browser.
+ * @returns Socket
+ */
+function connectPreviewServer(): Socket<DefaultEventsMap, DefaultEventsMap> {
   const socket = io(`ws://localhost:${config.PREVIEW_SERVER_PORT}`);
+
   socket.on('connect', () => {
     stdout.log(messages.DEV_PREVIEW_SERVER_CONNECTED);
   });
   return socket;
 }
 
+/**
+ * Sync the unsaved changes when dev server was not running by comparing
+ * the local theme files with the remote theme files and uploading the changes.
+ * @param cli
+ * @param themeId
+ */
 async function syncChanges(cli: CLI, themeId: string) {
   const meta = await cli.client.getThemeMeta(themeId);
 
@@ -59,6 +72,7 @@ async function syncChanges(cli: CLI, themeId: string) {
         });
         continue;
       }
+
       const fileStream = readFileSync(filePath);
       const localHash = crypto.createHash('sha1');
       localHash.update(fileStream);
@@ -79,7 +93,7 @@ export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'dev',
     group: 'theme',
-    description: 'starts a dev server and watches over the current directory',
+    description: 'Starts a dev server and watches over the current directory',
     options: [
       { name: '-p, --preview', description: 'opens a preview window' },
     ],
@@ -98,7 +112,7 @@ export default function command(cli: CLI): CommandDefinition {
 
       clear();
 
-      const loadingSpinner = new LoadingSpinner('Syncing changes...');
+      const loadingSpinner = new LoadingSpinner(messages.DEV_SYNCING_FILES);
       loadingSpinner.start();
       await syncChanges(cli, themeId);
       loadingSpinner.stop();
@@ -110,7 +124,7 @@ export default function command(cli: CLI): CommandDefinition {
         previewTheme(`https://${domain}/themes/${themeId}/preview`);
       }
 
-      stdout.info(`Watching for changes in ${kleur.bold().white(cwd())}...`);
+      stdout.info(`${messages.DEV_WATCHING_FILES}${kleur.bold().white(cwd())}...`);
 
       chokidar
         .watch(config.THEME_FILE_TYPES, {

@@ -2,10 +2,6 @@ import kleur from 'kleur';
 
 const stdout = console;
 
-/**
- * Print to standard output with meaningful colors
- */
-
 function log(arg: string) { return stdout.log(kleur.gray(arg)); }
 
 function info(arg: string) { return log(kleur.blue(arg)); }
