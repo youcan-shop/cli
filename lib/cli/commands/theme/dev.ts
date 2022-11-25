@@ -1,6 +1,6 @@
 import { cwd } from 'process';
 import { clear } from 'console';
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import crypto from 'crypto';
 import chokidar from 'chokidar';
 import kleur from 'kleur';
@@ -12,7 +12,7 @@ import stdout from '@/utils/system/stdout';
 import { LoadingSpinner, getCurrentThemeId } from '@/utils/common';
 import config from '@/config';
 import previewTheme from '@/core/themes/preview';
-import type { ThemeMetaResponse } from '@/core/client/types';
+import type { ThemeFileInfo, ThemeMetaResponse } from '@/core/client/types';
 import messages from '@/config/messages';
 
 const sizeFormatter = Intl.NumberFormat('en', {
@@ -47,7 +47,22 @@ async function syncChanges(cli: CLI, themeId: string) {
   const meta = await cli.client.getThemeMeta(themeId);
 
   for (const fileType of config.THEME_FILE_TYPES) {
-    const files: any = meta[fileType as keyof ThemeMetaResponse];
+    const files: ThemeFileInfo[] = meta[fileType as keyof ThemeMetaResponse] as ThemeFileInfo[];
+    const dirFiles = readdirSync(`./${fileType}`);
+
+    if (dirFiles.length > 0) {
+      const newFiles = dirFiles.filter(file => !files.find(f => f.file_name === file));
+      await Promise.all(newFiles.map(async (file) => {
+        const fileData = fileFromPathSync(`./${fileType}/${file}`);
+        await cli.client.updateFile(themeId, {
+          file_type: fileType,
+          file_name: file,
+          file_operation: 'save',
+          file_content: fileData,
+        });
+      }));
+    }
+
     for (const file of files) {
       const filePath = `${file.type}/${file.file_name}`;
 
