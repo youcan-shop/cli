@@ -37,7 +37,7 @@ export class LoadingSpinner {
   }
 
   start() {
-    process.stdout.write('\n\x1B[?25l');
+    process.stdout.write('\x1B[?25l');
     const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
     let i = 0;
 
@@ -59,7 +59,7 @@ export class LoadingSpinner {
     this.flush();
 
     process.stdout.write('\r');
-    process.stdout.write(kleur.green(`✔ ${this.message}`));
+    process.stdout.write(kleur.green(`✔ ${this.message}\n`));
 
     return this;
   }
@@ -68,7 +68,7 @@ export class LoadingSpinner {
     this.flush();
 
     process.stdout.write('\r');
-    process.stdout.write(kleur.red(`✖ ${message ?? this.message}`));
+    process.stdout.write(kleur.red(`✖ ${message ?? this.message}\n`));
 
     return this;
   }

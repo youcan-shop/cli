@@ -106,7 +106,7 @@ export default function command(_cli: CLI): CommandDefinition {
       }
 
       try {
-        openLink(config.OAUTH_ACCESS_TOKEN_URL);
+        openLink(config.OAUTH_AUTH_CODE_URL);
       }
       catch (err) {
         stdout.log(messages.LOGIN_OPEN_LINK);
