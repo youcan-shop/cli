@@ -1,7 +1,7 @@
 import os from 'os';
 import type { PathLike } from 'fs';
 import fs from 'fs';
-import path from 'path';
+import path, { resolve } from 'path';
 export const homeDir = os.homedir();
 
 /**
@@ -53,4 +53,8 @@ export class LoadingSpinner {
     process.stdout.write('\x1B[?25h');
     process.stdout.write('\r');
   }
+}
+
+export function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
