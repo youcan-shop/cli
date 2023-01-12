@@ -13,7 +13,7 @@ export default {
   SELLER_AREA_API_BASE_URI: 'https://api.youcan.shop',
   SELLER_AREA_WEB_BASE_URI: 'https://seller-area.youcan.shop',
 
-  STARTER_THEME_GIT_REPOSITORY: 'git@github.com:NextmediaMa/funri.git',
+  STARTER_THEME_GIT_REPOSITORY: 'git@github.com:youcan-shop/cod-theme.git',
 
   CLI_GLOBAL_CONFIG_DIR: path.resolve(homedir(), '.youcan'),
   CLI_GLOBAL_CONFIG_PATH: path.resolve(homedir(), '.youcan', 'config.json'),

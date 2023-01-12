@@ -59,16 +59,23 @@ async function syncChanges(cli: CLI, themeId: string) {
     // add newly created files
     if (dirFiles.length > 0) {
       const newFiles = dirFiles.filter(file => !files.find(f => f.file_name === file));
-      await Promise.all(newFiles.map(async (file) => {
-        const fileData = fileFromPathSync(`./${fileType}/${file}`);
 
-        await cli.client.updateFile(themeId, {
-          file_type: fileType,
-          file_name: file,
-          file_operation: 'save',
-          file_content: fileData,
-        });
-      }));
+      for (const file of newFiles) {
+        try {
+          const fileData = fileFromPathSync(`./${fileType}/${file}`);
+
+          await cli.client.updateFile(themeId, {
+            file_type: fileType,
+            file_name: file,
+            file_operation: 'save',
+            file_content: fileData,
+          });
+        }
+        catch (err) {
+          if (err instanceof Error)
+            stdout.error(`[error] ${file}: ${err.message}`);
+        }
+      }
     }
 
     // update remote with local changes
@@ -76,11 +83,17 @@ async function syncChanges(cli: CLI, themeId: string) {
       const filePath = `${file.type}/${file.file_name}`;
 
       if (!existsSync(filePath)) {
-        await cli.client.deleteFile(themeId, {
-          file_type: file.type,
-          file_name: file.file_name,
-          file_operation: 'delete',
-        });
+        try {
+          await cli.client.deleteFile(themeId, {
+            file_type: file.type,
+            file_name: file.file_name,
+            file_operation: 'delete',
+          });
+        }
+        catch (err) {
+          if (err instanceof Error)
+            stdout.error(`[error] ${file.file_name}: ${err.message}`);
+        }
         continue;
       }
       const fileStream = readFileSync(filePath);
@@ -88,12 +101,18 @@ async function syncChanges(cli: CLI, themeId: string) {
       localHash.update(fileStream);
 
       if (localHash.digest('hex') !== file.hash) {
-        await cli.client.updateFile(themeId, {
-          file_type: file.type,
-          file_name: file.file_name,
-          file_operation: 'save',
-          file_content: fileFromPathSync(filePath),
-        });
+        try {
+          await cli.client.updateFile(themeId, {
+            file_type: file.type,
+            file_name: file.file_name,
+            file_operation: 'save',
+            file_content: fileFromPathSync(filePath),
+          });
+        }
+        catch (err) {
+          if (err instanceof Error)
+            stdout.error(`[error] ${file.file_name}: ${err.message}`);
+        }
       }
     }
   }
