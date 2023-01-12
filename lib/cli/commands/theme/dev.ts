@@ -50,10 +50,18 @@ async function syncChanges(cli: CLI, themeId: string) {
     const files: ThemeFileInfo[] = meta[fileType as keyof ThemeMetaResponse] as ThemeFileInfo[];
     const dirFiles = readdirSync(`./${fileType}`);
 
+    // save schema before data
+    if (fileType === 'config') {
+      const fileOrder = ['settings_schema.json', 'settings_data.json'];
+      files.sort((a, b) => fileOrder.indexOf(a.file_name) - fileOrder.indexOf(b.file_name));
+    }
+
+    // add newly created files
     if (dirFiles.length > 0) {
       const newFiles = dirFiles.filter(file => !files.find(f => f.file_name === file));
       await Promise.all(newFiles.map(async (file) => {
         const fileData = fileFromPathSync(`./${fileType}/${file}`);
+
         await cli.client.updateFile(themeId, {
           file_type: fileType,
           file_name: file,
@@ -63,6 +71,7 @@ async function syncChanges(cli: CLI, themeId: string) {
       }));
     }
 
+    // update remote with local changes
     for (const file of files) {
       const filePath = `${file.type}/${file.file_name}`;
 
