@@ -72,10 +72,8 @@ async function syncChanges(cli: CLI, themeId: string) {
           });
         }
         catch (err) {
-          stdout.error(`File: ${file} `);
-
           if (err instanceof Error)
-            stdout.info(`message: ${err.message}`);
+            stdout.error(`[error] ${file}: ${err.message}`);
         }
       }
     }
@@ -93,9 +91,8 @@ async function syncChanges(cli: CLI, themeId: string) {
           });
         }
         catch (err) {
-          stdout.error(`File: ${file.file_name} `);
           if (err instanceof Error)
-            stdout.info(`message: ${err.message}`);
+            stdout.error(`[error] ${file.file_name}: ${err.message}`);
         }
         continue;
       }
@@ -113,10 +110,8 @@ async function syncChanges(cli: CLI, themeId: string) {
           });
         }
         catch (err) {
-          stdout.error(`File: ${file.file_name} `);
-
           if (err instanceof Error)
-            stdout.info(`message: ${err.message}`);
+            stdout.error(`[error] ${file.file_name}: ${err.message}`);
         }
       }
     }
