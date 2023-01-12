@@ -5,6 +5,7 @@ import fetch from 'node-fetch';
 import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, StoreInfoResponse, ThemeMetaResponse, UpdateThemeFileRequestData } from './types';
 import { get, post } from '@/utils/http';
 import config from '@/config';
+import { delay } from '@/utils/common';
 
 export default class Client {
   private accessToken: string | null = null;
@@ -58,6 +59,7 @@ export default class Client {
       `${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/update`,
       this.withDefaults({ body: form }),
     );
+    await delay(100);
   }
 
   public async deleteFile(themeId: string, data: DeleteThemeFileRequestData) {
@@ -68,6 +70,7 @@ export default class Client {
       `${config.SELLER_AREA_API_BASE_URI}/themes/${themeId}/update`,
       this.withDefaults({ body: form }),
     );
+    await delay(100);
   }
 
   public async getStoreInfo(): Promise<StoreInfoResponse> {
