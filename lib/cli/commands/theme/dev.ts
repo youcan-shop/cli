@@ -61,14 +61,19 @@ async function syncChanges(cli: CLI, themeId: string) {
       const newFiles = dirFiles.filter(file => !files.find(f => f.file_name === file));
 
       for (const file of newFiles) {
-        const fileData = fileFromPathSync(`./${fileType}/${file}`);
+        try {
+          const fileData = fileFromPathSync(`./${fileType}/${file}`);
 
-        await cli.client.updateFile(themeId, {
-          file_type: fileType,
-          file_name: file,
-          file_operation: 'save',
-          file_content: fileData,
-        });
+          await cli.client.updateFile(themeId, {
+            file_type: fileType,
+            file_name: file,
+            file_operation: 'save',
+            file_content: fileData,
+          });
+        }
+        catch (err) {
+          stdout.error(JSON.stringify(err.stack));
+        }
       }
     }
 
@@ -77,11 +82,16 @@ async function syncChanges(cli: CLI, themeId: string) {
       const filePath = `${file.type}/${file.file_name}`;
 
       if (!existsSync(filePath)) {
-        await cli.client.deleteFile(themeId, {
-          file_type: file.type,
-          file_name: file.file_name,
-          file_operation: 'delete',
-        });
+        try {
+          await cli.client.deleteFile(themeId, {
+            file_type: file.type,
+            file_name: file.file_name,
+            file_operation: 'delete',
+          });
+        }
+        catch (err) {
+          stdout.error(JSON.stringify(err.stack));
+        }
         continue;
       }
       const fileStream = readFileSync(filePath);
@@ -89,12 +99,17 @@ async function syncChanges(cli: CLI, themeId: string) {
       localHash.update(fileStream);
 
       if (localHash.digest('hex') !== file.hash) {
-        await cli.client.updateFile(themeId, {
-          file_type: file.type,
-          file_name: file.file_name,
-          file_operation: 'save',
-          file_content: fileFromPathSync(filePath),
-        });
+        try {
+          await cli.client.updateFile(themeId, {
+            file_type: file.type,
+            file_name: file.file_name,
+            file_operation: 'save',
+            file_content: fileFromPathSync(filePath),
+          });
+        }
+        catch (err) {
+          stdout.error(JSON.stringify(err.stack));
+        }
       }
     }
   }
