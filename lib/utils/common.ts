@@ -1,7 +1,7 @@
 import os from 'os';
 import type { PathLike } from 'fs';
 import fs from 'fs';
-import path, { resolve } from 'path';
+import path from 'path';
 import kleur from 'kleur';
 export const homeDir = os.homedir();
 
