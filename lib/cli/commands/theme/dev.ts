@@ -59,7 +59,8 @@ async function syncChanges(cli: CLI, themeId: string) {
     // add newly created files
     if (dirFiles.length > 0) {
       const newFiles = dirFiles.filter(file => !files.find(f => f.file_name === file));
-      await Promise.all(newFiles.map(async (file) => {
+
+      for (const file of newFiles) {
         const fileData = fileFromPathSync(`./${fileType}/${file}`);
 
         await cli.client.updateFile(themeId, {
@@ -68,7 +69,7 @@ async function syncChanges(cli: CLI, themeId: string) {
           file_operation: 'save',
           file_content: fileData,
         });
-      }));
+      }
     }
 
     // update remote with local changes
