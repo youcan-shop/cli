@@ -2,6 +2,7 @@ import os from 'os';
 import type { PathLike } from 'fs';
 import fs from 'fs';
 import path, { resolve } from 'path';
+import kleur from 'kleur';
 export const homeDir = os.homedir();
 
 /**
@@ -39,19 +40,44 @@ export class LoadingSpinner {
     process.stdout.write('\x1B[?25l');
     const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
     let i = 0;
+
     this.timer = setInterval(() => {
       process.stdout.write(`\r${frames[i = ++i % frames.length]} ${this.message}`);
-    }
-    , 100);
+    }, 100);
+
+    return this;
   }
 
-  stop() {
+  private flush() {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
     }
-    process.stdout.write('\x1B[?25h');
+  }
+
+  stop() {
+    this.flush();
+
     process.stdout.write('\r');
+    process.stdout.write(kleur.green(`✔ ${this.message}\n`));
+
+    return this;
+  }
+
+  error(message: string | null = null) {
+    this.flush();
+
+    process.stdout.write('\r');
+    process.stdout.write(kleur.red(`✖ ${message ?? this.message}\n`));
+
+    return this;
+  }
+
+  static async exec(message: string, closure: (spinner: LoadingSpinner) => Promise<void>) {
+    const spinner = new LoadingSpinner(message).start();
+
+    await closure(spinner);
+    spinner.timer && spinner.stop();
   }
 }
 

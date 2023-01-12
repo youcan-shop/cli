@@ -1,34 +1,15 @@
 import { execSync } from 'child_process';
 const { platform } = process;
 
-/**
- * Get the command to open a link based on the platform
- * https://dwheeler.com/essays/open-files-urls.htm
- */
-function openCommand(): string {
-  switch (platform) {
-    case 'linux':
-      return 'xdg-open';
-    case 'darwin':
-      return 'open';
-    case 'win32':
-      return 'cmd /c start';
-    default:
-      throw new Error('Platform not supported.');
-  }
-}
+const PLATFORM_OPEN_CMD_MAP = {
+  win32: 'cmd /c start',
+  linux: 'xdg-open',
+  darwin: 'open',
+};
 
-/**
- * Open a link in the default browser
- * @param url - URL to open
- */
 export default function openLink(url: string) {
-  try {
-    const command = openCommand();
-    execSync(`${command} '${url}'`);
-    return true;
-  }
-  catch (error) {
-    return false;
-  }
+  if (!(platform in PLATFORM_OPEN_CMD_MAP))
+    throw new Error('Platform not supported');
+
+  execSync(`${PLATFORM_OPEN_CMD_MAP[platform as keyof typeof PLATFORM_OPEN_CMD_MAP]} '${url}'`);
 }

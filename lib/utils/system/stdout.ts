@@ -14,4 +14,8 @@ function warn(arg: string) { return log(kleur.yellow(arg)); }
 
 function error(arg: string) { return log(kleur.bgRed().white(arg)); }
 
-export default { log, info, warn, error };
+function success(arg: string) { return log(kleur.green(arg)); }
+
+function clear() { return stdout.clear(); }
+
+export default { log, info, warn, error, clear, success };
