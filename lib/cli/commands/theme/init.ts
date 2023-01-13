@@ -54,13 +54,21 @@ const defaultInquiries = {
   theme_documentation_url: 'https://developer.youcan.shop',
 };
 
+function getSelectedTheme(optionTheme: string): string {
+  const selectedTheme = config.AVAILABLE_THEMES.find(theme => theme.name === optionTheme?.toLocaleLowerCase().trim())?.repository;
+
+  if (selectedTheme) return selectedTheme;
+
+  return config.STARTER_THEME_GIT_REPOSITORY;
+}
+
 export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'init',
     group: 'theme',
     description: 'Create a new theme or clone existing one.',
     options: [
-      { name: '-t, --theme <theme>', description: 'Specify a theme name ex: cod-theme' },
+      { name: '-t, --theme <theme>', description: 'Specify a theme name e.g. cod-theme' },
       { name: '-d, --default', description: 'Use default values for theme name, author, version, support url and documentation url.' },
     ],
 
@@ -72,14 +80,7 @@ export default function command(cli: CLI): CommandDefinition {
 
       stdout.info(messages.INIT_CLONE_START);
 
-      let themeRepository = config.STARTER_THEME_GIT_REPOSITORY;
-
-      if (options.theme) {
-        const selectedTheme = config.AVAILABLE_THEMES.find(theme => theme.name === options.theme.toLocaleLowerCase().trim())?.repository;
-
-        if (selectedTheme)
-          themeRepository = selectedTheme;
-      }
+      const themeRepository = getSelectedTheme(options.theme);
 
       cloneRepository(themeRepository, info.theme_name);
 
