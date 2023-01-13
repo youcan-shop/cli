@@ -13,7 +13,11 @@ export default {
   SELLER_AREA_API_BASE_URI: 'https://api.youcan.shop',
   SELLER_AREA_WEB_BASE_URI: 'https://seller-area.youcan.shop',
 
-  STARTER_THEME_GIT_REPOSITORY: 'git@github.com:youcan-shop/cod-theme.git',
+  STARTER_THEME_GIT_REPOSITORY: 'git@github.com:youcan-shop/light-theme.git',
+  AVAILABLE_THEMES: [
+    { name: 'default', repository: 'git@github.com:youcan-shop/light-theme.git' },
+    { name: 'cod-theme', repository: 'git@github.com:youcan-shop/cod-theme.git' },
+  ],
 
   CLI_GLOBAL_CONFIG_DIR: path.resolve(homedir(), '.youcan'),
   CLI_GLOBAL_CONFIG_PATH: path.resolve(homedir(), '.youcan', 'config.json'),

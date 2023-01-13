@@ -60,7 +60,7 @@ export default function command(cli: CLI): CommandDefinition {
     group: 'theme',
     description: 'Create a new theme or clone existing one.',
     options: [
-      { name: '-t, --theme <theme>', description: 'A git repository to clone instead of the starter theme.' },
+      { name: '-t, --theme <theme>', description: 'theme name' },
       { name: '-d, --default', description: 'Use default values for theme name, author, version, support url and documentation url.' },
     ],
 
@@ -71,7 +71,15 @@ export default function command(cli: CLI): CommandDefinition {
       const info = options.default ? defaultInquiries : await prompts(inquiries) as Omit<InitThemeRequest, 'archive'>;
 
       stdout.info(messages.INIT_CLONE_START);
-      cloneRepository(options.theme || config.STARTER_THEME_GIT_REPOSITORY, info.theme_name);
+
+      let themeRepository = config.STARTER_THEME_GIT_REPOSITORY;
+
+      if (options.theme) {
+        const selectedTheme = config.AVAILABLE_THEMES.find(theme => theme.name === options.theme.toLocaleLowerCase().trim())?.repository;
+        if (selectedTheme) themeRepository = selectedTheme;
+      }
+
+      cloneRepository(themeRepository, info.theme_name);
 
       const zippedTheme = await zipFolder(cwd(), info.theme_name);
       const themeFolderRs = await fileFromPath(zippedTheme);
