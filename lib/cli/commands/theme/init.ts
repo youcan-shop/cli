@@ -54,13 +54,21 @@ const defaultInquiries = {
   theme_documentation_url: 'https://developer.youcan.shop',
 };
 
+function getSelectedTheme(optionTheme: string): string {
+  const selectedTheme = config.AVAILABLE_THEMES.find(theme => theme.name === optionTheme?.toLocaleLowerCase().trim())?.repository;
+
+  if (selectedTheme) return selectedTheme;
+
+  return config.STARTER_THEME_GIT_REPOSITORY;
+}
+
 export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'init',
     group: 'theme',
     description: 'Create a new theme or clone existing one.',
     options: [
-      { name: '-t, --theme <theme>', description: 'A git repository to clone instead of the starter theme.' },
+      { name: '-t, --theme <theme>', description: 'Specify a theme name e.g. cod-theme' },
       { name: '-d, --default', description: 'Use default values for theme name, author, version, support url and documentation url.' },
     ],
 
@@ -71,7 +79,10 @@ export default function command(cli: CLI): CommandDefinition {
       const info = options.default ? defaultInquiries : await prompts(inquiries) as Omit<InitThemeRequest, 'archive'>;
 
       stdout.info(messages.INIT_CLONE_START);
-      cloneRepository(options.theme || config.STARTER_THEME_GIT_REPOSITORY, info.theme_name);
+
+      const themeRepository = getSelectedTheme(options.theme);
+
+      cloneRepository(themeRepository, info.theme_name);
 
       const zippedTheme = await zipFolder(cwd(), info.theme_name);
       const themeFolderRs = await fileFromPath(zippedTheme);
