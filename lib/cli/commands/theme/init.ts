@@ -60,7 +60,7 @@ export default function command(cli: CLI): CommandDefinition {
     group: 'theme',
     description: 'Create a new theme or clone existing one.',
     options: [
-      { name: '-t, --theme <theme>', description: 'theme name' },
+      { name: '-t, --theme <theme>', description: 'Specify a theme name ex: cod-theme' },
       { name: '-d, --default', description: 'Use default values for theme name, author, version, support url and documentation url.' },
     ],
 
@@ -76,7 +76,9 @@ export default function command(cli: CLI): CommandDefinition {
 
       if (options.theme) {
         const selectedTheme = config.AVAILABLE_THEMES.find(theme => theme.name === options.theme.toLocaleLowerCase().trim())?.repository;
-        if (selectedTheme) themeRepository = selectedTheme;
+
+        if (selectedTheme)
+          themeRepository = selectedTheme;
       }
 
       cloneRepository(themeRepository, info.theme_name);
