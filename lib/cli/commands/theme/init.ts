@@ -8,7 +8,7 @@ import config from '@/config';
 import cloneRepository from '@/utils/git/cloneRepository';
 import stdout from '@/utils/system/stdout';
 import type { InitThemeRequest } from '@/core/client/types';
-import zipFolder from '@/utils/system/zipFolder';
+import { zipFolder } from '@/utils/system/zipFolder';
 import writeToFile from '@/utils/system/writeToFile';
 import deleteFile from '@/utils/system/deleteFile';
 import messages from '@/config/messages';
