@@ -1,7 +1,7 @@
 {
   "name": "@youcan/cli",
   "type": "module",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "YouCan CLI for developers.",
   "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
   "keywords": [],
