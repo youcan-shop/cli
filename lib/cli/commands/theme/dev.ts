@@ -125,6 +125,7 @@ export default function command(cli: CLI): CommandDefinition {
     description: 'starts a dev server and watches over the current directory',
     options: [
       { name: '-p, --preview', description: 'opens a preview window' },
+      { name: '-d, --disable-hardware-acceleration', description: 'disable hardware acceleration' },
     ],
     action: async (options: Record<string, string>) => {
       let socket: ReturnType<typeof io>;
@@ -150,7 +151,7 @@ export default function command(cli: CLI): CommandDefinition {
         socket = connectPreviewServer();
         socket.emit('theme:dev', { themeId });
 
-        previewTheme(`https://${domain}/themes/${themeId}/preview`);
+        previewTheme(`https://${domain}/themes/${themeId}/preview`, options);
       }
 
       stdout.info(`Watching for changes in ${kleur.bold().white(cwd())}...`);

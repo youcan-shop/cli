@@ -5,12 +5,17 @@ import puppeteer from 'puppeteer';
 import stdout from '@/utils/system/stdout';
 import config from '@/config';
 
-async function openPreviewPage(url: string) {
-  const browser = await puppeteer.launch({
+async function openPreviewPage(url: string, disableHardwareAcceleration: string) {
+  const options: Record<string, any> = {
     headless: false,
     defaultViewport: null,
     userDataDir: '/tmp/youcan_puppeteer',
-  });
+  };
+
+  if (disableHardwareAcceleration)
+    options.args = ['--disable-gpu'];
+
+  const browser = await puppeteer.launch(options);
 
   browser.on('disconnected', () => {
     stdout.info('Browser closed');
@@ -25,11 +30,11 @@ async function openPreviewPage(url: string) {
   return page;
 }
 
-export default async function previewTheme(url: string) {
+export default async function previewTheme(url: string, options: Record<string, string>) {
   const httpServer = createServer();
   const io = new Server(httpServer);
 
-  const previewPage = await openPreviewPage(url);
+  const previewPage = await openPreviewPage(url, options.disableHardwareAcceleration);
 
   io.on('connection', (socket: Socket) => {
     socket.on('theme:update', async () => {
