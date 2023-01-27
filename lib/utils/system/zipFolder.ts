@@ -31,8 +31,8 @@ export async function zipFolder(folderPath: string, folderName: string): Promise
   });
 }
 
-export async function zipDirectory(dirPath: string, folderName: string) {
-  const ls = lsDir(dirPath);
+export async function zipDirectory(dirPath: string, folderName: string, only?: string[]) {
+  const ls = lsDir(dirPath).filter(folder => only?.includes(folder));
 
   return new Promise((resolve, reject) => {
     try {
