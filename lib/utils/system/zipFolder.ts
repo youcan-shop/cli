@@ -1,5 +1,5 @@
 import fs from 'fs';
-import path, { resolve } from 'path';
+import path from 'path';
 import archiver from 'archiver';
 import { lsDir } from './ls';
 /**
