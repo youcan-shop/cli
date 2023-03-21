@@ -2,6 +2,7 @@ import { Agent } from 'https';
 import type { RequestInit } from 'node-fetch';
 import fetch from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';
+import stdout from './system/stdout';
 
 const HttpsAgent = new Agent({ keepAlive: true, keepAliveMsecs: 5 * 60 * 1000 });
 
@@ -14,8 +15,11 @@ export const DEFAULT_HTTP_CLIENT_OPTIONS = {
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(endpoint, mergeDeepLeft(options, DEFAULT_HTTP_CLIENT_OPTIONS) as RequestInit);
-  if (!response.ok)
-    throw new Error(await response.text(), { cause: response });
+  if (!response.ok) {
+    const data = await response.text();
+
+    stdout.error(`[error] ${data}`);
+  }
 
   return response.json() as Promise<T>;
 }
