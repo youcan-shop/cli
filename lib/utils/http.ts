@@ -1,4 +1,4 @@
-import { Agent } from 'https';
+import { Agent } from 'http';
 import type { RequestInit } from 'node-fetch';
 import fetch from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';

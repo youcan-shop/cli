@@ -151,7 +151,7 @@ export default function command(cli: CLI): CommandDefinition {
         socket = connectPreviewServer();
         socket.emit('theme:dev', { themeId });
 
-        previewTheme(`https://${domain}/themes/${themeId}/preview`, options);
+        previewTheme(`http://${domain}/themes/${themeId}/preview`, options);
       }
 
       stdout.info(`Watching for changes in ${kleur.bold().white(cwd())}...`);
