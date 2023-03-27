@@ -9,6 +9,29 @@ export interface InitThemeRequest {
   theme_documentation_url: string
 }
 
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface LoginResponse {
+  token: string
+  stores: Store[]
+}
+
+export interface SelectStoreRequest {
+  id: string
+}
+
+export interface SelectStoreResponse {
+  token: string
+}
+
+export interface Store {
+  store_id: string
+  slug: string
+  is_active: boolean
+}
 export interface UpdateThemeFileRequestData {
   file_type: string
   file_name: string
