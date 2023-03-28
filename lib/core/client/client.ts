@@ -7,11 +7,12 @@ import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestDa
 import { get, post } from '@/utils/http';
 import config from '@/config';
 import { delay } from '@/utils/common';
+import type { listStoresResponse } from '@/cli/commands/store/types';
 
 export default class Client {
   private accessToken: string | null = null;
 
-  public constructor() {}
+  public constructor() { }
 
   public setAccessToken(token: string) {
     this.accessToken = token;
@@ -33,6 +34,10 @@ export default class Client {
       `${config.SELLER_AREA_API_BASE_URI}/auth/login`,
       this.withDefaults({ body: form }),
     );
+  }
+
+  public async listStores(): Promise<listStoresResponse> {
+    return await get<listStoresResponse>(`${config.SELLER_AREA_API_BASE_URI}/stores`, this.withDefaults({}));
   }
 
   public async selectStore(data: SelectStoreRequest): Promise<SelectStoreResponse> {

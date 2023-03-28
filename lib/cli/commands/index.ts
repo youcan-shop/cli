@@ -8,3 +8,6 @@ export { default as DevCommand } from './theme/dev';
 export { default as DeleteCommand } from './theme/delete';
 export { default as PullCommand } from './theme/pull';
 export { default as PackCommand } from './theme/pack';
+
+// store
+export { default as StoreSwitch } from './store/switch';

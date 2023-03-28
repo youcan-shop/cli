@@ -2,7 +2,15 @@ export default {
   LOGIN_OPEN_LINK: 'Open this link in your browser to continue authentication:',
   LOGIN_SUCCESS: 'You have been successfully logged in.',
 
+  FETCHING_CURRENT_STORE_INFO: 'Fetching current store info',
+  CURRENT_DEVELOPMENT_STORE: 'Current development store',
+  ERROR_WHILE_FETCHING_CURRENT_STORE_INFO: 'Error while fetching current store info',
   SELECT_STORE: 'Which development store you would like to use?',
+  NO_STORE_FOUND: 'No development store found!',
+  NO_STORE_SELECTED: 'No development store selected.',
+  SELECT_STORE_IN_PROGRESS: 'Selecting store in progress',
+  CANNOT_SELECT_STORE: 'Could not select the development store.',
+  STORE_SELECTED: 'Store selected',
 
   INIT_SUCCESS: 'The theme has been initiated with id: ',
   INIT_CLONE_START: 'Cloning your theme from github',
