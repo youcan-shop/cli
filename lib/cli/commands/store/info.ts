@@ -20,7 +20,9 @@ export default function command(cli: CLI): CommandDefinition {
         async (spinner) => {
           try {
             const storeInfo = await cli.client.getStoreInfo() as StoreInfoResponse;
+
             spinner.stop();
+
             stdout.info(`${messages.CURRENT_DEVELOPMENT_STORE}: ${storeInfo.slug}`);
           }
           catch (err) {
