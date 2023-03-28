@@ -33,9 +33,9 @@ In order to make your changes you have to clone a fork of this repository to you
         git clone https://github.com/<your-username>/youcan-cli.git
         cd youcan-cli
     ```
-* Add `NextmediaMa/youcan-cli` as the `upstream` repository
+* Add `youcan-shop/youcan-cli` as the `upstream` repository
     ```
-        git remote add upstream https://github.com/NextmediaMa/youcan-cli
+        git remote add upstream https://github.com/youcan-shop/youcan-cli
     ```
 * You should regularly pull from the `main` branch of the upstream repository to keep up to date with the latest changes to the project.
     ```
