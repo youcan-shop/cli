@@ -120,7 +120,7 @@ async function syncChanges(cli: CLI, themeId: string) {
 
 export default function command(cli: CLI): CommandDefinition {
   return {
-    name: 'dev',
+    name: 'theme:dev',
     group: 'theme',
     description: 'starts a dev server and watches over the current directory',
     options: [

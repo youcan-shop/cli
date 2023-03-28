@@ -2,6 +2,19 @@ export default {
   LOGIN_OPEN_LINK: 'Open this link in your browser to continue authentication:',
   LOGIN_SUCCESS: 'You have been successfully logged in.',
 
+  FETCHING_CURRENT_STORE_INFO: 'Fetching current store info',
+  CURRENT_DEVELOPMENT_STORE: 'Current development store',
+  ERROR_WHILE_FETCHING_CURRENT_STORE_INFO: 'Error while fetching current store info',
+  SELECT_STORE: 'Which development store you would like to use?',
+  NO_STORE_FOUND: 'No development store found!',
+  NO_STORE_SELECTED: 'No development store selected.',
+  SELECT_STORE_IN_PROGRESS: 'Selecting store in progress',
+  CANNOT_SELECT_STORE: 'Could not select the development store.',
+  STORE_SELECTED: 'Store selected',
+
+  FETCHING_DEV_THEMES: 'Fetching current development themes',
+  ERROR_WHILE_FETCHING_DEV_THEMES: 'Error while fetching current development themes',
+
   INIT_SUCCESS: 'The theme has been initiated with id: ',
   INIT_CLONE_START: 'Cloning your theme from github',
 
@@ -10,7 +23,7 @@ export default {
 
   DELETE_NO_THEME_SELECTED: 'No theme selected.',
   DELETE_THEME_DELETED: 'Theme deleted successfully.',
-  DELETE_NO_REMOTE_THEMES: 'This store does not have any development themes.',
+  NO_REMOTE_THEMES: 'This store does not have any development themes.',
   DELETE_SELECT_THEME: 'Which remote development theme would you like to delete?',
   DELETE_IN_PROGRESS: 'Deleting theme',
   DELETE_ERROR: 'Could not delete remote development theme.',

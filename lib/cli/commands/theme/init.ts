@@ -64,7 +64,7 @@ function getSelectedTheme(optionTheme: string): string {
 
 export default function command(cli: CLI): CommandDefinition {
   return {
-    name: 'init',
+    name: 'theme:init',
     group: 'theme',
     description: 'Create a new theme or clone existing one.',
     options: [

@@ -3,8 +3,13 @@ export { default as LoginCommand } from './auth/login';
 export { default as LogoutCommand } from './auth/logout';
 
 // theme
-export { default as InitCommand } from './theme/init';
-export { default as DevCommand } from './theme/dev';
-export { default as DeleteCommand } from './theme/delete';
-export { default as PullCommand } from './theme/pull';
-export { default as PackCommand } from './theme/pack';
+export { default as ThemeInitCommand } from './theme/init';
+export { default as ThemeListCommand } from './theme/list';
+export { default as ThemeDevCommand } from './theme/dev';
+export { default as ThemeDeleteCommand } from './theme/delete';
+export { default as ThemePullCommand } from './theme/pull';
+export { default as ThemePackCommand } from './theme/pack';
+
+// store
+export { default as StoreInfoCommand } from './store/info';
+export { default as StoreSwitchCommand } from './store/switch';

@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/utils/common';
 
 export default function command(cli: CLI): CommandDefinition {
   return {
-    name: 'delete',
+    name: 'theme:delete',
     group: 'theme',
     description: 'Delete a remote development theme',
     options: [],
@@ -19,7 +19,7 @@ export default function command(cli: CLI): CommandDefinition {
       const { dev: devThemes } = await cli.client.listThemes() as listThemesResponse;
 
       if (!devThemes.length)
-        return stdout.error(messages.DELETE_NO_REMOTE_THEMES);
+        return stdout.error(messages.NO_REMOTE_THEMES);
 
       const choices = devThemes.map(theme => ({
         title: theme.name,

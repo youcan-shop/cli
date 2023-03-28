@@ -18,4 +18,6 @@ function success(arg: string) { return log(kleur.green(arg)); }
 
 function clear() { return stdout.clear(); }
 
-export default { log, info, warn, error, clear, success };
+function table(arg: any) { return stdout.table(arg); }
+
+export default { log, info, warn, error, clear, success, table };

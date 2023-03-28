@@ -1,6 +1,6 @@
 ## JIRA Ticket
 
-[DOT-X](https://nextmediama.atlassian.net/browse/DOT-X)
+[DOT-X](https://youcanshop.atlassian.net/browse/DOT-X)
 
 ## QA Steps
 

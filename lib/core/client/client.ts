@@ -1,16 +1,18 @@
+import { exit } from 'process';
 import { FormData } from 'formdata-node';
 import type { RequestInit } from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';
 import fetch from 'node-fetch';
-import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, StoreInfoResponse, ThemeMetaResponse, UpdateThemeFileRequestData } from './types';
+import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, LoginRequest, LoginResponse, SelectStoreRequest, SelectStoreResponse, StoreInfoResponse, ThemeMetaResponse, UpdateThemeFileRequestData } from './types';
 import { get, post } from '@/utils/http';
 import config from '@/config';
 import { delay } from '@/utils/common';
+import type { listStoresResponse } from '@/cli/commands/store/types';
 
 export default class Client {
   private accessToken: string | null = null;
 
-  public constructor() {}
+  public constructor() { }
 
   public setAccessToken(token: string) {
     this.accessToken = token;
@@ -22,6 +24,27 @@ export default class Client {
 
   public isAuthenticated(): boolean {
     return this.accessToken != null;
+  }
+
+  public async auth(data: LoginRequest): Promise<LoginResponse> {
+    const form = new FormData();
+    Object.entries(data).forEach(([key, value]) => form.append(key, value));
+
+    return await post<LoginResponse>(
+      `${config.SELLER_AREA_API_BASE_URI}/auth/login`,
+      this.withDefaults({ body: form }),
+    );
+  }
+
+  public async listStores(): Promise<listStoresResponse> {
+    return await get<listStoresResponse>(`${config.SELLER_AREA_API_BASE_URI}/stores`, this.withDefaults({}));
+  }
+
+  public async selectStore(data: SelectStoreRequest): Promise<SelectStoreResponse> {
+    return await post<SelectStoreResponse>(
+      `${config.SELLER_AREA_API_BASE_URI}/switch-store/${data.id}`,
+      this.withDefaults({}),
+    );
   }
 
   public async initTheme(data: InitThemeRequestData) {
