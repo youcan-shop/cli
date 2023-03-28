@@ -8,7 +8,7 @@ import config from '@/config';
 
 export default function command(cli: CLI): CommandDefinition {
   return {
-    name: 'pack',
+    name: 'theme:pack',
     group: 'theme',
     description: 'Package a theme',
     options: [],

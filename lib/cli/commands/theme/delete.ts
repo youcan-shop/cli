@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/utils/common';
 
 export default function command(cli: CLI): CommandDefinition {
   return {
-    name: 'delete',
+    name: 'theme:delete',
     group: 'theme',
     description: 'Delete a remote development theme',
     options: [],
