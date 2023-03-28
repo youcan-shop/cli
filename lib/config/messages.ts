@@ -2,6 +2,8 @@ export default {
   LOGIN_OPEN_LINK: 'Open this link in your browser to continue authentication:',
   LOGIN_SUCCESS: 'You have been successfully logged in.',
 
+  SELECT_STORE: 'Which development store you would like to use?',
+
   INIT_SUCCESS: 'The theme has been initiated with id: ',
   INIT_CLONE_START: 'Cloning your theme from github',
 
