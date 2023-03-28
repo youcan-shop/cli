@@ -12,6 +12,9 @@ export default {
   CANNOT_SELECT_STORE: 'Could not select the development store.',
   STORE_SELECTED: 'Store selected',
 
+  FETCHING_DEV_THEMES: 'Fetching current development themes',
+  ERROR_WHILE_FETCHING_DEV_THEMES: 'Error while fetching current development themes',
+
   INIT_SUCCESS: 'The theme has been initiated with id: ',
   INIT_CLONE_START: 'Cloning your theme from github',
 
@@ -20,7 +23,7 @@ export default {
 
   DELETE_NO_THEME_SELECTED: 'No theme selected.',
   DELETE_THEME_DELETED: 'Theme deleted successfully.',
-  DELETE_NO_REMOTE_THEMES: 'This store does not have any development themes.',
+  NO_REMOTE_THEMES: 'This store does not have any development themes.',
   DELETE_SELECT_THEME: 'Which remote development theme would you like to delete?',
   DELETE_IN_PROGRESS: 'Deleting theme',
   DELETE_ERROR: 'Could not delete remote development theme.',
