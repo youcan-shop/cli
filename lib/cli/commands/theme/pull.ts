@@ -12,7 +12,7 @@ import messages from '@/config/messages';
 
 export default function command(cli: CLI): CommandDefinition {
   return {
-    name: 'pull',
+    name: 'theme:pull',
     group: 'theme',
     description: 'Pull a theme',
     options: [],
