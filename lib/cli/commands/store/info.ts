@@ -15,20 +15,18 @@ export default function command(cli: CLI): CommandDefinition {
       if (!cli.client.isAuthenticated())
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
 
-      let storeInfo: any;
-
       await LoadingSpinner.exec(
         `${messages.FETCHING_CURRENT_STORE_INFO}..`,
         async (spinner) => {
           try {
-            storeInfo = await cli.client.getStoreInfo() as StoreInfoResponse;
+            const storeInfo = await cli.client.getStoreInfo() as StoreInfoResponse;
+            spinner.stop();
+            stdout.info(`${messages.CURRENT_DEVELOPMENT_STORE}: ${storeInfo.slug}`);
           }
           catch (err) {
             spinner.error(messages.ERROR_WHILE_FETCHING_CURRENT_STORE_INFO);
           }
         });
-
-      stdout.info(`${messages.CURRENT_DEVELOPMENT_STORE}: ${storeInfo.slug}`);
     },
   };
 }

@@ -15,27 +15,28 @@ export default function command(cli: CLI): CommandDefinition {
       if (!cli.client.isAuthenticated())
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
 
-      let devThemes: any;
       await LoadingSpinner.exec(
         `${messages.FETCHING_DEV_THEMES}..`,
         async (spinner) => {
           try {
-            devThemes = await cli.client.listThemes() as listThemesResponse;
+            const devThemes = await cli.client.listThemes() as listThemesResponse;
+
+            spinner.stop();
+
+            if (!devThemes.dev.length)
+              return stdout.error(messages.NO_REMOTE_THEMES);
+
+            stdout.table(
+              devThemes.dev.map((theme: any) => ({
+                Name: theme.name,
+                Size: theme.size,
+              })),
+            );
           }
           catch (err) {
             spinner.error(messages.ERROR_WHILE_FETCHING_DEV_THEMES);
           }
         });
-
-      if (!devThemes.dev.length)
-        return stdout.error(messages.NO_REMOTE_THEMES);
-
-      stdout.table(
-        devThemes.dev.map((theme: any) => ({
-          Name: theme.name,
-          Size: theme.size,
-        })),
-      );
     },
   };
 }
