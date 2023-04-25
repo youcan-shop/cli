@@ -16,7 +16,9 @@ export default {
   STARTER_THEME_GIT_REPOSITORY: 'git@github.com:youcan-shop/light-theme.git',
   AVAILABLE_THEMES: [
     { name: 'default', repository: 'git@github.com:youcan-shop/light-theme.git' },
-    { name: 'cod-theme', repository: 'git@github.com:youcan-shop/cod-theme.git' },
+    { name: 'cod-theme', repository: 'https://github.com/youcan-shop/cod-theme' },
+    { name: 'cod-theme-2', repository: 'https://github.com/youcan-shop/cod-theme-2' },
+    { name: 'cod-theme-3', repository: 'https://github.com/youcan-shop/cod-theme-3' },
   ],
 
   CLI_GLOBAL_CONFIG_DIR: path.resolve(homedir(), '.youcan'),
