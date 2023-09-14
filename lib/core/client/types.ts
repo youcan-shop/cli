@@ -80,3 +80,11 @@ export interface ThemeMetaResponse {
   snippets: ThemeFileInfo[]
   assets: ThemeFileInfo[]
 }
+
+export interface CreateAppRequest {
+  name: string
+}
+
+export interface CreateAppResponse {
+  name: string
+}

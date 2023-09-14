@@ -3,7 +3,7 @@ import { FormData } from 'formdata-node';
 import type { RequestInit } from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';
 import fetch from 'node-fetch';
-import type { DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, LoginRequest, LoginResponse, SelectStoreRequest, SelectStoreResponse, StoreInfoResponse, ThemeMetaResponse, UpdateThemeFileRequestData } from './types';
+import type { CreateAppRequest, CreateAppResponse, DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, LoginRequest, LoginResponse, SelectStoreRequest, SelectStoreResponse, StoreInfoResponse, ThemeMetaResponse, UpdateThemeFileRequestData } from './types';
 import { get, post } from '@/utils/http';
 import config from '@/config';
 import { delay } from '@/utils/common';
@@ -98,6 +98,16 @@ export default class Client {
 
   public async getStoreInfo(): Promise<StoreInfoResponse> {
     return await get<StoreInfoResponse>(`${config.SELLER_AREA_API_BASE_URI}/me`, this.withDefaults());
+  }
+
+  public async createApp(data: CreateAppRequest): Promise<CreateAppResponse> {
+    const form = new FormData();
+    Object.entries(data).forEach(([key, value]) => form.append(key, value));
+
+    return await post<CreateAppResponse>(
+      `${config.SELLER_AREA_API_BASE_URI}/apps/create`,
+      this.withDefaults({ body: form }),
+    );
   }
 
   private withDefaults(override: RequestInit = {}): RequestInit {

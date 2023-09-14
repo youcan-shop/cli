@@ -13,3 +13,6 @@ export { default as ThemePackCommand } from './theme/pack';
 // store
 export { default as StoreInfoCommand } from './store/info';
 export { default as StoreSwitchCommand } from './store/switch';
+
+// apps
+export { default as CreateAppCommand } from './apps/create';
