@@ -16,3 +16,4 @@ export { default as StoreSwitchCommand } from './store/switch';
 
 // apps
 export { default as CreateAppCommand } from './apps/create';
+export { default as InstallAppCommand } from './apps/install';

@@ -3,7 +3,7 @@ import { FormData } from 'formdata-node';
 import type { RequestInit } from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';
 import fetch from 'node-fetch';
-import type { CreateAppRequest, CreateAppResponse, DeleteThemeFileRequestData, InitThemeRequest as InitThemeRequestData, InitThemeResponse, LoginRequest, LoginResponse, SelectStoreRequest, SelectStoreResponse, StoreInfoResponse, ThemeMetaResponse, UpdateThemeFileRequestData } from './types';
+import type { CreateAppRequest, CreateAppResponse, DeleteThemeFileRequestData, GenerateAppInstallationUrlResponse, InitThemeRequest as InitThemeRequestData, InitThemeResponse, LoginRequest, LoginResponse, SelectStoreRequest, SelectStoreResponse, StoreInfoResponse, ThemeMetaResponse, UpdateThemeFileRequestData } from './types';
 import { get, post } from '@/utils/http';
 import config from '@/config';
 import { delay } from '@/utils/common';
@@ -105,8 +105,15 @@ export default class Client {
     Object.entries(data).forEach(([key, value]) => form.append(key, value));
 
     return await post<CreateAppResponse>(
-      `${config.SELLER_AREA_API_BASE_URI}/apps/create`,
+      `${config.SELLER_AREA_API_BASE_URI}/apps/draft/create`,
       this.withDefaults({ body: form }),
+    );
+  }
+
+  public async generateAppInstallationUrl(name: string): Promise<GenerateAppInstallationUrlResponse> {
+    return await get<GenerateAppInstallationUrlResponse>(
+      `${config.SELLER_AREA_API_BASE_URI}/apps/draft/generate-installation-url?name=${name}`,
+      this.withDefaults(),
     );
   }
 
