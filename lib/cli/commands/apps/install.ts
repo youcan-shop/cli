@@ -9,23 +9,16 @@ export default function command(_cli: CLI): CommandDefinition {
     name: 'apps:install',
     group: 'apps',
     description: 'Generate app installation url',
+    options: [
+      { name: '-n, --name <app>', description: 'Specify a app name e.g. codmanager' },
+    ],
 
-    action: async () => {
+    action: async (options: Record<string, string>) => {
       if (!cli.client.isAuthenticated())
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
       try {
-        fs.readFile('package.json', 'utf8', async (err, data) => {
-          if (err) {
-            stdout.error(`Error reading package.json:${err}`);
-            return;
-          }
-
-          const packageData = JSON.parse(data);
-          const appName = packageData.name;
-
-          const response = await cli.client.generateAppInstallationUrl(appName);
-          stdout.info(`To test the app within your store hit the following url : ${response.url}`);
-        });
+        const response = await cli.client.generateAppInstallationUrl(options.name);
+        stdout.info(`To test the app within your store hit the following url : ${response.url}`);
       }
       catch (err: any) {
         const error = JSON.parse(err.message);

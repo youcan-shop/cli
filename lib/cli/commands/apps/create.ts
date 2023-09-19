@@ -42,7 +42,7 @@ export default function command(_cli: CLI): CommandDefinition {
           description: 'Your package description',
           main: 'index.js',
           scripts: {
-            start: 'node index.js && youcan apps:install',
+            start: `node index.js && youcan apps:install -n ${app.name}`,
           },
           dependencies: {},
         };
