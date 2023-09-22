@@ -88,3 +88,7 @@ export interface CreateAppRequest {
 export interface CreateAppResponse {
   name: string
 }
+
+export interface GenerateAppInstallationUrlResponse {
+  url: string
+}
