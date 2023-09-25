@@ -9,9 +9,8 @@ import messages from '@/config/messages';
 import { getPidByPort, isPortAvailable } from '@/utils/network';
 import { kill } from '@/utils/system';
 import { LoadingSpinner } from '@/utils/common';
-import cli from '@/cli';
 
-export default function command(_cli: CLI): CommandDefinition {
+export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'login',
     group: 'auth',

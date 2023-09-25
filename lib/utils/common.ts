@@ -30,7 +30,7 @@ export async function getCurrentThemeId(dir: PathLike): Promise<string | null> {
 }
 
 export class LoadingSpinner {
-  timer: NodeJS.Timer | null;
+  timer: NodeJS.Timeout | null;
   constructor(private message: string) {
     this.message = message;
     this.timer = null;
