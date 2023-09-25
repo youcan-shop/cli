@@ -1,10 +1,8 @@
-import fs from 'fs';
 import type { CLI, CommandDefinition } from '@/cli/commands/types';
 import stdout from '@/utils/system/stdout';
 import messages from '@/config/messages';
-import cli from '@/cli';
 
-export default function command(_cli: CLI): CommandDefinition {
+export default function command(cli: CLI): CommandDefinition {
   return {
     name: 'apps:install',
     group: 'apps',
