@@ -12,17 +12,20 @@ export default function command(cli: CLI): CommandDefinition {
     ],
 
     action: async (options: Record<string, string>) => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
+
       try {
         const response = await cli.client.generateAppInstallationUrl(options.name);
+
         stdout.info(`To test the app within your store hit the following url : ${response.url}`);
       }
       catch (err: any) {
         const error = JSON.parse(err.message);
+
         stdout.error(error);
       }
     },
   };
 }
-

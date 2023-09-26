@@ -18,8 +18,9 @@ export default function command(cli: CLI): CommandDefinition {
     options: [],
 
     action: async () => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
       const { dev } = await cli.client.listThemes() as listThemesResponse;
 
@@ -42,7 +43,9 @@ export default function command(cli: CLI): CommandDefinition {
 
       themeId = themeId || cwdThemeId;
 
-      if (!themeId) return stdout.error(messages.PULL_NO_THEME_FOUND);
+      if (!themeId) {
+        return stdout.error(messages.PULL_NO_THEME_FOUND);
+      }
 
       const fileName = `${themeId}`;
       const fileNameZip = `${fileName}.zip`;

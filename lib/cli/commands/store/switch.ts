@@ -16,8 +16,9 @@ export default function command(cli: CLI): CommandDefinition {
     options: [],
 
     action: async () => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
       let storeInfo: any;
 
@@ -36,8 +37,9 @@ export default function command(cli: CLI): CommandDefinition {
 
       const { stores } = await cli.client.listStores() as listStoresResponse;
 
-      if (!stores.length)
+      if (!stores.length) {
         return stdout.error(messages.NO_STORE_FOUND);
+      }
 
       const choices = stores.map(store => ({
         title: store.slug,
@@ -51,8 +53,9 @@ export default function command(cli: CLI): CommandDefinition {
         choices,
       });
 
-      if (!storeId)
+      if (!storeId) {
         return stdout.error(messages.NO_STORE_SELECTED);
+      }
 
       await LoadingSpinner.exec(
         `${messages.SELECT_STORE_IN_PROGRESS}..`,

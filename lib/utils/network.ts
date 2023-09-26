@@ -11,8 +11,9 @@ export async function isPortAvailable(port: string | number): Promise<boolean> {
     server.once('error', (err: NodeJS.ErrnoException) => {
       server.close();
 
-      if (err.code === 'EADDRINUSE')
+      if (err.code === 'EADDRINUSE') {
         resolve(false);
+      }
 
       reject(err);
     });
@@ -43,8 +44,9 @@ const PID_GETTER_CLASS_MAP = {
         return matches && matches[1] === String(port);
       });
 
-    if (col && col[2].length)
+    if (col && col[2].length) {
       return (parseInt(col[2], 10));
+    }
 
     return null;
   },
@@ -64,8 +66,9 @@ const PID_GETTER_CLASS_MAP = {
     if (cols && cols[1]) {
       const pid = cols[1].split('/', 1)[0];
 
-      if (pid.length)
+      if (pid.length) {
         return parseInt(pid, 10);
+      }
     }
 
     return null;
@@ -83,16 +86,18 @@ const PID_GETTER_CLASS_MAP = {
       return matches && matches[1] === String(port);
     });
 
-    if (cols && cols[1].length && parseInt(cols[1], 10) > 0)
+    if (cols && cols[1].length && parseInt(cols[1], 10) > 0) {
       return parseInt(cols[1], 10);
+    }
 
     return null;
   },
 };
 
 export async function getPidByPort(port: number | string) {
-  if (!(platform in PID_GETTER_CLASS_MAP))
+  if (!(platform in PID_GETTER_CLASS_MAP)) {
     throw new Error('Unsupported platform, process will have to be killed manually.');
+  }
 
   const getter = PID_GETTER_CLASS_MAP[platform as keyof typeof PID_GETTER_CLASS_MAP];
 

@@ -12,9 +12,12 @@ export default function command(cli: CLI): CommandDefinition {
     group: 'apps',
     description: 'Create your app',
     action: async () => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
+
       const loading = new LoadingSpinner('Creating your app ...');
+
       try {
         const inquiries: PromptObject[] = [
           {
@@ -31,8 +34,9 @@ export default function command(cli: CLI): CommandDefinition {
         const appPath = `./${app.name}`;
 
         fs.mkdir(appPath, (err: any) => {
-          if (err)
+          if (err) {
             loading.error(`Error creating directory: ${err}`);
+          }
         });
 
         const packageContent = {
@@ -47,13 +51,15 @@ export default function command(cli: CLI): CommandDefinition {
         };
 
         fs.writeFile(`${appPath}/package.json`, JSON.stringify(packageContent, null, 2), (err: any) => {
-          if (err)
+          if (err) {
             stdout.error(`Error creating the package.json file: ${err}`);
+          }
         });
 
         fs.writeFile(`${appPath}/index.js`, 'console.log(\'Hello, World!\')', (err: any) => {
-          if (err)
+          if (err) {
             stdout.error(`Error creating the index.js file: ${err}`);
+          }
         });
 
         loading.stop();

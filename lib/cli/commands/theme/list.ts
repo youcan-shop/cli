@@ -12,8 +12,9 @@ export default function command(cli: CLI): CommandDefinition {
     options: [],
 
     action: async () => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
       await LoadingSpinner.exec(
         `${messages.FETCHING_DEV_THEMES}..`,
@@ -23,8 +24,9 @@ export default function command(cli: CLI): CommandDefinition {
 
             spinner.stop();
 
-            if (!devThemes.dev.length)
+            if (!devThemes.dev.length) {
               return stdout.error(messages.NO_REMOTE_THEMES);
+            }
 
             stdout.table(
               devThemes.dev.map((theme: any) => ({

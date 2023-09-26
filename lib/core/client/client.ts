@@ -1,4 +1,3 @@
-import { exit } from 'process';
 import { FormData } from 'formdata-node';
 import type { RequestInit } from 'node-fetch';
 import { mergeDeepLeft } from 'ramda';

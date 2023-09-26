@@ -14,11 +14,13 @@ export default function command(cli: CLI): CommandDefinition {
     options: [],
 
     action: async () => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
-      if (!await getCurrentThemeId(cwd()))
+      if (!await getCurrentThemeId(cwd())) {
         return stdout.error('No theme found in the current directory');
+      }
 
       const loading = new LoadingSpinner('📦 Packaging your theme');
       loading.start();

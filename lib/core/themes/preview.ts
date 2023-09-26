@@ -12,8 +12,9 @@ async function openPreviewPage(url: string, disableHardwareAcceleration: string)
     userDataDir: '/tmp/youcan_puppeteer',
   };
 
-  if (disableHardwareAcceleration)
+  if (disableHardwareAcceleration) {
     options.args = ['--disable-gpu'];
+  }
 
   const browser = await puppeteer.launch(options);
 
@@ -44,4 +45,3 @@ export default async function previewTheme(url: string, options: Record<string, 
 
   httpServer.listen(config.PREVIEW_SERVER_PORT);
 }
-

@@ -13,13 +13,15 @@ export default function command(cli: CLI): CommandDefinition {
     options: [],
 
     action: async () => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
       const { dev: devThemes } = await cli.client.listThemes() as listThemesResponse;
 
-      if (!devThemes.length)
+      if (!devThemes.length) {
         return stdout.error(messages.NO_REMOTE_THEMES);
+      }
 
       const choices = devThemes.map(theme => ({
         title: theme.name,
@@ -33,8 +35,9 @@ export default function command(cli: CLI): CommandDefinition {
         choices,
       });
 
-      if (!themeId)
+      if (!themeId) {
         return stdout.error(messages.DELETE_NO_THEME_SELECTED);
+      }
 
       await LoadingSpinner.exec(
         `${messages.DELETE_IN_PROGRESS} ${themeId}..`,

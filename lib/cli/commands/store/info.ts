@@ -12,8 +12,9 @@ export default function command(cli: CLI): CommandDefinition {
     options: [],
 
     action: async () => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
       await LoadingSpinner.exec(
         `${messages.FETCHING_CURRENT_STORE_INFO}..`,

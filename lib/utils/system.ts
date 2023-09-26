@@ -13,7 +13,8 @@ export const kill = (pid: number, signal = 'SIGTERM', timeout = 1000): Promise<v
       }
 
       count += 100;
-      if (count > timeout)
+      if (count > timeout) {
         reject(new Error('Timeout process kill'));
+      }
     }, 100);
   });
