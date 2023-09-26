@@ -14,8 +14,9 @@ export const DEFAULT_HTTP_CLIENT_OPTIONS = {
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(endpoint, mergeDeepLeft(options, DEFAULT_HTTP_CLIENT_OPTIONS) as RequestInit);
-  if (!response.ok)
+  if (!response.ok) {
     throw new Error(await response.text(), { cause: response });
+  }
 
   return response.json() as Promise<T>;
 }

@@ -58,4 +58,3 @@ export async function zipDirectory(dirPath: string, folderName: string, only?: s
     }
   });
 }
-

@@ -8,6 +8,7 @@ import { execSync } from 'child_process';
 export default function cloneRepository(url: string, folder: string) {
   try {
     execSync(`git clone '${url}' '${folder}'`);
+
     return true;
   }
   catch (error) {

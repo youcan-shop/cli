@@ -11,8 +11,9 @@ export default function command(cli: CLI): CommandDefinition {
     description: 'Log out from the current store',
 
     action: async () => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
       deleteFile(config.CLI_GLOBAL_CONFIG_PATH);
 

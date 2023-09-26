@@ -8,8 +8,9 @@ const PLATFORM_OPEN_CMD_MAP = {
 };
 
 export default function openLink(url: string) {
-  if (!(platform in PLATFORM_OPEN_CMD_MAP))
+  if (!(platform in PLATFORM_OPEN_CMD_MAP)) {
     throw new Error('Platform not supported');
+  }
 
   execSync(`${PLATFORM_OPEN_CMD_MAP[platform as keyof typeof PLATFORM_OPEN_CMD_MAP]} '${url}'`);
 }

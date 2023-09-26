@@ -38,21 +38,28 @@ const cli = {
   },
 
   async prepareClient() {
-    if (!existsSync(config.CLI_GLOBAL_CONFIG_DIR))
+    if (!existsSync(config.CLI_GLOBAL_CONFIG_DIR)) {
       await fspromise.mkdir(config.CLI_GLOBAL_CONFIG_DIR);
+    }
 
-    if (!existsSync(config.CLI_GLOBAL_CONFIG_PATH))
+    if (!existsSync(config.CLI_GLOBAL_CONFIG_PATH)) {
       return await fspromise.writeFile(config.CLI_GLOBAL_CONFIG_PATH, '', { flag: 'wx', encoding: 'utf-8' });
+    }
 
     const data = await fspromise
       .readFile(config.CLI_GLOBAL_CONFIG_PATH, 'utf-8')
       .then((b) => {
-        try { return JSON.parse(b); }
-        catch { return {}; }
+        try {
+          return JSON.parse(b);
+        }
+        catch {
+          return {};
+        }
       });
 
-    if ('access_token' in data)
+    if ('access_token' in data) {
       this.client.setAccessToken(data.access_token);
+    }
   },
 };
 

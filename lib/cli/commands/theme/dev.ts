@@ -40,6 +40,7 @@ function connectPreviewServer() {
   socket.on('connect', () => {
     stdout.log(messages.DEV_PREVIEW_SERVER_CONNECTED);
   });
+
   return socket;
 }
 
@@ -72,8 +73,9 @@ async function syncChanges(cli: CLI, themeId: string) {
           });
         }
         catch (err) {
-          if (err instanceof Error)
+          if (err instanceof Error) {
             stdout.error(`[error] ${file}: ${err.message}`);
+          }
         }
       }
     }
@@ -91,8 +93,9 @@ async function syncChanges(cli: CLI, themeId: string) {
           });
         }
         catch (err) {
-          if (err instanceof Error)
+          if (err instanceof Error) {
             stdout.error(`[error] ${file.file_name}: ${err.message}`);
+          }
         }
         continue;
       }
@@ -110,8 +113,9 @@ async function syncChanges(cli: CLI, themeId: string) {
           });
         }
         catch (err) {
-          if (err instanceof Error)
+          if (err instanceof Error) {
             stdout.error(`[error] ${file.file_name}: ${err.message}`);
+          }
         }
       }
     }
@@ -130,13 +134,15 @@ export default function command(cli: CLI): CommandDefinition {
     action: async (options: Record<string, string>) => {
       let socket: ReturnType<typeof io>;
 
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
       const themeId = await getCurrentThemeId(cwd());
 
-      if (!themeId)
+      if (!themeId) {
         return stdout.error(messages.DEV_NO_THEME_DETECTED);
+      }
 
       const { domain } = await cli.client.getStoreInfo();
 
@@ -170,11 +176,13 @@ export default function command(cli: CLI): CommandDefinition {
           try {
             const [filetype, filename] = path.split('/', 2);
 
-            if (!config.THEME_FILE_TYPES.includes(filetype))
+            if (!config.THEME_FILE_TYPES.includes(filetype)) {
               return;
+            }
 
-            if (!['add', 'change', 'unlink'].includes(event))
+            if (!['add', 'change', 'unlink'].includes(event)) {
               return;
+            }
 
             switch (event) {
               case 'add':
@@ -197,7 +205,9 @@ export default function command(cli: CLI): CommandDefinition {
                 break;
             }
 
-            if (socket) socket.emit('theme:update', { themeId });
+            if (socket) {
+              socket.emit('theme:update', { themeId });
+            }
 
             logFileEvent({
               path,
@@ -215,8 +225,9 @@ export default function command(cli: CLI): CommandDefinition {
               roundtrip: new Date().getTime() - start,
             });
 
-            if (err instanceof Error)
+            if (err instanceof Error) {
               stdout.info(`message: ${err.message}`);
+            }
           }
         });
     },

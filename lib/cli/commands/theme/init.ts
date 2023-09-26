@@ -57,7 +57,9 @@ const defaultInquiries = {
 function getSelectedTheme(optionTheme: string): string {
   const selectedTheme = config.AVAILABLE_THEMES.find(theme => theme.name === optionTheme?.toLocaleLowerCase().trim())?.repository;
 
-  if (selectedTheme) return selectedTheme;
+  if (selectedTheme) {
+    return selectedTheme;
+  }
 
   return config.STARTER_THEME_GIT_REPOSITORY;
 }
@@ -73,8 +75,9 @@ export default function command(cli: CLI): CommandDefinition {
     ],
 
     action: async (options: Record<string, string>) => {
-      if (!cli.client.isAuthenticated())
+      if (!cli.client.isAuthenticated()) {
         return stdout.error(messages.AUTH_USER_NOT_LOGGED_IN);
+      }
 
       const info = options.default ? defaultInquiries : await prompts(inquiries) as Omit<InitThemeRequest, 'archive'>;
 
