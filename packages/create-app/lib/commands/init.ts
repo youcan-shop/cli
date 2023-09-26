@@ -9,11 +9,6 @@ export default class Init extends Cli.Command {
 
   static flags = {
     ...Cli.commonFlags,
-    name: Flags.string({
-      char: 'n',
-      env: 'YC_FLAG_NAME',
-      hidden: false,
-    }),
     path: Flags.string({
       char: 'p',
       env: 'YC_FLAG_PATH',
@@ -21,15 +16,11 @@ export default class Init extends Cli.Command {
       default: async () => cwd(),
       hidden: false,
     }),
-    package_manager: Flags.string({
-      char: 'd',
-      env: 'YC_FLAG_PACKAGE_MANAGER',
-      hidden: false,
-      options: ['npm', 'pnpm'],
-    }),
   };
 
   public async run(): Promise<void> {
+    const { flags } = await this.parse(Init);
+
     initPrompt(this, { directory: cwd() });
   }
 }
