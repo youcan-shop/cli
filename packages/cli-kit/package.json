@@ -1,0 +1,31 @@
+{
+  "name": "@youcan/cli-kit",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Utilities for the YouCan CLI",
+  "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
+  "license": "MIT",
+  "keywords": [
+    "youcan",
+    "youcan-cli",
+    "youcan-app"
+  ],
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc --noEmit && rollup --config rollup.config.js",
+    "dev": "rollup --config rollup.config.js --watch",
+    "release": "pnpm publish --access public",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@oclif/core": "^2.15.0",
+    "env-paths": "^3.0.0"
+  }
+}
