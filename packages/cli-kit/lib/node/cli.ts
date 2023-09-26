@@ -1,12 +1,14 @@
+import { Command as BaseCommand, Flags } from '@oclif/core';
+import prompts from 'prompts';
 import { truthy } from './context/helpers';
 import { isDevelopment } from './context/local';
 
-interface ExecOpts {
+interface ExecOptions {
   moduleUrl: string
   development: boolean
 }
 
-function setupEnvVars(options: Pick<ExecOpts, 'development'>) {
+function setupEnvVars(options: Pick<ExecOptions, 'development'>) {
   if (process.argv.includes('--verbose')) {
     process.env.DEBUG = process.env.DEBUG ?? '*';
   }
@@ -27,7 +29,7 @@ function setupColorMode(): void {
   }
 }
 
-export async function exec(options: ExecOpts): Promise<void> {
+export async function exec(options: ExecOptions): Promise<void> {
   setupEnvVars(options);
   setupColorMode();
 
@@ -42,7 +44,7 @@ export async function exec(options: ExecOpts): Promise<void> {
     .catch(err => Errors.handle(err));
 }
 
-export async function execCreate(cmdlet: string, options: ExecOpts): Promise<void> {
+export async function execCreate(cmdlet: string, options: ExecOptions): Promise<void> {
   setupEnvVars(options);
 
   const initIndex = process.argv
@@ -56,4 +58,21 @@ export async function execCreate(cmdlet: string, options: ExecOpts): Promise<voi
   }
 
   await exec(options);
+}
+
+export const commonFlags = {
+  'no-color': Flags.boolean({
+    hidden: false,
+    description: 'Disable color output.',
+    env: 'YC_FLAG_NO_COLOR',
+  }),
+  'verbose': Flags.boolean({
+    hidden: false,
+    description: 'Increase the verbosity of the logs.',
+    env: 'YC_FLAG_VERBOSE',
+  }),
+};
+
+export abstract class Command extends BaseCommand {
+  public prompt = prompts;
 }

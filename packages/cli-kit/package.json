@@ -19,13 +19,18 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc --noEmit && rollup --config rollup.config.js",
+    "build": "shx rm -rf dist && tsc --noEmit && rollup --config rollup.config.js",
     "dev": "rollup --config rollup.config.js --watch",
     "release": "pnpm publish --access public",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@oclif/core": "^2.15.0",
-    "env-paths": "^3.0.0"
+    "env-paths": "^3.0.0",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4.5",
+    "shx": "^0.3.4"
   }
 }

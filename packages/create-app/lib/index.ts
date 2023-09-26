@@ -1,7 +1,7 @@
-import { execCreate } from '@youcan/cli-kit';
+import { Cli } from '@youcan/cli-kit';
 
 async function execCreateAppCli(development: boolean): Promise<void> {
-  await execCreate('app', {
+  await Cli.execCreate('app', {
     moduleUrl: import.meta.url,
     development,
   });
