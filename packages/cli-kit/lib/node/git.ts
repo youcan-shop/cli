@@ -30,7 +30,7 @@ export async function assertGitExists(): Promise<void> {
 export async function clone(cloneOptions: CloneOptions): Promise<void> {
   await assertGitExists();
 
-  const { url, destination, progressUpdater, shallow, latestTag } = cloneOptions;
+  const { url, destination, shallow, latestTag } = cloneOptions;
 
   const [repository, branch] = url.split('#');
   const options: TaskOptions = { '--recurse-submodules': null };

@@ -1,9 +1,5 @@
 import type { Cli } from '@youcan/cli-kit';
 
-interface InitOptions {
-  directory: string
-}
-
 interface InitOutput {
   name: string
   template: string
@@ -16,7 +12,7 @@ export const TEMPLATES = {
   },
 };
 
-async function initPrompt(command: Cli.Command, options: InitOptions): Promise<InitOutput> {
+async function initPrompt(command: Cli.Command): Promise<InitOutput> {
   const defaults = {
     name: 'my-youcan-shop-app',
     template: TEMPLATES.nuxt.url,
