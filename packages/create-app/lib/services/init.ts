@@ -1,4 +1,4 @@
-import { Filesystem, Github, Path, String } from '@youcan/cli-kit';
+import { Filesystem, Git, Github, Path, String, Tasks } from '@youcan/cli-kit';
 
 interface InitServiceOptions {
   name: string
@@ -16,15 +16,34 @@ async function initService(options: InitServiceOptions) {
   await Filesystem.tapIntoTmp(async (tmp) => {
     const templateDownloadDirectory = Path.join(tmp, 'download');
 
-    const templatePathDirectory = repo.path
-      ? Path.join(templateDownloadDirectory, repo.path)
-      : templateDownloadDirectory;
+    // const templatePathDirectory = repo.path
+    //   ? Path.join(templateDownloadDirectory, repo.path)
+    //   : templateDownloadDirectory;
 
     const scaffoldDirectory = Path.join(tmp, 'app');
 
     const url = repo.branch ? `${repo.baseUrl}#${repo.branch}` : repo.baseUrl;
 
     await Filesystem.mkdir(templateDownloadDirectory);
+
+    const tasks: Tasks.Task[] = [];
+
+    tasks.push({
+      title: `Downloading app template from ${url}`,
+      task: async () => {
+        await Git.clone({
+          url,
+          shallow: true,
+          destination: templateDownloadDirectory,
+        });
+      },
+    });
+
+    await Tasks.run(tasks);
+
+    await Filesystem.move(scaffoldDirectory, outdir);
+
+    console.log(outdir, 'done');
   });
 }
 
