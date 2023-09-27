@@ -1,4 +1,4 @@
-import { Command as BaseCommand, Flags } from '@oclif/core';
+import { Command as BaseCommand, Flags, ux } from '@oclif/core';
 import prompts from 'prompts';
 import { truthy } from './context/helpers';
 import { isDevelopment } from './context/local';
@@ -74,5 +74,6 @@ export const commonFlags = {
 };
 
 export abstract class Command extends BaseCommand {
+  public output = ux;
   public prompt = prompts;
 }

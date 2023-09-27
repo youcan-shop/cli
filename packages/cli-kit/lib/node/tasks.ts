@@ -19,7 +19,7 @@ export async function run<T = unknown>(tasks: Task[]) {
   const context: T = {} as T;
 
   for (const task of tasks) {
-    Loader.exec(task.title, async (loader) => {
+    await Loader.exec(task.title, async (loader) => {
       try {
         const subtasks = await runTask(task, context);
 
@@ -28,9 +28,12 @@ export async function run<T = unknown>(tasks: Task[]) {
             await runTask(subtask, context);
           }
         }
+
+        loader.stop();
       }
       catch (err) {
         loader.error(String(err));
+
         throw err;
       }
     });
