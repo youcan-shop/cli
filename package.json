@@ -1,9 +1,10 @@
 {
   "type": "module",
   "private": true,
+  "packageManager": "^pnpm@8.7.5",
   "scripts": {
     "build": "pnpm -r build",
-    "lint": "eslint --fix",
+    "lint": "eslint --fix packages/**/*.{ts,js,json}",
     "release": "pnpm build && bumpp packages/*/package.json --commit \"release: v\" --push --tag && pnpm -r release"
   },
   "workspaces": {
@@ -12,8 +13,15 @@
     ]
   },
   "devDependencies": {
+    "@types/node": "^18.18.0",
     "@youcan/eslint-config": "^2.4.2",
     "bumpp": "^9.2.0",
-    "eslint": "^8.50.0"
+    "eslint": "^8.50.0",
+    "glob": "^10.3.9",
+    "rollup": "^3.29.3",
+    "rollup-plugin-node-externals": "^6.1.1",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "tslib": "^2.6.2",
+    "typescript": "^4.9.5"
   }
 }

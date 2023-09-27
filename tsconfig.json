@@ -12,6 +12,8 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "declaration": true
-  }
+    "declaration": true,
+    "isolatedModules": true
+  },
+  "exclude": ["**/dist/**"]
 }
