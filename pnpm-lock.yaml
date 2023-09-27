@@ -56,6 +56,9 @@ importers:
       '@youcan/cli-kit':
         specifier: workspace:*
         version: link:../cli-kit
+      '@youcan/theme':
+        specifier: workspace:*
+        version: link:../theme
     devDependencies:
       '@oclif/plugin-legacy':
         specifier: ^1.3.0
