@@ -1,5 +1,5 @@
-import { envvars } from '@/internal/node/constants';
+import { ENV_VARS } from '@/internal/node/constants';
 
 export function isDevelopment(env = process.env): boolean {
-  return env[envvars.env] === 'development';
+  return env[ENV_VARS.env] === 'development';
 }
