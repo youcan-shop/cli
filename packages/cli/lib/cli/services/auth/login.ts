@@ -1,4 +1,4 @@
-import { type Cli, Config, Crypto, Env, Http, System } from '@youcan/cli-kit';
+import { Callback, type Cli, Config, Crypto, Env, Http, System } from '@youcan/cli-kit';
 
 interface AdminSession {
   access_token: string
@@ -19,9 +19,7 @@ async function isTokenValid(token: string): Promise<boolean> {
 async function authorize(command: Cli.Command, scopes: string[] = [], state: string = Crypto.randomHex(30)) {
   const PORT = 3000;
   const HOST = '127.0.0.1';
-  const CALLBACK_URL = `http://${HOST}/${PORT}`;
   const AUTHORIZATION_URL = Env.sellerAreaHostname();
-  const CLIENT_ID = Env.oauthClientId();
 
   if (!await System.isPortAvailable(PORT)) {
     command.output.warn(`Port ${PORT} is unavailable, but it is required for authentication.`);
@@ -42,6 +40,7 @@ async function authorize(command: Cli.Command, scopes: string[] = [], state: str
   const verifier = Crypto.base64URLEncode(Crypto.sha256(challenge));
 
   const params = {
+    state,
     scopes: scopes.join(' '),
     client_id: Env.oauthClientId(),
     redirect_url: `http://${HOST}/${PORT}`,
@@ -53,7 +52,16 @@ async function authorize(command: Cli.Command, scopes: string[] = [], state: str
   await command.output.anykey('Press any key to open the login page on your browser..');
 
   const url = `http://${AUTHORIZATION_URL}/admin/oauth/authorize?${new URLSearchParams(params).toString()}`;
-  await System.open(url);
+
+  System.open(url);
+
+  const result = await Callback.listen(command, HOST, PORT, url);
+
+  if (result.state !== state) {
+    throw new Error('Authorization state mismatch..');
+  }
+
+  return { code: result.code, verifier };
 }
 
 async function loginService(command: Cli.Command): Promise<void> {
