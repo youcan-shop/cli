@@ -2,7 +2,7 @@
 /** @ts-expect-error */
 import Conf from 'conf';
 
-export class Config<T extends { [key: string]: any }> {
+class Manager<T extends { [key: string]: any }> {
   private readonly store: Conf;
 
   public constructor(options: { projectName?: string; cwd?: string }) {
@@ -24,4 +24,8 @@ export class Config<T extends { [key: string]: any }> {
   public clear(): void {
     this.store.clear();
   }
+}
+
+export function manager(options: { projectName?: string; cwd?: string }) {
+  return new Manager(options);
 }

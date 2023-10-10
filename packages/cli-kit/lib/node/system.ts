@@ -1,6 +1,8 @@
 import type { Readable, Writable } from 'stream';
 import type { ExecaChildProcess } from 'execa';
 import { execa } from 'execa';
+import tpu from 'tcp-port-used';
+import findProcess from 'find-process';
 
 export interface ExecOptions {
   cwd?: string
@@ -65,4 +67,26 @@ export async function exec(command: string, args: string[], options?: ExecOption
 
     throw err;
   }
+}
+
+export async function isPortAvailable(port: number): Promise<boolean> {
+  return !await tpu.check(port);
+}
+
+export async function getPortProcessName(port: number): Promise<string> {
+  const info = await findProcess('port', port);
+
+  return (info && info.length > 0) ? `(${info[0]?.name})` : '';
+}
+
+export async function killPortProcess(port: number): Promise<void> {
+  const { killPortProcess: kill } = await import('kill-port-process');
+
+  await kill(port);
+}
+
+export async function open(url: string): Promise<void> {
+  const _open = await import('open');
+
+  await _open.default(url);
 }

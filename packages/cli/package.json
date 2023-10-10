@@ -65,6 +65,9 @@
     "topics": {
       "theme": {
         "description": "Build YouCan themes."
+      },
+      "auth": {
+        "description": "Authenticate with your YouCan account."
       }
     },
     "additionalHelpFlags": [

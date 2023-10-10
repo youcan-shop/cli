@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { exec } from '@youcan/cli-kit/dist/node/cli';
+import { Cli } from '@youcan/cli-kit';
 
 process.on('uncaughtException', (err) => {
   fs.writeSync(process.stderr.fd, `${err.stack}\n`);
@@ -14,7 +14,7 @@ signals.forEach((signal) => {
 });
 
 async function execCli(development: boolean): Promise<void> {
-  await exec({
+  await Cli.exec({
     moduleUrl: import.meta.url,
     development,
   });
