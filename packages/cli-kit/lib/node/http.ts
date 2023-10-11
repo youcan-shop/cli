@@ -16,7 +16,7 @@ export const DEFAULT_HTTP_CLIENT_OPTIONS = {
   headers: {
     Accept: 'application/json',
   },
-  agent: agent(),
+  agent: await agent(),
 };
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {

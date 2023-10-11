@@ -18,6 +18,20 @@ export function oauthClientId(): string {
   }
 }
 
+export function oauthClientSecret(): string {
+  switch (get('HOST_ENV')) {
+    case 'dev':
+      return '1';
+    case 'test':
+      return '8';
+    case 'prod':
+      return 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X';
+
+    default:
+      throw new Error('non-exhaustive handling of envs');
+  }
+}
+
 export function sellerAreaHostname(): string {
   switch (get('HOST_ENV')) {
     case 'dev':
