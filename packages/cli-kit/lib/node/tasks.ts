@@ -1,3 +1,4 @@
+import { exit } from 'process';
 import { Loader } from '@/internal/node/ui';
 
 export interface Task<T = unknown> {
@@ -33,8 +34,7 @@ export async function run<T = unknown>(tasks: Task<T>[]) {
       }
       catch (err) {
         loader.error(String(err));
-
-        throw err;
+        exit(1);
       }
     });
   }
