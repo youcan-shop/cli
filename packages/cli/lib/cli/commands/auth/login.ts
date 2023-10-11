@@ -1,110 +1,50 @@
-import { exit } from 'process';
-import prompts from 'prompts';
-import type { PromptObject } from 'prompts';
-import type { CLI, CommandDefinition } from '@/cli/commands/types';
-import config from '@/config';
-import stdout from '@/utils/system/stdout';
-import writeToFile from '@/utils/system/writeToFile';
-import messages from '@/config/messages';
-import { getPidByPort, isPortAvailable } from '@/utils/network';
-import { kill } from '@/utils/system';
-import { LoadingSpinner } from '@/utils/common';
+import { Cli, Config, Env, Http } from '@youcan/cli-kit';
+import type { StoreResponse } from '@/cli/services/auth/login';
+import { authorize, exchange, isSessionValid } from '@/cli/services/auth/login';
 
-export default function command(cli: CLI): CommandDefinition {
-  return {
-    name: 'login',
-    group: 'auth',
-    description: 'Log into a YouCan store',
+export default class Login extends Cli.Command {
+  public async run(): Promise<void> {
+    this.output.log('Attempting to authenticate');
 
-    action: async () => {
-      if (!(await isPortAvailable(config.OAUTH_CALLBACK_PORT))) {
-        stdout.warn(`YouCan CLI requires that the port ${config.OAUTH_CALLBACK_PORT} be available`);
-        const prompt = await prompts({
-          initial: false,
-          type: 'confirm',
-          name: 'terminate',
-          message: 'Terminate the process to free the port?',
-        });
+    const existingSession = Config
+      .manager({ projectName: 'youcan-cli' })
+      .get('store_session');
 
-        if (!prompt.terminate) {
-          stdout.log('Exiting..');
-          exit(1);
-        }
+    if (existingSession && await isSessionValid(existingSession)) {
+      this.output.log('You are already logged in.');
 
-        const pid = await getPidByPort(config.OAUTH_CALLBACK_PORT);
+      return this.exit(0);
+    }
 
-        if (pid) {
-          await LoadingSpinner.exec(
-            `Terminating process ${pid}..`,
-            async (spinner) => {
-              try {
-                await kill(pid, 'SIGTERM', 30_000);
-              }
-              catch (err) {
-                spinner.error('Could not terminate process, proceeding..');
-              }
-            });
-        }
-      }
+    const accessToken = await exchange(await authorize(this));
 
-      const loading = new LoadingSpinner('Authenticating...');
+    const { stores } = await Http.get<{ stores: StoreResponse[] }>(
+      `${Env.apiHostname()}/stores`,
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+    );
 
-      try {
-        const inquiries: PromptObject[] = [
-          {
-            type: 'text',
-            name: 'email',
-            message: 'Type your email',
-            validate: value => value !== '',
-          },
-          {
-            type: 'password',
-            name: 'password',
-            message: 'Type your password',
-            validate: value => value !== '',
-          },
-        ];
+    const { selected } = await this.prompt({
+      type: 'select',
+      name: 'selected',
+      message: 'Select a store to log into',
+      choices: stores.filter(s => s.is_active).map(s => ({ title: s.slug, value: s.store_id })),
+    });
 
-        const credentials = await prompts(inquiries);
+    const store = stores.find(s => s.store_id === selected)!;
 
-        loading.start();
-        const response = await cli.client.auth({ email: credentials.email, password: credentials.password });
-        let token = response.token;
+    const { token: storeAccessToken } = await Http.post<{ token: string }>(
+      `${Env.apiHostname()}/switch-store/${store.store_id}`,
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+    );
 
-        loading.stop();
+    Config
+      .manager({ projectName: 'youcan-cli' })
+      .set('store_session', {
+        slug: store.slug,
+        id: store.store_id,
+        access_token: storeAccessToken,
+      });
 
-        cli.client.setAccessToken(response.token);
-
-        if (response.stores.length > 1) {
-          const choices = response.stores.map(store => ({
-            title: store.slug,
-            value: store.store_id,
-          }));
-
-          const { storeId } = await prompts({
-            type: 'select',
-            name: 'storeId',
-            message: messages.SELECT_STORE,
-            choices,
-          });
-
-          const selectStoreResponse = await cli.client.selectStore({ id: storeId });
-
-          token = selectStoreResponse.token;
-        }
-
-        writeToFile(
-          config.CLI_GLOBAL_CONFIG_PATH,
-          JSON.stringify({ access_token: token }),
-        );
-
-        stdout.info(messages.LOGIN_SUCCESS);
-      }
-      catch (err: any) {
-        const error = JSON.parse(err.message);
-
-        loading.error(error.detail);
-      }
-    },
-  };
+    this.output.info(`Logged in as ${store.slug}..`);
+  }
 }

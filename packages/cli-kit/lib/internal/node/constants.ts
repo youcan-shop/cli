@@ -10,6 +10,7 @@ export function cachedir() {
   return envpaths(identifier).cache;
 }
 
-export const envvars = {
-  env: 'YC_CLI_ENV',
+export const ENV_VARS = {
+  ENV: 'YC_CLI_ENV',
+  HOST_ENV: 'YC_CLI_HOST_ENV',
 };
