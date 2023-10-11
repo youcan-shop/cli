@@ -11,24 +11,20 @@ export function oauthClientId(): string {
     case 'test':
       return '8';
     case 'prod':
-      return '8';
-
     default:
-      throw new Error('non-exhaustive handling of envs');
+      return '8';
   }
 }
 
 export function oauthClientSecret(): string {
   switch (get('HOST_ENV')) {
     case 'dev':
-      return '1';
+      return 'qolnf82WfGnpZ9PRB7xMuJAmUlu92StAjrsdEiXC';
     case 'test':
       return '8';
     case 'prod':
-      return 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X';
-
     default:
-      throw new Error('non-exhaustive handling of envs');
+      return 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X';
   }
 }
 
@@ -36,13 +32,11 @@ export function sellerAreaHostname(): string {
   switch (get('HOST_ENV')) {
     case 'dev':
       return 'seller-area.dotshop.com';
-    case 'prod':
-      return 'seller-area.youcan.shop';
     case 'test':
       return 'seller-area.testyoucan.shop';
-
+    case 'prod':
     default:
-      throw new Error('non exhaustive handling of envs');
+      return 'seller-area.youcan.shop';
   }
 }
 
@@ -50,12 +44,10 @@ export function apiHostname(): string {
   switch (get('HOST_ENV')) {
     case 'dev':
       return 'api.dotshop.com';
-    case 'prod':
-      return 'api.youcan.shop';
     case 'test':
       return 'api.testyoucan.shop';
-
+    case 'prod':
     default:
-      throw new Error('non exhaustive handling of envs');
+      return 'api.youcan.shop';
   }
 }

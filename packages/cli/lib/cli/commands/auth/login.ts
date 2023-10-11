@@ -23,11 +23,16 @@ export default class Login extends Cli.Command {
       { headers: { Authorization: `Bearer ${accessToken}` } },
     );
 
+    const active = stores.filter(s => s.is_active);
+    if (!active.length) {
+      this.output.error('No active stores found.');
+    }
+
     const { selected } = await this.prompt({
       type: 'select',
       name: 'selected',
       message: 'Select a store to log into',
-      choices: stores.filter(s => s.is_active).map(s => ({ title: s.slug, value: s.store_id })),
+      choices: active.map(s => ({ title: s.slug, value: s.store_id })),
     });
 
     const store = stores.find(s => s.store_id === selected)!;
