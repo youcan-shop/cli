@@ -38,7 +38,6 @@ class CallbackListener {
         return callback(this, error, state, code);
       };
       const query = new URL(request.url!, `http://${request.headers.host}`).searchParams;
-      console.log(query);
 
       if (!query.has('code')) {
         return respond('missing code in authorization callback');

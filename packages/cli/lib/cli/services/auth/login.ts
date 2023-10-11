@@ -1,22 +1,22 @@
-import { Callback, type Cli, Config, Crypto, Env, Http, System } from '@youcan/cli-kit';
+import { Callback, type Cli, Crypto, Env, Http, System } from '@youcan/cli-kit';
 
 const LS_PORT = 3000;
 const LS_HOST = 'localhost';
 
-interface StoreSession {
+export interface StoreSession {
   id: string
   slug: string
   access_token: string
 }
 
-interface StoreResponse {
+export interface StoreResponse {
   slug: string
   store_id: string
   is_active: boolean
   is_email_verified: boolean
 }
 
-async function isSessionValid(session: StoreSession): Promise<boolean> {
+export async function isSessionValid(session: StoreSession): Promise<boolean> {
   try {
     const store = await Http.get<{ is_active: boolean }>(
         `${Env.apiHostname()}/me`,
@@ -30,7 +30,7 @@ async function isSessionValid(session: StoreSession): Promise<boolean> {
   }
 }
 
-async function exchange(code: string) {
+export async function exchange(code: string) {
   const params = {
     code,
     client_id: Env.oauthClientId(),
@@ -50,7 +50,7 @@ async function exchange(code: string) {
   return result.access_token;
 }
 
-async function authorize(command: Cli.Command, state: string = Crypto.randomHex(30)) {
+export async function authorize(command: Cli.Command, state: string = Crypto.randomHex(30)) {
   const AUTHORIZATION_URL = Env.sellerAreaHostname();
 
   if (!await System.isPortAvailable(LS_PORT)) {
@@ -90,50 +90,3 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
 
   return result.code;
 }
-
-async function loginService(command: Cli.Command): Promise<void> {
-  command.output.log('Attempting to authenticate');
-
-  const existingSession = Config
-    .manager({ projectName: 'youcan-cli' })
-    .get('store_session');
-
-  if (existingSession && await isSessionValid(existingSession)) {
-    command.output.log('You are already logged in.');
-
-    return command.exit(0);
-  }
-
-  const accessToken = await exchange(await authorize(command));
-
-  const { stores } = await Http.get<{ stores: StoreResponse[] }>(
-    `${Env.apiHostname()}/stores`,
-    { headers: { Authorization: `Bearer ${accessToken}` } },
-  );
-
-  const { selected } = await command.prompt({
-    type: 'select',
-    name: 'selected',
-    message: 'Select a store to log into',
-    choices: stores.filter(s => s.is_active).map(s => ({ title: s.slug, value: s.store_id })),
-  });
-
-  const store = stores.find(s => s.store_id === selected)!;
-
-  const { token: storeAccessToken } = await Http.post<{ token: string }>(
-    `${Env.apiHostname()}/switch-store/${store.store_id}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } },
-  );
-
-  Config
-    .manager({ projectName: 'youcan-cli' })
-    .set('store_session', {
-      slug: store.slug,
-      id: store.store_id,
-      access_token: storeAccessToken,
-    });
-
-  command.output.info(`Logged in as ${store.slug}..`);
-}
-
-export default loginService;
