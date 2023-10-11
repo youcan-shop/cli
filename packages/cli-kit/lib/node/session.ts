@@ -1,22 +1,16 @@
-import { Callback, type Cli, Crypto, Env, Http, System } from '@youcan/cli-kit';
+import { Callback, type Cli, Config, Crypto, Env, Http, System } from '..';
 
 const LS_PORT = 3000;
 const LS_HOST = 'localhost';
 
-export interface StoreSession {
-  id: string
-  slug: string
-  access_token: string
-}
-
-export interface StoreResponse {
+interface StoreResponse {
   slug: string
   store_id: string
   is_active: boolean
   is_email_verified: boolean
 }
 
-export async function isSessionValid(session: StoreSession): Promise<boolean> {
+async function isSessionValid(session: StoreSession): Promise<boolean> {
   try {
     const store = await Http.get<{ is_active: boolean }>(
         `${Env.apiHostname()}/me`,
@@ -30,7 +24,7 @@ export async function isSessionValid(session: StoreSession): Promise<boolean> {
   }
 }
 
-export async function exchange(code: string) {
+async function exchange(code: string) {
   const params = {
     code,
     client_id: Env.oauthClientId(),
@@ -50,7 +44,7 @@ export async function exchange(code: string) {
   return result.access_token;
 }
 
-export async function authorize(command: Cli.Command, state: string = Crypto.randomHex(30)) {
+async function authorize(command: Cli.Command, state: string = Crypto.randomHex(30)) {
   const AUTHORIZATION_URL = Env.sellerAreaHostname();
 
   if (!await System.isPortAvailable(LS_PORT)) {
@@ -63,7 +57,9 @@ export async function authorize(command: Cli.Command, state: string = Crypto.ran
       message: `Would you like to terminate ${await System.getPortProcessName(LS_PORT)}?`,
     });
 
-    !confirmed && command.output.error('Exiting..');
+    if (!confirmed) {
+      throw new Error('Exiting..');
+    }
 
     await System.killPortProcess(LS_PORT);
   }
@@ -89,4 +85,58 @@ export async function authorize(command: Cli.Command, state: string = Crypto.ran
   }
 
   return result.code;
+}
+
+export interface StoreSession {
+  id: string
+  slug: string
+  access_token: string
+}
+
+export async function authenticate(command: Cli.Command): Promise<StoreSession> {
+  const existingSession = Config
+    .manager({ projectName: 'youcan-cli' })
+    .get('store_session');
+
+  if (existingSession && await isSessionValid(existingSession)) {
+    return existingSession;
+  }
+
+  const accessToken = await exchange(await authorize(command));
+
+  const { stores } = await Http.get<{ stores: StoreResponse[] }>(
+      `${Env.apiHostname()}/stores`,
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+
+  const active = stores.filter(s => s.is_active);
+  if (!active.length) {
+    throw new Error('No active stores found');
+  }
+
+  const { selected } = await command.prompt({
+    type: 'select',
+    name: 'selected',
+    message: 'Select a store to log into',
+    choices: active.map(s => ({ title: s.slug, value: s.store_id })),
+  });
+
+  const store = stores.find(s => s.store_id === selected)!;
+
+  const { token: storeAccessToken } = await Http.post<{ token: string }>(
+      `${Env.apiHostname()}/switch-store/${store.store_id}`,
+      { headers: { Authorization: `Bearer ${accessToken}` } },
+  );
+
+  const session = {
+    slug: store.slug,
+    id: store.store_id,
+    access_token: storeAccessToken,
+  };
+
+  Config
+    .manager({ projectName: 'youcan-cli' })
+    .set('store_session', session);
+
+  return session;
 }
