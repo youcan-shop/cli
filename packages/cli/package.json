@@ -43,6 +43,7 @@
     "@oclif/plugin-commands": "^2.2.26",
     "@oclif/plugin-help": "^5.2.19",
     "@oclif/plugin-plugins": "^3.8.2",
+    "@youcan/app": "workspace:*",
     "@youcan/cli-kit": "workspace:*",
     "@youcan/theme": "workspace:*"
   },
@@ -56,15 +57,18 @@
     "scope": "youcan",
     "commands": "./dist/cli/commands",
     "plugins": [
+      "@youcan/app",
       "@youcan/theme",
       "@oclif/plugin-help",
-      "@oclif/plugin-plugins",
       "@oclif/plugin-commands"
     ],
     "topicSeparator": " ",
     "topics": {
       "theme": {
         "description": "Build YouCan themes."
+      },
+      "app": {
+        "description": "Build YouCan apps."
       },
       "auth": {
         "description": "Authenticate with your YouCan account."

@@ -15,16 +15,16 @@ async function runTask<T>(task: Task<T>, ctx: T) {
   return await task.task(ctx, task);
 }
 
-export async function run<T = unknown>(tasks: Task[]) {
+export async function run<T = unknown>(tasks: Task<T>[]) {
   const context: T = {} as T;
 
-  for (const task of tasks) {
+  for await (const task of tasks) {
     await Loader.exec(task.title, async (loader) => {
       try {
-        const subtasks = await runTask(task, context);
+        const subtasks = await runTask<T>(task, context);
 
         if (Array.isArray(subtasks) && subtasks.length > 0 && subtasks.every(t => 'task' in t)) {
-          for (const subtask of subtasks) {
+          for await (const subtask of subtasks) {
             await runTask(subtask, context);
           }
         }
