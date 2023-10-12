@@ -13,6 +13,11 @@ export type AppConfig = {
   }
 } & InitialAppConfig;
 
+export interface ExtensionConfig {
+  type: string
+  name: string
+}
+
 export interface ExtensionFlavor {
   name: string
   path?: string
@@ -30,8 +35,4 @@ export interface ExtensionTemplate {
   name: string
   description: string
   types: ExtensionTemplateType[]
-}
-
-export interface ExtensionInitOptions {
-
 }
