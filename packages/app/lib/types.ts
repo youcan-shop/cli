@@ -12,3 +12,26 @@ export type AppConfig = {
     scopes: string[]
   }
 } & InitialAppConfig;
+
+export interface ExtensionFlavor {
+  name: string
+  path?: string
+  value: 'liquid'
+}
+
+export interface ExtensionTemplateType {
+  url: string
+  type: string
+  flavors: ExtensionFlavor[]
+}
+
+export interface ExtensionTemplate {
+  identifier: string
+  name: string
+  description: string
+  types: ExtensionTemplateType[]
+}
+
+export interface ExtensionInitOptions {
+
+}
