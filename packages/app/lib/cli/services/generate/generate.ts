@@ -40,7 +40,7 @@ export async function initThemeExtension(options: InitExtensionOptions) {
 
     await Filesystem.move(flavorPath, options.directory, { overwrite: true });
 
-    await Filesystem.writeJsonFile(Path.join(directory, 'youcan.extensions.json'), {
+    await Filesystem.writeJsonFile(Path.join(options.directory, 'youcan.extension.json'), {
       name: options.name,
       type: options.type.type,
     });
