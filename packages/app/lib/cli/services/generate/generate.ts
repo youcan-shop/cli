@@ -1,5 +1,6 @@
 import { Filesystem, Git, Path, String } from '@youcan/cli-kit';
 import type { ExtensionFlavor, ExtensionTemplateType, InitialAppConfig } from '@/types';
+import { EXTENSION_CONFIG_FILENAME } from '@/constants';
 
 export async function ensureExtensionDirectoryExists(name: string) {
   const hyphenized = String.hyphenate(name);
@@ -41,7 +42,7 @@ export async function initThemeExtension(options: InitExtensionOptions) {
     await Filesystem.move(flavorPath, options.directory, { overwrite: true });
 
     await Filesystem.writeJsonFile(
-      Path.join(options.directory, 'youcan.extension.json'),
+      Path.join(options.directory, EXTENSION_CONFIG_FILENAME),
       { name: options.name, type: options.type.type },
     );
   });

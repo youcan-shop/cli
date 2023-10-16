@@ -1,1 +1,2 @@
-export const CONFIGURATION_FILE_NAME = 'youcan.app.json';
+export const APP_CONFIG_FILENAME = 'youcan.app.json';
+export const EXTENSION_CONFIG_FILENAME = 'youcan.extension.json';

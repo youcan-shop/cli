@@ -1,14 +1,14 @@
-import { Filesystem, Path, Session, Tasks } from '@youcan/cli-kit';
+import { Filesystem, Path, Tasks } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/theme-command';
 import type { AppConfig, InitialAppConfig } from '@/types';
 import extensions from '@/cli/services/generate/extensions';
 import { ensureExtensionDirectoryExists, initThemeExtension } from '@/cli/services/generate/generate';
+import { APP_CONFIG_FILENAME } from '@/constants';
 
 class GenerateExtension extends AppCommand {
   async run(): Promise<any> {
-    const filepath = Path.resolve(Path.cwd(), this.configFileName());
+    const filepath = Path.resolve(Path.cwd(), APP_CONFIG_FILENAME);
 
-    const session = await Session.authenticate(this);
     const app = await Filesystem.readJsonFile<AppConfig | InitialAppConfig>(filepath);
 
     const { identifier } = await this.prompt({

@@ -1,11 +1,12 @@
 import { Env, Filesystem, Http, Path, Session, Tasks } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/theme-command';
 import type { InitialAppConfig } from '@/types';
+import { APP_CONFIG_FILENAME } from '@/constants';
 
 class Dev extends AppCommand {
   async run(): Promise<any> {
     const session = await Session.authenticate(this);
-    const path = Path.resolve(Path.cwd(), this.configFileName());
+    const path = Path.resolve(Path.cwd(), APP_CONFIG_FILENAME);
 
     await Tasks.run<{ config?: InitialAppConfig }>([
       {
