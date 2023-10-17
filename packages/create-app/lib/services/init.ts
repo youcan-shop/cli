@@ -42,7 +42,7 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
       },
     );
 
-    await Tasks.run(tasks);
+    await Tasks.run({}, tasks);
   });
 
   command.output.info(`${slug} is ready for your to develop! Head to the docs for more information`);

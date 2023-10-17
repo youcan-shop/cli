@@ -11,3 +11,7 @@ export function cwd(): string {
 export function join(...paths: string[]): string {
   return path.join(...paths);
 }
+
+export function dirname(filepath: string) {
+  return path.dirname(filepath);
+}

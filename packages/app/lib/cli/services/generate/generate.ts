@@ -1,13 +1,11 @@
-import { Filesystem, Git, Path, String } from '@youcan/cli-kit';
+import { Filesystem, Git, Path } from '@youcan/cli-kit';
 import type { ExtensionFlavor, ExtensionTemplateType, InitialAppConfig } from '@/types';
 import { EXTENSION_CONFIG_FILENAME } from '@/constants';
 
 export async function ensureExtensionDirectoryExists(name: string) {
-  const hyphenized = String.hyphenate(name);
-  const dir = Path.join(Path.cwd(), 'extensions', hyphenized);
-
+  const dir = Path.join(Path.cwd(), 'extensions', name);
   if (await Filesystem.exists(dir)) {
-    throw new Error(`The '${hyphenized}' already exists, choose a new name for your extension`);
+    throw new Error(`The '${name}' already exists, choose a new name for your extension`);
   }
 
   await Filesystem.mkdir(dir);

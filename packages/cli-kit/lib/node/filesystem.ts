@@ -2,6 +2,7 @@ import FilesystemPromises from 'fs/promises';
 import type { Mode, OpenMode, PathLike } from 'fs';
 import { temporaryDirectoryTask } from 'tempy';
 import FsExtra from 'fs-extra';
+import type { Options as GlobOptions, Pattern } from 'fast-glob';
 
 export async function exists(path: string): Promise<boolean> {
   try {
@@ -53,4 +54,18 @@ export async function readJsonFile<T = Record<string, unknown>>(path: PathLike):
 
 export async function writeJsonFile(path: PathLike, data: Record<string, unknown>): Promise<void> {
   return writeFile(path, JSON.stringify(data, null, 4));
+}
+
+export async function glob(
+  pattern: Pattern | Pattern[],
+  options?: GlobOptions,
+): Promise<string[]> {
+  const { default: _glob } = await import('fast-glob');
+
+  let _options = options;
+  if (options?.dot == null) {
+    _options = { ...options, dot: true };
+  }
+
+  return _glob(pattern, _options);
 }

@@ -1,4 +1,4 @@
-import { Filesystem, Path, Tasks } from '@youcan/cli-kit';
+import { Filesystem, Path, String, Tasks } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/theme-command';
 import type { AppConfig, InitialAppConfig } from '@/types';
 import extensions from '@/cli/services/generate/extensions';
@@ -33,24 +33,25 @@ class GenerateExtension extends AppCommand {
       type: 'text',
       initial: extension.name,
       validate: prev => prev.length >= 3,
+      format: name => String.hyphenate(name),
     });
 
-    await Tasks.run<{ directory: string }>([
+    await Tasks.run<{ directory?: string }>({}, [
       {
         title: 'Validating extension options..',
-        async task(context) {
-          context.directory = await ensureExtensionDirectoryExists(name);
+        async task(ctx) {
+          ctx.directory = await ensureExtensionDirectoryExists(name);
         },
       },
       {
         title: 'Initializing extension..',
-        async task(context) {
+        async task(ctx) {
           await initThemeExtension({
             app,
             name,
             type,
             flavor,
-            directory: context.directory,
+            directory: ctx.directory!,
           });
         },
       },

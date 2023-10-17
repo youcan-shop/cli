@@ -1,3 +1,5 @@
+import type { PathLike } from 'fs';
+
 export interface InitialAppConfig {
   [key: string]: unknown
   name: string
@@ -35,4 +37,15 @@ export interface ExtensionTemplate {
   name: string
   description: string
   types: ExtensionTemplateType[]
+}
+
+export interface Extension {
+  root: PathLike
+  config: ExtensionConfig
+}
+
+export interface App {
+  root: string
+  config: AppConfig
+  extensions: Extension[]
 }
