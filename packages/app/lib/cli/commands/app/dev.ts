@@ -1,36 +1,27 @@
 import { Env, Filesystem, Http, Path, Session, Tasks } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/theme-command';
-import type { InitialAppConfig } from '@/types';
+import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
+import { bootExtensionWorker } from '@/cli/services/dev/workers';
 
 class Dev extends AppCommand {
   async run(): Promise<any> {
+    const app = await load();
     const session = await Session.authenticate(this);
-    const path = Path.resolve(Path.cwd(), APP_CONFIG_FILENAME);
 
-    await Tasks.run<{ config?: InitialAppConfig }>([
-      {
-        title: 'Loading app configuration..',
-        async task(context, _) {
-          if (!await Filesystem.exists(path)) {
-            throw new Error('Could not find the app\'s configuration file.');
-          }
-
-          context.config = await Filesystem.readJsonFile<InitialAppConfig>(path);
-        },
-      },
+    await Tasks.run({ cmd: this }, [
       {
         title: 'Creating draft app..',
-        skip(ctx) {
-          return ctx.config!.id != null;
+        skip() {
+          return app.config.id != null;
         },
-        async task(context, _) {
+        async task() {
           const res = await Http.post<Record<string, any>>(`${Env.apiHostname()}/apps/draft/create`, {
             headers: { Authorization: `Bearer ${session.access_token}` },
-            body: JSON.stringify({ name: context.config!.name }),
+            body: JSON.stringify({ name: app.config.name }),
           });
 
-          context.config = {
+          app.config = {
             name: res.name,
             id: res.id,
             url: res.url,
@@ -40,7 +31,19 @@ class Dev extends AppCommand {
             },
           };
 
-          await Filesystem.writeJsonFile(path, context.config);
+          await Filesystem.writeJsonFile(
+            Path.join(app.root, APP_CONFIG_FILENAME),
+            app.config,
+          );
+        },
+      },
+      {
+        title: 'Preparing dev workers..',
+        async task(ctx) {
+          const promises = app.extensions.map(async ext => await bootExtensionWorker(ctx.cmd, app, ext));
+          const workers = await Promise.all(promises);
+
+          console.log(workers);
         },
       },
     ]);
