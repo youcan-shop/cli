@@ -13,10 +13,13 @@ export default class ThemeExtensionWorker {
     const session = await Session.authenticate(command);
 
     try {
-      const res = await Http.post(`${Env.apiHostname()}/apps/draft/extensions/create`, {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ ...extension.config, app_id: app.config.id }),
-      });
+      const res = await Http.post(
+        `${Env.apiHostname()}/apps/draft/${app.config.id}/extensions/create`,
+        {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ ...extension.config }),
+        },
+      );
 
       console.log(res);
     }
