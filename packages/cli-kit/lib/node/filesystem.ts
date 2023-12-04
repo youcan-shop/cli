@@ -5,6 +5,7 @@ import { temporaryDirectoryTask } from 'tempy';
 import FsExtra from 'fs-extra';
 import type { Options as GlobOptions, Pattern } from 'fast-glob';
 import archiver from 'archiver';
+import chokidar from 'chokidar';
 import { Path } from '..';
 
 export async function exists(path: string): Promise<boolean> {
@@ -103,3 +104,5 @@ export async function unlink(path: string): Promise<void> {
     await FilesystemPromises.unlink(path);
   }
 }
+
+export const watch = chokidar.watch;

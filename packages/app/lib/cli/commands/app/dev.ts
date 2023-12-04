@@ -43,7 +43,7 @@ class Dev extends AppCommand {
           const promises = app.extensions.map(async ext => await bootExtensionWorker(ctx.cmd, app, ext));
           const workers = await Promise.all(promises);
 
-          console.log(workers);
+          await Promise.all(workers.map(async worker => await worker.run()));
         },
       },
     ]);

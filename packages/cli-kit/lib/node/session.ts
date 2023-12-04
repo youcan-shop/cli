@@ -93,6 +93,11 @@ export interface StoreSession {
   access_token: string
 }
 
+export async function get(): Promise<StoreSession | null> {
+  return Config.manager({ projectName: 'youcan-cli' })
+    .get('store_session') ?? null;
+}
+
 export async function authenticate(command: Cli.Command): Promise<StoreSession> {
   const existingSession = Config
     .manager({ projectName: 'youcan-cli' })

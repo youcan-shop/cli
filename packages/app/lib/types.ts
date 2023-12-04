@@ -1,8 +1,18 @@
 import type { PathLike } from 'fs';
+import type { Cli } from '@youcan/cli-kit';
 
 export interface InitialAppConfig {
   [key: string]: unknown
   name: string
+}
+
+export interface ExtensionWorkerConstructor<T extends Extension = Extension> {
+  new(command: Cli.Command, app: App, extension: T): ExtensionWorker
+}
+
+export interface ExtensionWorker {
+  run(): Promise<void>
+  boot(): Promise<void>
 }
 
 export type AppConfig = {
@@ -16,6 +26,7 @@ export type AppConfig = {
 } & InitialAppConfig;
 
 export interface ExtensionConfig {
+  [key: string]: unknown
   type: string
   name: string
 }
@@ -40,6 +51,10 @@ export interface ExtensionTemplate {
 }
 
 export interface Extension {
+  // post boot
+  id?: string
+  metadata?: ExtensionMetadata
+
   root: PathLike
   config: ExtensionConfig
 }
@@ -48,4 +63,18 @@ export interface App {
   root: string
   config: AppConfig
   extensions: Extension[]
+}
+
+export interface ExtensionFileDescriptor {
+  id: string
+  type: string
+  name: string
+  file_name: string
+  size: number
+  hash: string
+}
+
+export interface ExtensionMetadata {
+
+  [key: string]: ExtensionFileDescriptor[]
 }

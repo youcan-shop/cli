@@ -15,3 +15,7 @@ export function join(...paths: string[]): string {
 export function dirname(filepath: string) {
   return path.dirname(filepath);
 }
+
+export function basename(filepath: string) {
+  return path.basename(filepath);
+}
