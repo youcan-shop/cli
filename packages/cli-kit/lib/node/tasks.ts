@@ -36,4 +36,6 @@ export async function run<T = unknown>(ctx: T, tasks: Task<T>[]) {
       }
     });
   }
+
+  return ctx;
 }

@@ -1,1 +1,1 @@
-export const CONFIGURATION_FILE_NAME = 'youcan.theme.json';
+export const THEME_CONFIG_FILENAME = 'youcan.theme.json';

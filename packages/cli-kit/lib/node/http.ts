@@ -14,8 +14,8 @@ async function agent() {
 
 export const DEFAULT_HTTP_CLIENT_OPTIONS = {
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    // 'Content-Type': 'application/json',
   },
   agent: await agent(),
 };
