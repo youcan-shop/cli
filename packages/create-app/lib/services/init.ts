@@ -21,11 +21,9 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
 
     await Filesystem.mkdir(templateDownloadDirectory);
 
-    const tasks: Tasks.Task[] = [];
-
-    tasks.push(
+    await Tasks.run({}, [
       {
-        title: `Downloading app template from ${url}..`,
+        title: `Downloading app template from ${url}...`,
         task: async () => {
           await Git.clone({
             url,
@@ -35,14 +33,21 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
         },
       },
       {
-        title: `Copying files to ${outdir}`,
+        title: 'Configuring app...',
+        task: async () => {
+          await Filesystem.writeJsonFile(
+            Path.join(templateDownloadDirectory, 'youcan.app.json'),
+            { name: slug },
+          );
+        },
+      },
+      {
+        title: `Copying files to ${outdir}...`,
         task: async () => {
           await Filesystem.move(templateDownloadDirectory, outdir);
         },
       },
-    );
-
-    await Tasks.run({}, tasks);
+    ]);
   });
 
   command.output.info(`${slug} is ready for your to develop! Head to the docs for more information`);
