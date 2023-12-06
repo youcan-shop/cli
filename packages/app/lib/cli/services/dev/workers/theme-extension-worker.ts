@@ -1,5 +1,5 @@
 import type { Cli } from '@youcan/cli-kit';
-import { Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
+import { Color, Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
 import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata, ExtensionWorker } from '@/types';
 
 export default class ThemeExtensionWorker implements ExtensionWorker {
@@ -9,6 +9,20 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
     'snippets',
     'blocks',
   ];
+
+  private EVENT_LOG_MAP = {
+    error: () => Color.bold().red('[error]'),
+    add: () => Color.bold().green('[created]'),
+    change: () => Color.bold().blue('[updated]'),
+    unlink: () => Color.bold().yellow('[deleted]'),
+  };
+
+  private formatter = Intl.NumberFormat('en', {
+    unitDisplay: 'narrow',
+    notation: 'compact',
+    style: 'unit',
+    unit: 'byte',
+  });
 
   public constructor(
     private command: Cli.Command,
@@ -58,24 +72,37 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
           return;
         }
 
+        const start = new Date().getTime();
+
         const [filetype, filename] = [
           Path.basename(Path.dirname(path)),
           Path.basename(path),
         ];
 
+        let size = 0;
+
         switch (event) {
           case 'add':
           case 'change':
-            await this.file('put', filetype, filename);
+            size = (await this.file('put', filetype, filename)).size;
 
             break;
           case 'unlink':
-            await this.file('del', filetype, filename);
+            size = (await this.file('del', filetype, filename)).size;
+
             break;
         }
+
+        this.log(
+          event,
+          Path.join(filetype, filename),
+          this.formatter.format(size),
+          new Date().getTime() - start,
+        );
       }
       catch (err) {
-        console.error(err);
+        this.log('error', path);
+        this.command.error(err as Error);
       }
     });
   }
@@ -98,5 +125,16 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
         }),
       },
     );
+  }
+
+  private log(event: string, path: string, size?: string, time?: number) {
+    const tag = this.EVENT_LOG_MAP[event as keyof typeof this.EVENT_LOG_MAP]();
+
+    let line = `${tag} ${Color.underline().white(path)}`;
+    if (event !== 'error') {
+      line += ` - ${size} | ${time}ms \n`;
+    }
+
+    this.command.log(`${tag} ${Color.underline().white(path)} - ${size} | ${time}ms \n`);
   }
 }

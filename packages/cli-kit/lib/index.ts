@@ -14,3 +14,5 @@ export * as Callback from './node/callback';
 export * as Filesystem from './node/filesystem';
 
 export * as String from './common/string';
+
+export { default as Color } from 'kleur';
