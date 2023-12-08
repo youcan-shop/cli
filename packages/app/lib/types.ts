@@ -1,4 +1,3 @@
-import type { PathLike } from 'fs';
 import type { Cli } from '@youcan/cli-kit';
 
 export interface InitialAppConfig {
@@ -55,7 +54,7 @@ export interface Extension {
   id?: string
   metadata?: ExtensionMetadata
 
-  root: PathLike
+  root: string
   config: ExtensionConfig
 }
 

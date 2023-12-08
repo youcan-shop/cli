@@ -1,5 +1,5 @@
 import type { Cli } from '@youcan/cli-kit';
-import { Color, Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
+import { Color, Crypto, Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
 import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata, ExtensionWorker } from '@/types';
 
 export default class ThemeExtensionWorker implements ExtensionWorker {
@@ -46,7 +46,25 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
       this.extension.metadata = res.metadata;
 
       for (const type of Object.keys(this.extension.metadata!)) {
-        // TODO: sync
+        const descriptors = this.extension.metadata[type];
+
+        const directory = Path.resolve(this.extension.root, type);
+        const present = await Filesystem.readdir(Path.resolve(directory));
+
+        present.filter(f => !descriptors.find(d => d.file_name === f))
+          .forEach(async file => await this.file('put', type, file));
+
+        descriptors.forEach(async (descriptor) => {
+          const path = Path.resolve(directory, descriptor.file_name);
+          if (!(await Filesystem.exists(path))) {
+            return await this.file('del', type, descriptor.file_name);
+          }
+
+          const buff = await Filesystem.readFile(path);
+          if (Crypto.sha1(buff) !== descriptor.hash) {
+            await this.file('put', type, descriptor.file_name);
+          }
+        });
       }
     }
     catch (err) {
@@ -56,7 +74,7 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
 
   public async run() {
     const paths = this.FILE_TYPES
-      .map(p => Path.resolve(this.extension.root.toString(), p));
+      .map(p => Path.resolve(this.extension.root, p));
 
     const watcher = Filesystem.watch(paths, {
       persistent: true,
@@ -66,7 +84,7 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
       },
     });
 
-    watcher.on('all', async (event, path) => {
+    watcher.on('all', async (event, path, stat) => {
       try {
         if (!['add', 'change', 'unlink'].includes(event)) {
           return;
@@ -96,7 +114,7 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
         this.log(
           event,
           Path.join(filetype, filename),
-          this.formatter.format(size),
+          this.formatter.format(stat!.size),
           new Date().getTime() - start,
         );
       }
@@ -112,7 +130,7 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
     type: typeof this.FILE_TYPES[number],
     name: string,
   ): Promise<ExtensionFileDescriptor> {
-    const path = Path.resolve(this.extension.root.toString(), type, name);
+    const path = Path.resolve(this.extension.root, type, name);
 
     return await Http.post<ExtensionFileDescriptor>(
       `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/${this.extension.id!}/file`,

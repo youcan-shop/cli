@@ -12,6 +12,10 @@ export function sha256(str: string): Buffer {
   return crypto.createHash('sha256').update(str).digest();
 }
 
+export function sha1(str: Buffer | string): string {
+  return crypto.createHash('sha1').update(str).digest('hex');
+}
+
 export function hashString(str: string): string {
   return crypto.createHash('sha1').update(str).digest('hex');
 }

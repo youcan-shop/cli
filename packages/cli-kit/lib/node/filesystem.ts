@@ -105,4 +105,8 @@ export async function unlink(path: string): Promise<void> {
   }
 }
 
+export async function readdir(path: string) {
+  return await FilesystemPromises.readdir(path);
+}
+
 export const watch = chokidar.watch;
