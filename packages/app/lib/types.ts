@@ -16,7 +16,8 @@ export interface ExtensionWorker {
 
 export type AppConfig = {
   id: string
-  url: string
+  app_url: string
+  redirect_urls: string[]
 
   oauth: {
     client_id: string

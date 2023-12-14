@@ -11,20 +11,26 @@ class Dev extends AppCommand {
 
     await Tasks.run({ cmd: this }, [
       {
-        title: 'Creating draft app..',
-        skip() {
-          return app.config.id != null;
-        },
+        title: 'Syncing app configuration..',
         async task() {
-          const res = await Http.post<Record<string, any>>(`${Env.apiHostname()}/apps/draft/create`, {
+          const endpoint = app.config.id === null
+            ? `${Env.apiHostname()}/apps/draft/create`
+            : `${Env.apiHostname()}/apps/draft/${app.config.id}/update`;
+
+          const res = await Http.post<Record<string, any>>(endpoint, {
             headers: { Authorization: `Bearer ${session.access_token}` },
-            body: JSON.stringify({ name: app.config.name }),
+            body: JSON.stringify({
+              name: app.config.name,
+              app_url: app.config.app_url,
+              redirect_urls: app.config.redirect_urls,
+            }),
           });
 
           app.config = {
             name: res.name,
             id: res.id,
-            url: res.url,
+            app_url: res.app_url,
+            redirect_urls: res.redirect_urls,
             oauth: {
               scopes: res.scopes,
               client_id: res.client_id,
