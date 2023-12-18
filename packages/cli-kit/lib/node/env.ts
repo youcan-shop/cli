@@ -12,7 +12,7 @@ export function oauthClientId(): string {
       return '8';
     case 'prod':
     default:
-      return '8';
+      return '7';
   }
 }
 
@@ -24,7 +24,7 @@ export function oauthClientSecret(): string {
       return '8';
     case 'prod':
     default:
-      return 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X';
+      return 'eCU2eKdDyMlLf1A6LweWL6BjDMixok4IV86rUm3u';
   }
 }
 
@@ -36,7 +36,7 @@ export function sellerAreaHostname(): string {
       return 'seller-area.testyoucan.shop';
     case 'prod':
     default:
-      return 'seller-area.youcan.shop';
+      return 'seller-area.youcanshop.dev';
   }
 }
 
@@ -48,6 +48,6 @@ export function apiHostname(): string {
       return 'api.testyoucan.shop';
     case 'prod':
     default:
-      return 'api.youcan.shop';
+      return 'api.youcanshop.dev';
   }
 }
