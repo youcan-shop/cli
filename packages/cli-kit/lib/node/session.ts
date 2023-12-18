@@ -3,13 +3,6 @@ import { Callback, type Cli, Config, Crypto, Env, Http, System } from '..';
 const LS_PORT = 3000;
 const LS_HOST = 'localhost';
 
-interface StoreResponse {
-  slug: string
-  store_id: string
-  is_active: boolean
-  is_email_verified: boolean
-}
-
 async function isSessionValid(session: StoreSession): Promise<boolean> {
   try {
     const store = await Http.get<{ is_active: boolean }>(
@@ -109,34 +102,15 @@ export async function authenticate(command: Cli.Command): Promise<StoreSession> 
 
   const accessToken = await exchange(await authorize(command));
 
-  const { stores } = await Http.get<{ stores: StoreResponse[] }>(
-      `${Env.apiHostname()}/stores`,
-      { headers: { Authorization: `Bearer ${accessToken}` } },
-  );
-
-  const active = stores.filter(s => s.is_active);
-  if (!active.length) {
-    throw new Error('No active stores found');
-  }
-
-  const { selected } = await command.prompt({
-    type: 'select',
-    name: 'selected',
-    message: 'Select a store to log into',
-    choices: active.map(s => ({ title: s.slug, value: s.store_id })),
-  });
-
-  const store = stores.find(s => s.store_id === selected)!;
-
-  const { token: storeAccessToken } = await Http.post<{ token: string }>(
-      `${Env.apiHostname()}/switch-store/${store.store_id}`,
-      { headers: { Authorization: `Bearer ${accessToken}` } },
+  const store = await Http.get<{ id: string; slug: string }>(
+    `${Env.apiHostname()}/me`,
+    { headers: { Authorization: `Bearer ${accessToken}` } },
   );
 
   const session = {
     slug: store.slug,
-    id: store.store_id,
-    access_token: storeAccessToken,
+    id: store.id,
+    access_token: accessToken,
   };
 
   Config
