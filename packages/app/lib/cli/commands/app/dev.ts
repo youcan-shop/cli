@@ -13,7 +13,7 @@ class Dev extends AppCommand {
       {
         title: 'Syncing app configuration..',
         async task() {
-          const endpoint = app.config.id === null
+          const endpoint = app.config.id == null
             ? `${Env.apiHostname()}/apps/draft/create`
             : `${Env.apiHostname()}/apps/draft/${app.config.id}/update`;
 
