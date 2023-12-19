@@ -6,9 +6,13 @@ interface InitOutput {
 }
 
 export const TEMPLATES = {
-  nuxt: {
+  'nuxt': {
     label: 'Start with Nuxt (recommended)',
-    url: 'https:/github.com/youcan-shop/shop-app-template-nuxt',
+    url: 'https://github.com/youcan-shop/shop-app-template-nuxt',
+  },
+  'extension-only': {
+    label: 'Start with an extension only',
+    url: 'https://github.com/youcan-shop/shop-app-template-none',
   },
 };
 
