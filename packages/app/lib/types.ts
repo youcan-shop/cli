@@ -59,8 +59,23 @@ export interface Extension {
   config: ExtensionConfig
 }
 
+export interface WebConfig {
+  name?: string
+  commands: {
+    dev: string
+    build?: string
+  }
+}
+
+export interface Web {
+  root: string
+  config: WebConfig
+  framework?: string
+}
+
 export interface App {
   root: string
+  webs: Web[]
   config: AppConfig
   extensions: Extension[]
 }

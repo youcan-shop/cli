@@ -1,5 +1,6 @@
 import type { Cli } from '@youcan/cli-kit';
 import { Color, Crypto, Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
+import dayjs from 'dayjs';
 import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata, ExtensionWorker } from '@/types';
 
 export default class ThemeExtensionWorker implements ExtensionWorker {
@@ -44,28 +45,6 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
 
       this.extension.id = res.id;
       this.extension.metadata = res.metadata;
-
-      for (const type of Object.keys(this.extension.metadata!)) {
-        const descriptors = this.extension.metadata[type];
-
-        const directory = Path.resolve(this.extension.root, type);
-        const present = await Filesystem.readdir(Path.resolve(directory));
-
-        present.filter(f => !descriptors.find(d => d.file_name === f))
-          .forEach(async file => await this.file('put', type, file));
-
-        descriptors.forEach(async (descriptor) => {
-          const path = Path.resolve(directory, descriptor.file_name);
-          if (!(await Filesystem.exists(path))) {
-            return await this.file('del', type, descriptor.file_name);
-          }
-
-          const buff = await Filesystem.readFile(path);
-          if (Crypto.sha1(buff) !== descriptor.hash) {
-            await this.file('put', type, descriptor.file_name);
-          }
-        });
-      }
     }
     catch (err) {
       this.command.error(err as Error);
@@ -73,6 +52,30 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
   }
 
   public async run() {
+    this.log(`pushed '${this.extension.config.name}' to a draft...`);
+
+    for (const type of Object.keys(this.extension.metadata!)) {
+      const descriptors = this.extension.metadata![type];
+
+      const directory = Path.resolve(this.extension.root, type);
+      const present = await Filesystem.readdir(Path.resolve(directory));
+
+      present.filter(f => !descriptors.find(d => d.file_name === f))
+        .forEach(async file => await this.file('put', type, file));
+
+      descriptors.forEach(async (descriptor) => {
+        const path = Path.resolve(directory, descriptor.file_name);
+        if (!(await Filesystem.exists(path))) {
+          return await this.file('del', type, descriptor.file_name);
+        }
+
+        const buff = await Filesystem.readFile(path);
+        if (Crypto.sha1(buff) !== descriptor.hash) {
+          await this.file('put', type, descriptor.file_name);
+        }
+      });
+    }
+
     const paths = this.FILE_TYPES
       .map(p => Path.resolve(this.extension.root, p));
 
@@ -84,13 +87,11 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
       },
     });
 
-    watcher.on('all', async (event, path, stat) => {
+    watcher.on('all', async (event, path) => {
       try {
         if (!['add', 'change', 'unlink'].includes(event)) {
           return;
         }
-
-        const start = new Date().getTime();
 
         const [filetype, filename] = [
           Path.basename(Path.dirname(path)),
@@ -108,17 +109,9 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
 
             break;
         }
-
-        this.log(
-          event,
-          Path.join(filetype, filename),
-          this.formatter.format(stat!.size),
-          new Date().getTime() - start,
-        );
       }
       catch (err) {
-        this.log('error', path);
-        this.command.error(err as Error);
+        this.command.output.warn(err as Error);
       }
     });
   }
@@ -129,6 +122,8 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
     name: string,
   ): Promise<ExtensionFileDescriptor> {
     const path = Path.resolve(this.extension.root, type, name);
+
+    this.log(`- ${Path.join(type, name)}`);
 
     return await Http.post<ExtensionFileDescriptor>(
       `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/${this.extension.id!}/file`,
@@ -143,14 +138,14 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
     );
   }
 
-  private log(event: string, path: string, size?: string, time?: number) {
-    const tag = this.EVENT_LOG_MAP[event as keyof typeof this.EVENT_LOG_MAP]();
+  private log(message: string): void {
+    const lines = message.split('\n');
+    const time = dayjs().format('HH:mm:SSS');
 
-    let line = `${tag} ${Color.underline().white(path)}`;
-    if (event !== 'error') {
-      line += ` - ${size} | ${time}ms \n`;
+    for (let i = 0; i < lines.length; i++) {
+      i === 0
+        ? this.command.output.info(Color.yellow(`${time} [ extensions ] ${lines[i]}`))
+        : this.command.output.info(Color.yellow(`                       ${lines[i]}`));
     }
-
-    this.command.log(line);
   }
 }

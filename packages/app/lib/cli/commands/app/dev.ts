@@ -3,13 +3,19 @@ import { AppCommand } from '@/util/theme-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
 import { bootExtensionWorker } from '@/cli/services/dev/workers';
+import type { ExtensionWorker } from '@/types';
+
+interface Context {
+  cmd: AppCommand
+  workers: ExtensionWorker[]
+}
 
 class Dev extends AppCommand {
   async run(): Promise<any> {
     const app = await load();
     const session = await Session.authenticate(this);
 
-    await Tasks.run({ cmd: this }, [
+    const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
         title: 'Syncing app configuration..',
         async task() {
@@ -47,12 +53,15 @@ class Dev extends AppCommand {
         title: 'Preparing dev workers..',
         async task(ctx) {
           const promises = app.extensions.map(async ext => await bootExtensionWorker(ctx.cmd, app, ext));
-          const workers = await Promise.all(promises);
 
-          await Promise.all(workers.map(async worker => await worker.run()));
+          ctx.workers = await Promise.all(promises);
         },
       },
     ]);
+
+    this.clear();
+
+    await Promise.all(workers.map(async worker => await worker.run()));
   }
 }
 

@@ -76,4 +76,8 @@ export const commonFlags = {
 export abstract class Command extends BaseCommand {
   public output = ux;
   public prompt = prompts;
+
+  public clear() {
+    console.clear();
+  }
 }
