@@ -97,16 +97,14 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
           Path.basename(path),
         ];
 
-        let size = 0;
-
         switch (event) {
           case 'add':
           case 'change':
-            size = (await this.file('put', filetype, filename)).size;
+            await this.file('put', filetype, filename);
 
             break;
           case 'unlink':
-            size = (await this.file('del', filetype, filename)).size;
+            await this.file('del', filetype, filename);
 
             break;
         }
@@ -153,6 +151,6 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
       line += ` - ${size} | ${time}ms \n`;
     }
 
-    this.command.log(`${tag} ${Color.underline().white(path)} - ${size} | ${time}ms \n`);
+    this.command.log(line);
   }
 }
