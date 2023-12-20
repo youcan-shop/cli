@@ -1,17 +1,6 @@
-import type { Cli } from '@youcan/cli-kit';
-
 export interface InitialAppConfig {
   [key: string]: unknown
   name: string
-}
-
-export interface ExtensionWorkerConstructor<T extends Extension = Extension> {
-  new(command: Cli.Command, app: App, extension: T): ExtensionWorker
-}
-
-export interface ExtensionWorker {
-  run(): Promise<void>
-  boot(): Promise<void>
 }
 
 export type AppConfig = {

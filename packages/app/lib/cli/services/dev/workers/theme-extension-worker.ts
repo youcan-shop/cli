@@ -1,9 +1,11 @@
 import type { Cli } from '@youcan/cli-kit';
 import { Color, Crypto, Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
-import dayjs from 'dayjs';
-import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata, ExtensionWorker } from '@/types';
+import AbstractWorker, { WorkerLogger } from './abstract-worker';
+import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 
-export default class ThemeExtensionWorker implements ExtensionWorker {
+export default class ThemeExtensionWorker extends AbstractWorker {
+  private logger: WorkerLogger;
+
   public FILE_TYPES = [
     'assets',
     'locales',
@@ -11,25 +13,15 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
     'blocks',
   ];
 
-  private EVENT_LOG_MAP = {
-    error: () => Color.bold().red('[error]'),
-    add: () => Color.bold().green('[created]'),
-    change: () => Color.bold().blue('[updated]'),
-    unlink: () => Color.bold().yellow('[deleted]'),
-  };
-
-  private formatter = Intl.NumberFormat('en', {
-    unitDisplay: 'narrow',
-    notation: 'compact',
-    style: 'unit',
-    unit: 'byte',
-  });
-
   public constructor(
     private command: Cli.Command,
     private app: App,
     private extension: Extension,
-  ) {}
+  ) {
+    super();
+
+    this.logger = new WorkerLogger('stdout', 'extensions', Color.yellow);
+  }
 
   public async boot(): Promise<void> {
     const session = await Session.authenticate(this.command);
@@ -52,7 +44,7 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
   }
 
   public async run() {
-    this.log(`pushed '${this.extension.config.name}' to a draft...`);
+    this.logger.write(`pushed '${this.extension.config.name}' to a draft...`);
 
     for (const type of Object.keys(this.extension.metadata!)) {
       const descriptors = this.extension.metadata![type];
@@ -123,7 +115,7 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
   ): Promise<ExtensionFileDescriptor> {
     const path = Path.resolve(this.extension.root, type, name);
 
-    this.log(`- ${Path.join(type, name)}`);
+    this.logger.write(`- ${Path.join(type, name)}`);
 
     return await Http.post<ExtensionFileDescriptor>(
       `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/${this.extension.id!}/file`,
@@ -136,16 +128,5 @@ export default class ThemeExtensionWorker implements ExtensionWorker {
         }),
       },
     );
-  }
-
-  private log(message: string): void {
-    const lines = message.split('\n');
-    const time = dayjs().format('HH:mm:SSS');
-
-    for (let i = 0; i < lines.length; i++) {
-      i === 0
-        ? this.command.output.info(Color.yellow(`${time} [ extensions ] ${lines[i]}`))
-        : this.command.output.info(Color.yellow(`                       ${lines[i]}`));
-    }
   }
 }

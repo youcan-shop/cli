@@ -2,12 +2,12 @@ import { Env, Filesystem, Http, Path, Session, Tasks } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/theme-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
-import { bootExtensionWorker } from '@/cli/services/dev/workers';
-import type { ExtensionWorker } from '@/types';
+import type { Worker } from '@/cli/services/dev/workers';
+import { bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
 
 interface Context {
   cmd: AppCommand
-  workers: ExtensionWorker[]
+  workers: Worker[]
 }
 
 class Dev extends AppCommand {
@@ -50,16 +50,17 @@ class Dev extends AppCommand {
         },
       },
       {
-        title: 'Preparing dev workers..',
+        title: 'Preparing dev processes...',
         async task(ctx) {
-          const promises = app.extensions.map(async ext => await bootExtensionWorker(ctx.cmd, app, ext));
+          const promises: Promise<Worker>[] = [];
+
+          app.webs.forEach(web => promises.unshift(bootWebWorker(ctx.cmd, app, web)));
+          app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(ctx.cmd, app, ext)));
 
           ctx.workers = await Promise.all(promises);
         },
       },
     ]);
-
-    this.clear();
 
     await Promise.all(workers.map(async worker => await worker.run()));
   }

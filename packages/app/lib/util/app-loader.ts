@@ -43,7 +43,7 @@ async function loadExtensions(app: App): Promise<Extension[]> {
 }
 
 async function loadWebs(app: App): Promise<Web[]> {
-  const pattern = Path.join(app.root, `${DEFAULT_WEBS_DIR}/*`, WEB_CONFIG_FILENAME);
+  const pattern = Path.join(app.root, DEFAULT_WEBS_DIR, WEB_CONFIG_FILENAME);
   const paths = await Filesystem.glob(pattern);
 
   const promises = paths.map(async p => ({
