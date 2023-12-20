@@ -3,14 +3,14 @@ import { Callback, type Cli, Config, Crypto, Env, Http, System } from '..';
 const LS_PORT = 3000;
 const LS_HOST = 'localhost';
 
-async function isSessionValid(session: StoreSession): Promise<boolean> {
+async function isSessionValid(cmd: Cli.Command, session: StoreSession): Promise<boolean> {
   try {
-    const store = await Http.get<{ is_active: boolean }>(
+    const store = await Http.get<{ status: number }>(
         `${Env.apiHostname()}/me`,
         { headers: { Authorization: `Bearer ${session.access_token}` } },
     );
 
-    return store.is_active;
+    return store.status === 1;
   }
   catch (err) {
     return false;
