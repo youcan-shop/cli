@@ -25,15 +25,15 @@ export class WorkerLogger extends Writable {
 
     for (let i = 0; i < lines.length; i++) {
       i === 0
-        ? channel.write(this.color(`${time} [ ${this.center(this.type, 10)} ] ${lines[i]}\n`))
-        : channel.write(this.color(`                         ${lines[i]}\n`));
+        ? channel.write(this.color(`${time} | ${this.pad(this.type, 10)} | ${lines[i]}\n`))
+        : channel.write(this.color(`                       | ${lines[i]}\n`));
     }
 
     return true;
   }
 
-  private center(subject: string, length: number, char = ' ') {
-    return subject.padStart((subject.length + length) / 2, char).padEnd(length, char);
+  private pad(subject: string, length: number, char = ' ') {
+    return subject.padEnd(length, char);
   }
 }
 
