@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      dayjs:
-        specifier: ^1.11.10
-        version: 1.11.10
     devDependencies:
       '@types/node':
         specifier: ^18.18.0
@@ -54,6 +50,9 @@ importers:
       '@youcan/cli-kit':
         specifier: workspace:*
         version: link:../cli-kit
+      dayjs:
+        specifier: ^1.11.10
+        version: 1.11.10
     devDependencies:
       '@oclif/plugin-legacy':
         specifier: ^1.3.0
