@@ -79,6 +79,10 @@ export default class ThemeExtensionWorker extends AbstractWorker {
       },
     });
 
+    this.command.controller.signal.addEventListener('abort', () => {
+      watcher.close();
+    });
+
     watcher.on('all', async (event, path) => {
       try {
         if (!['add', 'change', 'unlink'].includes(event)) {

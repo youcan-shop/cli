@@ -23,6 +23,7 @@ export default class WebWorker extends AbstractWorker {
 
     return System.exec(cmd, args, {
       stdout: this.logger,
+      signal: this.command.controller.signal,
       stderr: new WorkerLogger('stderr', this.web.config.name || 'web', Color.red),
     });
   }

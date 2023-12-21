@@ -76,8 +76,15 @@ export const commonFlags = {
 export abstract class Command extends BaseCommand {
   public output = ux;
   public prompt = prompts;
+  public controller = new AbortController();
 
   public clear() {
     console.clear();
+  }
+
+  exit(code?: number | undefined): never {
+    this.controller.abort();
+
+    return super.exit(code);
   }
 }

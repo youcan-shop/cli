@@ -3,7 +3,7 @@ import { AppCommand } from '@/util/theme-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
 import type { Worker } from '@/cli/services/dev/workers';
-import { bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
+import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
 
 interface Context {
   cmd: AppCommand
@@ -52,7 +52,9 @@ class Dev extends AppCommand {
       {
         title: 'Preparing dev processes...',
         async task(ctx) {
-          const promises: Promise<Worker>[] = [];
+          const promises: Promise<Worker>[] = [
+            bootAppWorker(ctx.cmd, app),
+          ];
 
           app.webs.forEach(web => promises.unshift(bootWebWorker(ctx.cmd, app, web)));
           app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(ctx.cmd, app, ext)));

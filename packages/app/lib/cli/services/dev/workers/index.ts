@@ -1,6 +1,7 @@
 import type { Cli } from '@youcan/cli-kit';
 import ThemeExtensionWorker from './theme-extension-worker';
 import WebWorker from './web-worker';
+import AppWorker from './app-worker';
 import type { App, Extension, Web } from '@/types';
 
 export interface ExtensionWorkerCtor {
@@ -14,6 +15,14 @@ export interface Worker {
 const EXTENSION_WORKERS: Record<string, ExtensionWorkerCtor> = {
   theme: ThemeExtensionWorker,
 };
+
+export async function bootAppWorker(command: Cli.Command, app: App) {
+  const worker = new AppWorker(command, app);
+
+  await worker.boot();
+
+  return worker;
+}
 
 export async function bootExtensionWorker(command: Cli.Command, app: App, extension: Extension) {
   const Ctor = EXTENSION_WORKERS[extension.config.type as keyof typeof EXTENSION_WORKERS];
