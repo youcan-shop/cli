@@ -46,8 +46,8 @@ export default class ThemeExtensionWorker extends AbstractWorker {
   public async run() {
     this.logger.write(`pushed '${this.extension.config.name}' to a draft...`);
 
-    for (const type of Object.keys(this.extension.metadata!)) {
-      const descriptors = this.extension.metadata![type];
+    for (const type of this.FILE_TYPES) {
+      const descriptors = this.extension.metadata![type] ?? [];
 
       const directory = Path.resolve(this.extension.root, type);
       const present = await Filesystem.readdir(Path.resolve(directory));
