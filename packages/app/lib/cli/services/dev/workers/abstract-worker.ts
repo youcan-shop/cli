@@ -20,7 +20,7 @@ export class WorkerLogger extends Writable {
 
     const channel = this.channel === 'stdout' ? stdout : stderr;
 
-    const time = dayjs().format('HH:mm:SSS');
+    const time = dayjs().format('HH:mm:ss:SSS');
     const lines = chunk.toString().split('\n').map(s => s.trim()).filter(s => s !== '');
 
     for (let i = 0; i < lines.length; i++) {

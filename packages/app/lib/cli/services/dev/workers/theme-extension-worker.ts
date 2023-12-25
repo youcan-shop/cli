@@ -1,10 +1,11 @@
 import type { Cli } from '@youcan/cli-kit';
-import { Color, Crypto, Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
+import { Color, Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
 import AbstractWorker, { WorkerLogger } from './abstract-worker';
 import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 
 export default class ThemeExtensionWorker extends AbstractWorker {
   private logger: WorkerLogger;
+  private queue: Array<() => Promise<any>> = [];
 
   public FILE_TYPES = [
     'assets',
@@ -50,21 +51,20 @@ export default class ThemeExtensionWorker extends AbstractWorker {
       const descriptors = this.extension.metadata![type] ?? [];
 
       const directory = Path.resolve(this.extension.root, type);
-      const present = await Filesystem.readdir(Path.resolve(directory));
+      const present = await Filesystem.exists(directory)
+        ? await Filesystem.readdir(directory)
+        : [];
 
       present.filter(f => !descriptors.find(d => d.file_name === f))
-        .forEach(async file => await this.file('put', type, file));
+        .forEach(async file => this.enqueue('put', type, file));
 
       descriptors.forEach(async (descriptor) => {
         const path = Path.resolve(directory, descriptor.file_name);
         if (!(await Filesystem.exists(path))) {
-          return await this.file('del', type, descriptor.file_name);
+          return this.enqueue('del', type, descriptor.file_name);
         }
 
-        const buff = await Filesystem.readFile(path);
-        if (Crypto.sha1(buff) !== descriptor.hash) {
-          await this.file('put', type, descriptor.file_name);
-        }
+        this.enqueue('put', type, descriptor.file_name);
       });
     }
 
@@ -97,11 +97,11 @@ export default class ThemeExtensionWorker extends AbstractWorker {
         switch (event) {
           case 'add':
           case 'change':
-            await this.file('put', filetype, filename);
+            this.enqueue('put', filetype, filename);
 
             break;
           case 'unlink':
-            await this.file('del', filetype, filename);
+            this.enqueue('del', filetype, filename);
 
             break;
         }
@@ -110,27 +110,39 @@ export default class ThemeExtensionWorker extends AbstractWorker {
         this.command.output.warn(err as Error);
       }
     });
+
+    // quick racing conditions hack
+    setInterval(async () => {
+      const task = this.queue.shift();
+      if (task == null) {
+        return;
+      }
+
+      await task();
+    }, 10);
   }
 
-  private async file(
+  private enqueue(
     op: 'put' | 'del',
     type: typeof this.FILE_TYPES[number],
     name: string,
-  ): Promise<ExtensionFileDescriptor> {
-    const path = Path.resolve(this.extension.root, type, name);
+  ): void {
+    this.queue.push(async () => {
+      const path = Path.resolve(this.extension.root, type, name);
 
-    this.logger.write(`- ${Path.join(type, name)}`);
+      await Http.post<ExtensionFileDescriptor>(
+        `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/${this.extension.id!}/file`,
+        {
+          body: Form.convert({
+            file_name: name,
+            file_type: type,
+            file_operation: op,
+            file_content: await Form.file(path),
+          }),
+        },
+      );
 
-    return await Http.post<ExtensionFileDescriptor>(
-      `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/${this.extension.id!}/file`,
-      {
-        body: Form.convert({
-          file_name: name,
-          file_type: type,
-          file_operation: op,
-          file_content: await Form.file(path),
-        }),
-      },
-    );
+      this.logger.write(`[${op === 'put' ? 'updated' : 'deleted'}] - ${Path.join(type, name)}`);
+    });
   }
 }
