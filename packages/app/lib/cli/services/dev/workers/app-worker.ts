@@ -29,6 +29,7 @@ export default class AppWorker extends AbstractWorker {
     });
 
     watcher.once('change', async () => {
+      await watcher.close();
       this.command.controller.abort();
 
       this.logger.write('config update detected, reloading workers...');
