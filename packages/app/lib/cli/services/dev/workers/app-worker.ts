@@ -28,13 +28,11 @@ export default class AppWorker extends AbstractWorker {
       },
     });
 
-    watcher.on('change', async () => {
-      watcher.close();
+    watcher.once('change', async () => {
       this.command.controller.abort();
 
       this.logger.write('config update detected, reloading workers...');
 
-      this.command.output.wait(2000);
       this.command.config.runCommand(this.command.id!, this.command.argv);
     });
   }
