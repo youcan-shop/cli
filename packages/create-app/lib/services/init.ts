@@ -13,14 +13,15 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
 
   await assertDirectoryAvailability(outdir, slug);
 
-  const repo = Github.parseRepositoryReference(options.template);
-
   await Filesystem.tapIntoTmp(async (tmp) => {
     const templateDownloadDirectory = Path.join(tmp, 'download');
-    const url = repo.branch ? `${repo.baseUrl}#${repo.branch}` : repo.baseUrl;
-
     await Filesystem.mkdir(templateDownloadDirectory);
 
+    if (options.template === '#') {
+      return;
+    }
+    const repo = Github.parseRepositoryReference(options.template);
+    const url = repo.branch ? `${repo.baseUrl}#${repo.branch}` : repo.baseUrl;
     await Tasks.run({}, [
       {
         title: `Downloading app template from ${url}...`,

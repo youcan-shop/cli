@@ -10,6 +10,10 @@ export const TEMPLATES = {
     label: 'Start with Nuxt (recommended)',
     url: 'https://github.com/youcan-shop/shop-app-template-nuxt',
   },
+  'blank': {
+    label: 'Start a blank app',
+    url: '#',
+  },
   'extension-only': {
     label: 'Start with an extension only',
     url: 'https://github.com/youcan-shop/shop-app-template-none',
