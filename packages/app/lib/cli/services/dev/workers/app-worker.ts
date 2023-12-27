@@ -20,6 +20,9 @@ export default class AppWorker extends AbstractWorker {
   }
 
   public async run(): Promise<void> {
+    await this.command.output.wait(500);
+    this.logger.write('watching for config updates...');
+
     const watcher = Filesystem.watch(Path.resolve(this.app.root, APP_CONFIG_FILENAME), {
       persistent: true,
       ignoreInitial: true,
