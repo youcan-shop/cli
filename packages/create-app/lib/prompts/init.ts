@@ -5,7 +5,7 @@ interface InitOutput {
   template: string
 }
 
-export const TEMPLATES = {
+export const TEMPLATES: Record<string, { label: string; url?: string }> = {
   'nuxt': {
     label: 'Start with Nuxt (recommended)',
     url: 'https://github.com/youcan-shop/shop-app-template-nuxt',
@@ -13,6 +13,9 @@ export const TEMPLATES = {
   'extension-only': {
     label: 'Start with an extension only',
     url: 'https://github.com/youcan-shop/shop-app-template-none',
+  },
+  'none': {
+    label: 'A blank canvas',
   },
 };
 
@@ -46,7 +49,7 @@ async function initPrompt(command: Cli.Command): Promise<InitOutput> {
       type: 'select',
       name: 'template',
       message: 'Your app\'s starting template',
-      format: v => TEMPLATES[v as keyof typeof TEMPLATES].url,
+      format: v => TEMPLATES[v as keyof typeof TEMPLATES]?.url,
       choices: Object
         .entries(TEMPLATES)
         .map(([k, v]) => ({ title: v.label, value: k })),

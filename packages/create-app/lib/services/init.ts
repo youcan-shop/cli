@@ -4,7 +4,7 @@ import { Filesystem, Git, Github, Path, String, Tasks } from '@youcan/cli-kit';
 interface InitServiceOptions {
   name: string
   directory: string
-  template: string
+  template?: string
 }
 
 async function initService(command: Cli.Command, options: InitServiceOptions) {
@@ -13,18 +13,24 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
 
   await assertDirectoryAvailability(outdir, slug);
 
-  const repo = Github.parseRepositoryReference(options.template);
+  const repo = options.template
+    ? Github.parseRepositoryReference(options.template)
+    : null;
 
   await Filesystem.tapIntoTmp(async (tmp) => {
     const templateDownloadDirectory = Path.join(tmp, 'download');
-    const url = repo.branch ? `${repo.baseUrl}#${repo.branch}` : repo.baseUrl;
 
     await Filesystem.mkdir(templateDownloadDirectory);
 
     await Tasks.run({}, [
       {
-        title: `Downloading app template from ${url}...`,
+        title: 'Closing app template...',
+        skip: () => repo == null,
         task: async () => {
+          const url = repo!.branch
+            ? `${repo!.baseUrl}#${repo!.branch}`
+            : repo!.baseUrl;
+
           await Git.clone({
             url,
             shallow: true,
