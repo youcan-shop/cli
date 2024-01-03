@@ -7,8 +7,8 @@ export default {
   OAUTH_CALLBACK_SERVER_TIMEOUT: 5 * 60 * 100,
   OAUTH_CALLBACK_URL: 'http://localhost:3000/',
   OAUTH_CLIENT_SECRET: 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X',
-  OAUTH_AUTH_CODE_URL: 'https://seller-area.youcan.shop/admin/oauth/authorize?response_type=code&client_id=8&redirect_url=http://localhost:3000/&state=',
-  OAUTH_ACCESS_TOKEN_URL: 'https://seller-area.youcan.shop/admin/oauth/token',
+  OAUTH_AUTH_CODE_URL: 'https://seller-area.youcan.shop/admin/oauth/authorize?response_type=code&client_id=8&redirect_url=http://localhost:3000/&scope=*',
+  OAUTH_ACCESS_TOKEN_URL: 'https://api.youcan.shop/oauth/token',
 
   SELLER_AREA_API_BASE_URI: 'https://api.youcan.shop',
   SELLER_AREA_WEB_BASE_URI: 'https://seller-area.youcan.shop',
