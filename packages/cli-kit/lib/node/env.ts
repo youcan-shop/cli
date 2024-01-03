@@ -9,7 +9,7 @@ export function oauthClientId(): string {
     case 'dev':
       return '3';
     case 'test':
-      return '8';
+      return '11';
     case 'prod':
     default:
       return '7';
@@ -21,7 +21,7 @@ export function oauthClientSecret(): string {
     case 'dev':
       return 'kvvtjXFCeuvvNX2nwD30SAfh7DMbVXm16E0MPCTu';
     case 'test':
-      return '8';
+      return 'UkNttuRvqjPtX08nSzwGssnKPb21Kg0s0NJNKMAo';
     case 'prod':
     default:
       return 'eCU2eKdDyMlLf1A6LweWL6BjDMixok4IV86rUm3u';
