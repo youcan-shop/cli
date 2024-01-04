@@ -83,7 +83,7 @@ async function prompt(command: ThemeCommand) {
     {
       name: 'theme_name',
       type: 'text',
-      initial: 'light-theme',
+      initial: 'Starter',
       message: 'Your theme\'s name',
       validate: (v: string) => {
         if (!v.length) {
@@ -96,12 +96,6 @@ async function prompt(command: ThemeCommand) {
 
         return true;
       },
-    },
-    {
-      type: 'text',
-      name: 'theme_name',
-      message: 'The theme\'s name, used for display purposes.',
-      initial: 'Starter',
     },
     {
       type: 'text',
