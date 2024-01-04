@@ -1,17 +1,13 @@
-import type { Cli } from '@youcan/cli-kit';
+import type { Cli, Worker } from '@youcan/cli-kit';
 import ThemeExtensionWorker from './theme-extension-worker';
 import WebWorker from './web-worker';
 import AppWorker from './app-worker';
 import type { App, Extension, Web } from '@/types';
 
 export interface ExtensionWorkerCtor {
-  new(command: Cli.Command, app: App, extension: Extension): Worker
+  new(command: Cli.Command, app: App, extension: Extension): Worker.Interface
 }
 
-export interface Worker {
-  run(): Promise<void>
-  boot(): Promise<void>
-}
 const EXTENSION_WORKERS: Record<string, ExtensionWorkerCtor> = {
   theme: ThemeExtensionWorker,
 };

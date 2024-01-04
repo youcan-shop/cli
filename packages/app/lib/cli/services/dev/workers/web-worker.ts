@@ -1,9 +1,8 @@
-import { type Cli, Color, System } from '@youcan/cli-kit';
-import AbstractWorker, { WorkerLogger } from './abstract-worker';
+import { type Cli, Color, System, Worker } from '@youcan/cli-kit';
 import type { App, Web } from '@/types';
 
-export default class WebWorker extends AbstractWorker {
-  private logger: WorkerLogger;
+export default class WebWorker extends Worker.Abstract {
+  private logger: Worker.Logger;
 
   public constructor(
     private command: Cli.Command,
@@ -12,7 +11,7 @@ export default class WebWorker extends AbstractWorker {
   ) {
     super();
 
-    this.logger = new WorkerLogger('stderr', this.web.config.name || 'web', Color.blue);
+    this.logger = new Worker.Logger('stderr', this.web.config.name || 'web', Color.blue);
   }
 
   public async boot(): Promise<void> {
@@ -24,7 +23,7 @@ export default class WebWorker extends AbstractWorker {
     return System.exec(cmd, args, {
       stdout: this.logger,
       signal: this.command.controller.signal,
-      stderr: new WorkerLogger('stderr', this.web.config.name || 'web', Color.red),
+      stderr: new Worker.Logger('stderr', this.web.config.name || 'web', Color.red),
     });
   }
 }

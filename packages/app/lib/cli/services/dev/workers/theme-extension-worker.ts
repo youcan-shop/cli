@@ -1,10 +1,9 @@
 import type { Cli } from '@youcan/cli-kit';
-import { Color, Env, Filesystem, Form, Http, Path, Session } from '@youcan/cli-kit';
-import AbstractWorker, { WorkerLogger } from './abstract-worker';
+import { Color, Env, Filesystem, Form, Http, Path, Session, Worker } from '@youcan/cli-kit';
 import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 
-export default class ThemeExtensionWorker extends AbstractWorker {
-  private logger: WorkerLogger;
+export default class ThemeExtensionWorker extends Worker.Abstract {
+  private logger: Worker.Logger;
   private queue: Array<() => Promise<any>> = [];
 
   public FILE_TYPES = [
@@ -21,7 +20,7 @@ export default class ThemeExtensionWorker extends AbstractWorker {
   ) {
     super();
 
-    this.logger = new WorkerLogger('stdout', 'extensions', Color.yellow);
+    this.logger = new Worker.Logger('stdout', 'extensions', Color.yellow);
   }
 
   public async boot(): Promise<void> {

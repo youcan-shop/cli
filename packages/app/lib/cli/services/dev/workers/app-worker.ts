@@ -1,10 +1,9 @@
-import { type Cli, Color, Filesystem, Path } from '@youcan/cli-kit';
-import AbstractWorker, { WorkerLogger } from './abstract-worker';
+import { type Cli, Color, Filesystem, Path, Worker } from '@youcan/cli-kit';
 import type { App } from '@/types';
 import { APP_CONFIG_FILENAME } from '@/constants';
 
-export default class AppWorker extends AbstractWorker {
-  private logger: WorkerLogger;
+export default class AppWorker extends Worker.Abstract {
+  private logger: Worker.Logger;
 
   constructor(
     private command: Cli.Command,
@@ -12,7 +11,7 @@ export default class AppWorker extends AbstractWorker {
   ) {
     super();
 
-    this.logger = new WorkerLogger('stdout', 'app', Color.cyan);
+    this.logger = new Worker.Logger('stdout', 'app', Color.cyan);
   }
 
   public async boot(): Promise<void> {

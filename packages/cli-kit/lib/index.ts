@@ -9,6 +9,7 @@ export * as Github from './node/github';
 export * as System from './node/system';
 export * as Config from './node/config';
 export * as Crypto from './node/crypto';
+export * as Worker from './node/worker';
 export * as Session from './node/session';
 export * as Callback from './node/callback';
 export * as Filesystem from './node/filesystem';

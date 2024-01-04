@@ -1,10 +1,14 @@
 import { Writable } from 'stream';
 import { stderr, stdout } from 'process';
-import type { Color } from '@youcan/cli-kit';
 import dayjs from 'dayjs';
-import type { Worker } from './index';
+import type { Color } from '..';
 
-export class WorkerLogger extends Writable {
+export interface Interface {
+  run(): Promise<void>
+  boot(): Promise<void>
+}
+
+export class Logger extends Writable {
   constructor(
     private channel: 'stdout' | 'stderr',
     private type: string,
@@ -37,7 +41,7 @@ export class WorkerLogger extends Writable {
   }
 }
 
-export default abstract class AbstractWorker implements Worker {
+export abstract class Abstract implements Interface {
   public abstract boot(): Promise<void>;
   public abstract run(): Promise<void>;
 }

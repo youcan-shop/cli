@@ -4,7 +4,7 @@ import { APP_CONFIG_FILENAME, DEFAULT_EXTENSIONS_DIR, DEFAULT_WEBS_DIR, EXTENSIO
 
 export async function load() {
   const path = Path.resolve(Path.cwd(), APP_CONFIG_FILENAME);
-  if (!await Filesystem.exists) {
+  if (!await Filesystem.exists(path)) {
     throw new Error(`app config not found at ${path}`);
   }
 

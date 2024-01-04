@@ -1,13 +1,13 @@
+import type { Worker } from '@youcan/cli-kit';
 import { Env, Filesystem, Http, Path, Session, Tasks } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/theme-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
-import type { Worker } from '@/cli/services/dev/workers';
 import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
 
 interface Context {
   cmd: AppCommand
-  workers: Worker[]
+  workers: Worker.Interface[]
 }
 
 class Dev extends AppCommand {
@@ -52,7 +52,7 @@ class Dev extends AppCommand {
       {
         title: 'Preparing dev processes...',
         async task(ctx) {
-          const promises: Promise<Worker>[] = [
+          const promises: Promise<Worker.Interface>[] = [
             bootAppWorker(ctx.cmd, app),
           ];
 

@@ -115,6 +115,9 @@ importers:
       conf:
         specifier: ^11.0.2
         version: 11.0.2
+      dayjs:
+        specifier: ^1.11.10
+        version: 1.11.10
       env-paths:
         specifier: ^3.0.0
         version: 3.0.0
