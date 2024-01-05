@@ -30,6 +30,14 @@ export interface Theme {
   metadata?: Metadata
 }
 
+export interface ThemeInfo {
+  id: string
+  name: string
+  size: number
+  version: string
+  live: boolean
+}
+
 export interface Store {
   domain: string
   slug: string
