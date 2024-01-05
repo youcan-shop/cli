@@ -1,5 +1,5 @@
 import FilesystemPromises from 'fs/promises';
-import type { Mode, OpenMode, PathLike } from 'fs';
+import type { Mode, OpenMode, PathLike, Stats } from 'fs';
 import { createWriteStream } from 'fs';
 import { temporaryDirectoryTask } from 'tempy';
 import FsExtra from 'fs-extra';
@@ -74,7 +74,7 @@ export async function glob(
   return _glob(pattern, _options);
 }
 
-export async function archived(path: string, name: string): Promise<string> {
+export async function archived(path: string, name: string, glob = '**/*'): Promise<string> {
   return new Promise((resolve, reject) => {
     try {
       const archivePath = Path.resolve(path, `${name}.zip`);
@@ -90,7 +90,12 @@ export async function archived(path: string, name: string): Promise<string> {
       );
 
       _archiver.pipe(output);
-      _archiver.directory(Path.resolve(path, name), false);
+
+      _archiver.glob(glob, {
+        ignore: [`${name}.zip`],
+        cwd: path,
+      });
+
       _archiver.finalize();
     }
     catch (err) {
@@ -107,6 +112,10 @@ export async function unlink(path: string): Promise<void> {
 
 export async function readdir(path: string) {
   return await FilesystemPromises.readdir(path);
+}
+
+export async function stat(path: string): Promise<Stats> {
+  return await FilesystemPromises.stat(path);
 }
 
 export const watch = chokidar.watch;

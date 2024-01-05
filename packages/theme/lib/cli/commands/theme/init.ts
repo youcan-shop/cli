@@ -49,7 +49,11 @@ class Init extends ThemeCommand {
         {
           title: 'Initializing development theme...',
           task: async (ctx) => {
-            const path = await Filesystem.archived(Path.cwd(), answers.theme_name);
+            const path = await Filesystem.archived(
+              Path.resolve(Path.cwd(), answers.theme_name),
+              answers.theme_name,
+            );
+
             Object.assign(ctx.payload, { archive: await Form.file(path) });
 
             const form = Form.convert(ctx.payload);

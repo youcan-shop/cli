@@ -12,7 +12,7 @@ export default class Delete extends ThemeCommand {
       return this.output.info('You have no remote dev themes');
     }
 
-    const choices = themes.map(t => ({ title: t.name, value: t.id }));
+    const choices = themes.map(t => ({ title: `${t.name} (${t.id})`, value: t.id }));
 
     const { identifiers } = await this.prompt({
       choices,
@@ -25,7 +25,7 @@ export default class Delete extends ThemeCommand {
       const theme = themes.find(t => t.id === id)!;
 
       return {
-        title: `Deleting '${theme.name}'...`,
+        title: `Deleting '${theme.name} (${theme.id})'...`,
         async task() {
           await Http.post(`${Env.apiHostname()}/themes/${theme.id}/delete`);
         },
