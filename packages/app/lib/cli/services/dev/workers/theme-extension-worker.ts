@@ -127,7 +127,7 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
     name: string,
   ): void {
     this.queue.push(async () => {
-      const path = Path.resolve(this.extension.root, type, name);
+      const path = Path.join(this.extension.root, type, name);
 
       await Http.post<ExtensionFileDescriptor>(
         `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/${this.extension.id!}/file`,
@@ -136,7 +136,9 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
             file_name: name,
             file_type: type,
             file_operation: op,
-            file_content: await Form.file(path),
+            file_content: op === 'put'
+              ? await Form.file(path)
+              : undefined,
           }),
         },
       );
