@@ -1,10 +1,15 @@
-import { Color, Crypto, Env, Filesystem, Form, Http, Path, Worker } from '@youcan/cli-kit';
+import { Color, Crypto, Env, Filesystem, Form, Http, Path, System, Worker } from '@youcan/cli-kit';
+import { Server } from 'socket.io';
+import debounce from 'debounce';
 import type { ThemeCommand } from '@/util/theme-command';
-import type { FileDescriptor, Metadata, Theme } from '@/types';
+import type { FileDescriptor, Metadata, Store, Theme } from '@/types';
 
 export default class ThemeWorker extends Worker.Abstract {
   private logger: Worker.Logger;
+  private previewLogger: Worker.Logger;
+
   private queue: Array<() => Promise<any>> = [];
+  private io!: Server;
 
   public FILE_TYPES: Array<keyof Metadata> = [
     'layouts',
@@ -18,11 +23,13 @@ export default class ThemeWorker extends Worker.Abstract {
 
   public constructor(
     private command: ThemeCommand,
+    private store: Store,
     private theme: Theme,
   ) {
     super();
 
     this.logger = new Worker.Logger('stdout', 'themes', Color.magenta);
+    this.previewLogger = new Worker.Logger('stdout', 'preview', Color.dim);
   }
 
   async boot(): Promise<void> {
@@ -30,6 +37,19 @@ export default class ThemeWorker extends Worker.Abstract {
       const res = await Http.get<Metadata>(`${Env.apiHostname()}/themes/${this.theme.theme_id}/metadata`);
 
       this.theme.metadata = res;
+
+      this.io = new Server(7565, {
+        cors: {
+          origin: `${Http.scheme()}://${this.store.domain}`,
+          methods: ['GET', 'POST'],
+        },
+      });
+
+      this.io.on('connection', (socket) => {
+        this.previewLogger.write(`attached to preview page at ${socket.handshake.address}`);
+      });
+
+      System.open(`${Http.scheme()}://${this.store.domain}/themes/${this.theme.theme_id}/preview`);
     }
     catch (err) {
       this.command.error(err as Error);
@@ -136,6 +156,11 @@ export default class ThemeWorker extends Worker.Abstract {
         );
 
         this.logger.write(`[${op === 'save' ? 'updated' : 'deleted'}] - ${Path.join(type, name)}`);
+
+        debounce(() => {
+          this.io.emit('theme:update');
+          this.previewLogger.write('reloading preview...');
+        }, 100)();
       }
       catch (err) {
         this.logger.write(`[error] - ${Path.join(type, name)}`);

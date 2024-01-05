@@ -29,3 +29,8 @@ export interface Theme {
   theme_id: string
   metadata?: Metadata
 }
+
+export interface Store {
+  domain: string
+  slug: string
+}
