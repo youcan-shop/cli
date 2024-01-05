@@ -4,7 +4,8 @@ import { is, mergeDeepLeft } from 'ramda';
 import { Session } from '..';
 import * as Env from './env';
 import { isJson } from '@/common/string';
-function scheme(): 'http' | 'https' {
+
+export function scheme(): 'http' | 'https' {
   return Env.get('HOST_ENV') === 'dev' ? 'http' : 'https';
 }
 
