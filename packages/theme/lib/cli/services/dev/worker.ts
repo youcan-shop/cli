@@ -163,7 +163,9 @@ export default class ThemeWorker extends Worker.Abstract {
         }, 100)();
       }
       catch (err) {
-        this.logger.write(`[error] - ${Path.join(type, name)}`);
+        if (err instanceof Error) {
+          this.logger.write(`[error] - ${Path.join(type, name)}\n${err.message}`);
+        }
       }
     });
   }

@@ -30,7 +30,7 @@ export class Logger extends Writable {
     for (let i = 0; i < lines.length; i++) {
       i === 0
         ? channel.write(this.color(`${time} | ${this.pad(this.type, 10)} | ${lines[i]}\n`))
-        : channel.write(this.color(`                       | ${lines[i]}\n`));
+        : channel.write(this.color(`                          | ${lines[i]}\n`));
     }
 
     return true;
