@@ -1,18 +1,36 @@
-# youcan-cli
+# YouCan CLI
 
-YouCan CLI is a command line utility for building custom YouCan themes. It can be installed and run on Mac, Linux, and Windows systems. Using the CLI requires you to have pre-requisite knowledge of the YouCan themes system documented [here](https://developer.youcan.shop/).
+YouCan CLI is a command line tool to simplify building YouCan Shop themes and apps.
 
-## Requirements
+Learn more in the [API Reference](#).
 
-The YouCan CLI requires that you install the latest version of [Node.js](https://nodejs.org/en/download/) and [npm](https://docs.npmjs.com/getting-started), or whichever node package manger you prefer.
+## Prerequisites
 
-## Installation
+Install the latest version of [Node.js](https://nodejs.org/en/download/) and a package manager of your choice.
 
-```shell
-npm install -g @youcan/cli
-```
+## Usage
+
+### Developing Apps
+
+You can initialize a YouCan Shop app template using your package manager of choice, this will install all the dependencies you need including YouCan CLI and [Qantra](https://github.com/youcan-shop/qantra)
+
+- `npm init @youcan/app@latest`
+- `pnpm create @youcan/create-app@latest`
+
+Learn more in the docs: [Apps: Getting started](https://developer.youcan.shop/apps/introduction.html)
+
+### Developing themes
+
+To develop a YouCan Shop theme, you must first install the cli and the theme module globally with:
+
+- `npm i -g @youcan/cli@latest @youcan/theme@latest`
+
+To initialize a starter theme, run the following command:
+
+- `youcan theme init`
+
+To learn more about developing themes for YouCan Shop, refer to [Themes: Getting started](https://developer.youcan.shop/themes/introduction.html)
 
 ## Help
 
-- [Open a GitHub issue](https://github.com/youcan-shop/youcan-cli/issues) - For bug reports and feature requests, you can open an issue in the YouCan CLI repository.
-- [CLI documentation - Theme development](https://developer.youcan.shop/themes/cli/introduction.html) - Visit our documentation for guides on getting started with YouCan Theme development.
+If you encounter any issues while using the YouCan CLI or have any suggestions, you can [open an issue](https://github.com/youcan-shop/cli/issues).
