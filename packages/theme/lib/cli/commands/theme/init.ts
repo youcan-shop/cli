@@ -22,7 +22,7 @@ class Init extends ThemeCommand {
       char: 'u',
       env: 'YC_FLAG_CLONE_URL',
       description: 'The Git URL to clone from',
-      default: 'https://github.com/youcan-shop/light-theme',
+      default: 'https://github.com/youcan-shop/dusk',
     }),
   };
 
