@@ -6,6 +6,8 @@ import { ensureExtensionDirectoryExists, initThemeExtension } from '@/cli/servic
 import { APP_CONFIG_FILENAME } from '@/constants';
 
 class GenerateExtension extends AppCommand {
+  static description = 'Generate an app extension';
+
   async run(): Promise<any> {
     const filepath = Path.resolve(Path.cwd(), APP_CONFIG_FILENAME);
 

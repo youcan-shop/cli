@@ -11,6 +11,8 @@ interface Context {
 }
 
 class Dev extends AppCommand {
+  static description = 'Run the app in draft mode';
+
   async run(): Promise<any> {
     const app = await load();
     const session = await Session.authenticate(this);

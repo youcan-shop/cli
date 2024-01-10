@@ -3,6 +3,8 @@ import { ThemeCommand } from '@/util/theme-command';
 import type { ThemeInfo } from '@/types';
 
 export default class Delete extends ThemeCommand {
+  static description = 'Select remote development themes to delete';
+
   async run() {
     await Session.authenticate(this);
 

@@ -34,6 +34,8 @@ interface Context {
 }
 
 export default class Pack extends ThemeCommand {
+  static description = 'Pack your theme into an archive to upload or share';
+
   async run() {
     await Session.authenticate(this);
     const theme = await load();

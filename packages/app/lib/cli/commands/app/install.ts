@@ -3,6 +3,8 @@ import { load } from '@/util/app-loader';
 import { AppCommand } from '@/util/theme-command';
 
 export default class Install extends AppCommand {
+  static description = 'Generate an app installation URL';
+
   async run() {
     const app = await load();
 

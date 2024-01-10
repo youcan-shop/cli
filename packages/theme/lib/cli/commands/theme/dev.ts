@@ -12,6 +12,8 @@ interface Context {
 }
 
 export default class Dev extends ThemeCommand {
+  static description = 'Start a theme development server and preview your changes';
+
   async run() {
     const theme = await load();
     await Session.authenticate(this);

@@ -10,6 +10,8 @@ const formatter = Intl.NumberFormat('en', {
 });
 
 export default class List extends ThemeCommand {
+  static description = 'List remote development themes';
+
   async run() {
     await Session.authenticate(this);
 

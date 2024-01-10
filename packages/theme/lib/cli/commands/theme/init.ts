@@ -5,7 +5,7 @@ import { THEME_FLAGS } from '@/flags';
 import { THEME_CONFIG_FILENAME } from '@/constants';
 
 class Init extends ThemeCommand {
-  static description = 'Clones a theme template Git repo.';
+  static description = 'Clones a theme template git repo';
 
   static args = {
     name: Args.string({
