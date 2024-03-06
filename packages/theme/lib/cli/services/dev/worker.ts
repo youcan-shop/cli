@@ -1,6 +1,7 @@
 import { Color, Crypto, Env, Filesystem, Form, Http, Path, System, Worker } from '@youcan/cli-kit';
 import { Server } from 'socket.io';
 import debounce from 'debounce';
+import type { FormDataResolvable } from '@youcan/cli-kit/dist/node/form';
 import type { ThemeCommand } from '@/util/theme-command';
 import type { FileDescriptor, Metadata, Store, Theme } from '@/types';
 
@@ -141,17 +142,20 @@ export default class ThemeWorker extends Worker.Abstract {
       try {
         const path = Path.join(this.theme.root, type, name);
 
+        const payload: Record<string, FormDataResolvable> = {
+          file_name: name,
+          file_type: type,
+          file_operation: op,
+        };
+
+        if (op === 'save') {
+          payload.file_content = await Form.file(path);
+        }
+
         await Http.post(
         `${Env.apiHostname()}/themes/${this.theme.theme_id}/update`,
         {
-          body: Form.convert({
-            file_name: name,
-            file_type: type,
-            file_operation: op,
-            file_content: op === 'save'
-              ? await Form.file(path)
-              : undefined,
-          }),
+          body: Form.convert(payload),
         },
         );
 

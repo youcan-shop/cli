@@ -1,5 +1,6 @@
 import type { Cli } from '@youcan/cli-kit';
 import { Color, Env, Filesystem, Form, Http, Path, Session, Worker } from '@youcan/cli-kit';
+import type { FormDataResolvable } from '@youcan/cli-kit/dist/node/form';
 import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 
 export default class ThemeExtensionWorker extends Worker.Abstract {
@@ -129,17 +130,20 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
     this.queue.push(async () => {
       const path = Path.join(this.extension.root, type, name);
 
+      const payload: Record<string, FormDataResolvable> = {
+        file_name: name,
+        file_type: type,
+        file_operation: op,
+      };
+
+      if (op === 'put') {
+        payload.file_content = await Form.file(path);
+      }
+
       await Http.post<ExtensionFileDescriptor>(
         `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/${this.extension.id!}/file`,
         {
-          body: Form.convert({
-            file_name: name,
-            file_type: type,
-            file_operation: op,
-            file_content: op === 'put'
-              ? await Form.file(path)
-              : undefined,
-          }),
+          body: Form.convert(payload),
         },
       );
 
