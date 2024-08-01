@@ -20,7 +20,7 @@ export default class Install extends AppCommand {
         {
           title: 'Building authorization url',
           async task(ctx) {
-            const { url } = await Http.get<{ url: string }>(`${Env.apiHostname()}/apps/draft/${app.config.id}/authorization-url`);
+            const { url } = await Http.get<{ url: string }>(`${Env.apiHostname()}/apps/${app.config.id}/authorization-url`);
 
             ctx.url = url;
           },

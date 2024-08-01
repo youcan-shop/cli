@@ -29,7 +29,7 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
 
     try {
       const res = await Http.post<{ id: string; metadata: ExtensionMetadata }>(
-        `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/create`,
+        `${Env.apiHostname()}/apps/${this.app.config.id}/extensions/create`,
         {
           headers: { Authorization: `Bearer ${session.access_token}` },
           body: JSON.stringify({ ...this.extension.config }),
@@ -141,7 +141,7 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
       }
 
       await Http.post<ExtensionFileDescriptor>(
-        `${Env.apiHostname()}/apps/draft/${this.app.config.id}/extensions/${this.extension.id!}/file`,
+        `${Env.apiHostname()}/apps/${this.app.config.id}/extensions/${this.extension.id!}/file`,
         {
           body: Form.convert(payload),
         },

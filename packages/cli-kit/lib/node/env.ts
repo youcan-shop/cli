@@ -36,7 +36,7 @@ export function sellerAreaHostname(): string {
       return 'seller-area.testyoucan.shop';
     case 'prod':
     default:
-      return 'seller-area.youcanshop.dev';
+      return 'seller-area.youcan.shop';
   }
 }
 
@@ -48,6 +48,6 @@ export function apiHostname(): string {
       return 'api.testyoucan.shop';
     case 'prod':
     default:
-      return 'api.youcanshop.dev';
+      return 'api.youcan.shop';
   }
 }
