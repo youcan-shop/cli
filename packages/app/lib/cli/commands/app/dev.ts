@@ -11,7 +11,7 @@ interface Context {
 }
 
 class Dev extends AppCommand {
-  static description = 'Run the app in draft mode';
+  static description = 'Run the app in dev mode';
 
   async run(): Promise<any> {
     const app = await load();
@@ -22,8 +22,8 @@ class Dev extends AppCommand {
         title: 'Syncing app configuration..',
         async task() {
           const endpoint = app.config.id == null
-            ? `${Env.apiHostname()}/apps/draft/create`
-            : `${Env.apiHostname()}/apps/draft/${app.config.id}/update`;
+            ? `${Env.apiHostname()}/apps/create`
+            : `${Env.apiHostname()}/apps/${app.config.id}/update`;
 
           const res = await Http.post<Record<string, any>>(endpoint, {
             headers: { Authorization: `Bearer ${session.access_token}` },
