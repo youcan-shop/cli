@@ -33,7 +33,6 @@
     "dayjs": "^1.11.10",
     "env-paths": "^3.0.0",
     "execa": "^6.1.0",
-    "fast-glob": "^3.3.2",
     "find-process": "^1.4.7",
     "formdata-node": "^5.0.1",
     "fs-extra": "^11.1.1",
