@@ -12,7 +12,7 @@ export function oauthClientId(): string {
       return '11';
     case 'prod':
     default:
-      return '7';
+      return '8';
   }
 }
 
@@ -24,7 +24,7 @@ export function oauthClientSecret(): string {
       return 'UkNttuRvqjPtX08nSzwGssnKPb21Kg0s0NJNKMAo';
     case 'prod':
     default:
-      return 'eCU2eKdDyMlLf1A6LweWL6BjDMixok4IV86rUm3u';
+      return 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X';
   }
 }
 
