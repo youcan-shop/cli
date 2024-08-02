@@ -3,9 +3,11 @@ import type { Mode, OpenMode, PathLike, Stats } from 'fs';
 import { createWriteStream } from 'fs';
 import { temporaryDirectoryTask } from 'tempy';
 import FsExtra from 'fs-extra';
-import type { Options as GlobOptions, Pattern } from 'fast-glob';
 import archiver from 'archiver';
 import chokidar from 'chokidar';
+import type { GlobOptions } from 'glob';
+import { glob as _glob } from 'glob';
+
 import { Path } from '..';
 
 export async function exists(path: string): Promise<boolean> {
@@ -61,17 +63,15 @@ export async function writeJsonFile(path: PathLike, data: Record<string, unknown
 }
 
 export async function glob(
-  pattern: Pattern | Pattern[],
+  pattern: string | string[],
   options?: GlobOptions,
 ): Promise<string[]> {
-  const { default: _glob } = await import('fast-glob');
-
   let _options = options;
   if (options?.dot == null) {
     _options = { ...options, dot: true };
   }
 
-  return _glob(pattern, _options);
+  return _glob.glob(pattern, _options || {}) as Promise<string[]>;
 }
 
 export async function archived(path: string, name: string, glob = '**/*'): Promise<string> {
