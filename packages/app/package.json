@@ -1,7 +1,7 @@
 {
   "name": "@youcan/app",
   "type": "module",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "OCLIF plugin for building apps",
   "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
   "license": "MIT",
