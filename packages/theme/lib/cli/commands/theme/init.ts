@@ -38,7 +38,7 @@ class Init extends ThemeCommand {
     const session = await Session.authenticate(this);
 
     const answers = await (prompt(this));
-    const dest = Path.join(flags.path, answers.theme_name);
+    const dest = Path.join(flags.path, flags.inplace ? '' : answers.theme_name);
 
     await Tasks.run(
       {
@@ -56,13 +56,14 @@ class Init extends ThemeCommand {
         {
           title: 'Initializing development theme...',
           task: async (ctx) => {
-            const path = await Filesystem.archived(
-              flags.inplace ? Path.cwd() : Path.resolve(Path.cwd(), answers.theme_name),
-              answers.theme_name,
+            const path = await Filesystem.archived(dest, answers.theme_name);
+
+            const configPath = Path.join(
+              Path.cwd(),
+              THEME_CONFIG_FILENAME,
             );
 
-            const configPath = Path.resolve(Path.cwd(), THEME_CONFIG_FILENAME);
-            if (await Filesystem.exists(configPath)) {
+            if (flags.inplace && await Filesystem.exists(configPath)) {
               throw new Error(`
                 This directory is already linked to a remote theme,
                 please delete youcan.app.json if you wish to create a new one
@@ -85,7 +86,7 @@ class Init extends ThemeCommand {
           title: 'Cleaning up...',
           task: async (ctx) => {
             await Filesystem.writeJsonFile(
-              Path.join(Path.cwd(), ctx.payload.theme_name, THEME_CONFIG_FILENAME),
+              Path.join(dest, THEME_CONFIG_FILENAME),
               { theme_id: ctx.theme_id as string },
             );
 
