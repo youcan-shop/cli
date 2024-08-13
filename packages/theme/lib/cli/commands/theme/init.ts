@@ -24,6 +24,12 @@ class Init extends ThemeCommand {
       description: 'The Git URL to clone from',
       default: 'https://github.com/youcan-shop/dusk',
     }),
+    inplace: Flags.boolean({
+      char: 'i',
+      default: false,
+      env: 'YC_FLAG_INPLACE',
+      description: 'Initialize the current directory as a dev theme instead of cloning',
+    }),
   };
 
   async run(): Promise<any> {
@@ -32,7 +38,7 @@ class Init extends ThemeCommand {
     const session = await Session.authenticate(this);
 
     const answers = await (prompt(this));
-    const dest = Path.join(flags.path, answers.theme_name);
+    const dest = Path.join(flags.path, flags.inplace ? '' : answers.theme_name);
 
     await Tasks.run(
       {
@@ -42,6 +48,7 @@ class Init extends ThemeCommand {
       }, [
         {
           title: `Cloning ${flags.url} into ${dest}...`,
+          skip: () => flags.inplace,
           task: async () => {
             await Git.clone({ url: flags.url, destination: dest });
           },
@@ -49,17 +56,25 @@ class Init extends ThemeCommand {
         {
           title: 'Initializing development theme...',
           task: async (ctx) => {
-            const path = await Filesystem.archived(
-              Path.resolve(Path.cwd(), answers.theme_name),
-              answers.theme_name,
+            const path = await Filesystem.archived(dest, answers.theme_name);
+
+            const configPath = Path.join(
+              Path.cwd(),
+              THEME_CONFIG_FILENAME,
             );
+
+            if (flags.inplace && await Filesystem.exists(configPath)) {
+              throw new Error(`
+                This directory is already linked to a remote theme,
+                please delete youcan.app.json if you wish to create a new one
+              `);
+            }
 
             Object.assign(ctx.payload, { archive: await Form.file(path) });
 
-            const form = Form.convert(ctx.payload);
             const res = await Http.post<{ id: string }>(`${Env.apiHostname()}/themes/init`, {
               headers: { Authorization: `Bearer ${session.access_token}` },
-              body: form,
+              body: Form.convert(ctx.payload),
             });
 
             ctx.theme_id = res.id;
@@ -71,7 +86,7 @@ class Init extends ThemeCommand {
           title: 'Cleaning up...',
           task: async (ctx) => {
             await Filesystem.writeJsonFile(
-              Path.join(Path.cwd(), ctx.payload.theme_name, THEME_CONFIG_FILENAME),
+              Path.join(dest, THEME_CONFIG_FILENAME),
               { theme_id: ctx.theme_id as string },
             );
 
