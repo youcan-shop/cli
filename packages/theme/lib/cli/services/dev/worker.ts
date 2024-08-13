@@ -1,9 +1,10 @@
-import { Color, Crypto, Env, Filesystem, Form, Http, Path, System, Worker } from '@youcan/cli-kit';
+import { Color, Filesystem, Http, Path, System, Worker } from '@youcan/cli-kit';
 import { Server } from 'socket.io';
 import debounce from 'debounce';
-import type { FormDataResolvable } from '@youcan/cli-kit/dist/node/form';
+import { execute } from './execute';
 import type { ThemeCommand } from '@/util/theme-command';
-import type { FileDescriptor, Metadata, Store, Theme } from '@/types';
+import type { Store, Theme } from '@/types';
+import { THEME_FILE_TYPES } from '@/constants';
 
 export default class ThemeWorker extends Worker.Abstract {
   private logger: Worker.Logger;
@@ -11,16 +12,6 @@ export default class ThemeWorker extends Worker.Abstract {
 
   private queue: Array<() => Promise<any>> = [];
   private io!: Server;
-
-  public FILE_TYPES: Array<keyof Metadata> = [
-    'layouts',
-    'sections',
-    'locales',
-    'assets',
-    'snippets',
-    'config',
-    'templates',
-  ];
 
   public constructor(
     private command: ThemeCommand,
@@ -35,43 +26,6 @@ export default class ThemeWorker extends Worker.Abstract {
 
   async boot(): Promise<void> {
     try {
-      const res = await Http.get<Metadata>(`${Env.apiHostname()}/themes/${this.theme.theme_id}/metadata`);
-
-      this.theme.metadata = res;
-
-      this.logger.write(`pushing changes to ${this.theme.metadata!.theme_name}...`);
-
-      for (const type of this.FILE_TYPES) {
-        const descriptors = this.theme.metadata![type] as FileDescriptor[] ?? [];
-        const directory = Path.resolve(this.theme.root, type);
-
-        const present = await Filesystem.exists(directory)
-          ? await Filesystem.readdir(directory)
-          : [];
-
-        if (type === 'config') {
-          const order = ['settings_schema.json', 'settings_data.json'];
-          descriptors.sort((a, b) => order.indexOf(a.file_name) - order.indexOf(b.file_name));
-        }
-
-        present.filter(f => !descriptors.find(d => d.file_name === f))
-          .forEach(async file => this.enqueue('save', type, file));
-
-        descriptors.forEach(async (descriptor) => {
-          const path = Path.resolve(directory, descriptor.file_name);
-          if (!(await Filesystem.exists(path))) {
-            return this.enqueue('delete', type, descriptor.file_name);
-          }
-
-          const buffer = await Filesystem.readFile(path);
-          const hash = Crypto.sha1(buffer);
-
-          if (hash !== descriptor.hash) {
-            this.enqueue('save', type, descriptor.file_name);
-          }
-        });
-      }
-
       this.io = new Server(7565, {
         cors: {
           origin: `${Http.scheme()}://${this.store.domain}`,
@@ -91,7 +45,7 @@ export default class ThemeWorker extends Worker.Abstract {
   }
 
   async run(): Promise<void> {
-    const directories = this.FILE_TYPES.map(t => Path.resolve(this.theme.root, t));
+    const directories = THEME_FILE_TYPES.map(t => Path.resolve(this.theme.root, t));
 
     const watcher = Filesystem.watch(directories, {
       awaitWriteFinish: { stabilityThreshold: 50 },
@@ -109,7 +63,7 @@ export default class ThemeWorker extends Worker.Abstract {
       }
 
       const [filetype, filename] = [
-        Path.basename(Path.dirname(path)) as typeof this.FILE_TYPES[number],
+        Path.basename(Path.dirname(path)) as typeof THEME_FILE_TYPES[number],
         Path.basename(path),
       ];
 
@@ -126,6 +80,8 @@ export default class ThemeWorker extends Worker.Abstract {
       }
     });
 
+    this.logger.write('Listening for changes...');
+
     // quick racing conditions hack
     setInterval(async () => {
       const task = this.queue.shift();
@@ -137,40 +93,18 @@ export default class ThemeWorker extends Worker.Abstract {
     }, 10);
   }
 
-  private enqueue(op: 'save' | 'delete', type: typeof this.FILE_TYPES[number], name: string): void {
+  private enqueue(op: 'save' | 'delete', type: typeof THEME_FILE_TYPES[number], name: string): void {
     this.queue.push(async () => {
-      try {
-        const path = Path.join(this.theme.root, type, name);
+      await this.execute(op, type, name, true);
 
-        const payload: Record<string, FormDataResolvable> = {
-          file_name: name,
-          file_type: type,
-          file_operation: op,
-        };
-
-        if (op === 'save') {
-          payload.file_content = await Form.file(path);
-        }
-
-        await Http.post(
-        `${Env.apiHostname()}/themes/${this.theme.theme_id}/update`,
-        {
-          body: Form.convert(payload),
-        },
-        );
-
-        this.logger.write(`[${op === 'save' ? 'updated' : 'deleted'}] - ${Path.join(type, name)}`);
-
-        debounce(() => {
-          this.io.emit('theme:update');
-          this.previewLogger.write('reloading preview...');
-        }, 100)();
-      }
-      catch (err) {
-        if (err instanceof Error) {
-          this.logger.write(`[error] - ${Path.join(type, name)}\n${err.message}`);
-        }
-      }
+      debounce(() => {
+        this.io.emit('theme:update');
+        this.previewLogger.write('reloading preview...');
+      }, 100)();
     });
+  }
+
+  private async execute(op: 'save' | 'delete', type: typeof THEME_FILE_TYPES[number], name: string, log = false): Promise<void> {
+    return execute(this.theme, op, type, name, this.logger);
   }
 }
