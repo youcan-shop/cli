@@ -39,6 +39,39 @@ export default class ThemeWorker extends Worker.Abstract {
 
       this.theme.metadata = res;
 
+      this.logger.write(`pushing changes to ${this.theme.metadata!.theme_name}...`);
+
+      for (const type of this.FILE_TYPES) {
+        const descriptors = this.theme.metadata![type] as FileDescriptor[] ?? [];
+        const directory = Path.resolve(this.theme.root, type);
+
+        const present = await Filesystem.exists(directory)
+          ? await Filesystem.readdir(directory)
+          : [];
+
+        if (type === 'config') {
+          const order = ['settings_schema.json', 'settings_data.json'];
+          descriptors.sort((a, b) => order.indexOf(a.file_name) - order.indexOf(b.file_name));
+        }
+
+        present.filter(f => !descriptors.find(d => d.file_name === f))
+          .forEach(async file => this.enqueue('save', type, file));
+
+        descriptors.forEach(async (descriptor) => {
+          const path = Path.resolve(directory, descriptor.file_name);
+          if (!(await Filesystem.exists(path))) {
+            return this.enqueue('delete', type, descriptor.file_name);
+          }
+
+          const buffer = await Filesystem.readFile(path);
+          const hash = Crypto.sha1(buffer);
+
+          if (hash !== descriptor.hash) {
+            this.enqueue('save', type, descriptor.file_name);
+          }
+        });
+      }
+
       this.io = new Server(7565, {
         cors: {
           origin: `${Http.scheme()}://${this.store.domain}`,
@@ -58,39 +91,6 @@ export default class ThemeWorker extends Worker.Abstract {
   }
 
   async run(): Promise<void> {
-    this.logger.write(`pushing changes to ${this.theme.metadata!.theme_name}...`);
-
-    for (const type of this.FILE_TYPES) {
-      const descriptors = this.theme.metadata![type] as FileDescriptor[] ?? [];
-      const directory = Path.resolve(this.theme.root, type);
-
-      const present = await Filesystem.exists(directory)
-        ? await Filesystem.readdir(directory)
-        : [];
-
-      if (type === 'config') {
-        const order = ['settings_schema.json', 'settings_data.json'];
-        descriptors.sort((a, b) => order.indexOf(a.file_name) - order.indexOf(b.file_name));
-      }
-
-      present.filter(f => !descriptors.find(d => d.file_name === f))
-        .forEach(async file => this.enqueue('save', type, file));
-
-      descriptors.forEach(async (descriptor) => {
-        const path = Path.resolve(directory, descriptor.file_name);
-        if (!(await Filesystem.exists(path))) {
-          return this.enqueue('delete', type, descriptor.file_name);
-        }
-
-        const buffer = await Filesystem.readFile(path);
-        const hash = Crypto.sha1(buffer);
-
-        if (hash !== descriptor.hash) {
-          this.enqueue('save', type, descriptor.file_name);
-        }
-      });
-    }
-
     const directories = this.FILE_TYPES.map(t => Path.resolve(this.theme.root, t));
 
     const watcher = Filesystem.watch(directories, {
