@@ -62,7 +62,7 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
     response_type: 'code',
     scope: '*',
     client_id: Env.oauthClientId(),
-    redirect_url: `http://${LS_HOST}:${LS_PORT}/`,
+    redirect_uri: `http://${LS_HOST}:${LS_PORT}/`,
   };
 
   await command.output.anykey('Press any key to open the login page on your browser..');
