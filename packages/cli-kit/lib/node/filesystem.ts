@@ -21,6 +21,17 @@ export async function exists(path: string): Promise<boolean> {
   }
 }
 
+export async function isDirectory(path: string): Promise<boolean> {
+  try {
+    const stats: Stats = await FilesystemPromises.stat(path);
+
+    return stats.isDirectory();
+  }
+  catch {
+    return false;
+  }
+}
+
 export async function tapIntoTmp<T>(callback: (tmp: string) => T | Promise<T>): Promise<T> {
   return temporaryDirectoryTask(callback);
 }
