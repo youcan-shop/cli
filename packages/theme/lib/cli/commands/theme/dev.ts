@@ -53,12 +53,19 @@ export default class Dev extends ThemeCommand {
             }
 
             for (const file of present.filter(f => !descriptors.find(d => d.file_name === f))) {
+              const path = Path.resolve(directory, file);
+              const isDir = await Filesystem.isDirectory(path);
+
+              if (isDir) {
+                continue;
+              }
+
               await execute(theme, 'save', type, file);
             }
 
             for (const descriptor of descriptors) {
               const path = Path.resolve(directory, descriptor.file_name);
-              if (!(await Filesystem.exists(path))) {
+              if ((await Filesystem.isDirectory(path)) || !(await Filesystem.exists(path))) {
                 return await execute(theme, 'delete', type, descriptor.file_name);
               }
 

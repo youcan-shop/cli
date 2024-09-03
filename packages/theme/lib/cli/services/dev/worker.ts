@@ -51,6 +51,7 @@ export default class ThemeWorker extends Worker.Abstract {
       awaitWriteFinish: { stabilityThreshold: 50 },
       ignoreInitial: true,
       persistent: true,
+      depth: 0,
     });
 
     this.command.controller.signal.addEventListener('abort', () => {
