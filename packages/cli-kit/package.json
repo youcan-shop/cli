@@ -28,7 +28,7 @@
     "@oclif/core": "^2.15.0",
     "archiver": "^5.3.2",
     "change-case": "^4.1.2",
-    "chokidar": "^3.5.3",
+    "chokidar": "^4.0.1",
     "conf": "^11.0.2",
     "dayjs": "^1.11.10",
     "env-paths": "^3.0.0",
