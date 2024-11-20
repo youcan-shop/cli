@@ -1,10 +1,16 @@
 import type { Cli } from '@youcan/cli-kit';
 import { Filesystem, Git, Github, Path, String, Tasks } from '@youcan/cli-kit';
 
+type PackageManagersType =
+  | 'pnpm'
+  | 'npm'
+  | 'yarn'
+
 interface InitServiceOptions {
   name: string
   directory: string
-  template?: string
+  template?: string,
+  packageManager: PackageManagersType
 }
 
 async function initService(command: Cli.Command, options: InitServiceOptions) {
