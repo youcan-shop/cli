@@ -3,11 +3,16 @@ import type { Cli } from '@youcan/cli-kit';
 import { Filesystem, Git, Github, Path, String, System, Tasks } from '@youcan/cli-kit';
 import type { inferUserPackageManager } from '@youcan/cli-kit/dist/node/system';
 
+type PackageManagersType =
+  | 'pnpm'
+  | 'npm'
+  | 'yarn'
+
 interface InitServiceOptions {
   name: string
   directory: string
-  template?: string
-  packageManager: ReturnType<typeof inferUserPackageManager>
+  template?: string,
+  packageManager: PackageManagersType
 }
 
 async function initService(command: Cli.Command, options: InitServiceOptions) {
