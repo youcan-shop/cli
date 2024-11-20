@@ -24,11 +24,11 @@ export default class Init extends Cli.Command {
     const response = await initPrompt(this);
 
     if (
-      typeof response.name === 'undefined' ||
-      typeof response.template === 'undefined'
+      typeof response.name === 'undefined'
+      || typeof response.template === 'undefined'
     ) {
       this.log('Operation cancelled');
-      process.exit(130);
+      this.exit(130);
     }
 
     await initService(this, {
