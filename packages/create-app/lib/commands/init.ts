@@ -6,7 +6,7 @@ import initService from '@/services/init';
 
 export default class Init extends Cli.Command {
   static aliases: string[] = ['create-app'];
-  static description = 'bootstaps a new youcan app';
+  static description = 'bootstraps a new youcan app';
 
   static flags = {
     ...Cli.commonFlags,
@@ -21,8 +21,15 @@ export default class Init extends Cli.Command {
 
   public async run(): Promise<void> {
     const { flags } = await this.parse(Init);
-
     const response = await initPrompt(this);
+
+    if (
+      typeof response.name === 'undefined' ||
+      typeof response.template === 'undefined'
+    ) {
+      this.log('Operation cancelled');
+      process.exit(130);
+    }
 
     await initService(this, {
       name: response.name,

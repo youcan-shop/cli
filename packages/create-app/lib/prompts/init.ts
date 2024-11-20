@@ -1,8 +1,8 @@
 import type { Cli } from '@youcan/cli-kit';
 
 interface InitOutput {
-  name: string
-  template: string
+  name?: string
+  template?: string
 }
 
 export const TEMPLATES: Record<string, { label: string; url?: string }> = {
