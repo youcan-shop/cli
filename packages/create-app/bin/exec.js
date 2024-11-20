@@ -5,4 +5,4 @@ process.removeAllListeners('warning');
 // eslint-disable-next-line import/first
 import execCreateAppCli from '../dist/index.js';
 
-execCreateAppCli(true);
+execCreateAppCli(false);
