@@ -1,18 +1,16 @@
 import path from 'path';
 import type { Cli } from '@youcan/cli-kit';
 import { Filesystem, Git, Github, Path, String, System, Tasks } from '@youcan/cli-kit';
-import { inferUserPackageManager } from '@youcan/cli-kit/dist/node/system';
-import path from 'path';
+import type { inferUserPackageManager } from '@youcan/cli-kit/dist/node/system';
 
 interface InitServiceOptions {
   name: string
   directory: string
-  template?: string,
+  template?: string
   packageManager: ReturnType<typeof inferUserPackageManager>
 }
 
 async function initService(command: Cli.Command, options: InitServiceOptions) {
-
   const slug = String.hyphenate(options.name);
   const outdir = Path.join(options.directory, slug);
   const relativeOutdir = path.relative(process.cwd(), outdir);
@@ -60,7 +58,7 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
         },
       },
       {
-        title: `Installing dependencies...`,
+        title: 'Installing dependencies...',
         loadable: false,
         task: async () => {
           await System.exec(options.packageManager, ['install'], {
@@ -78,7 +76,7 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
 
   command.output.info('   To preview your app, run');
   command.output.info(`      cd ${relativeOutdir}`);
-  command.output.info('      pnpm dev');
+  command.output.info(`      ${options.packageManager} dev`);
   command.output.info('   For an overview of all the command, run `pnpm youcan app help`');
 }
 

@@ -95,21 +95,21 @@ export async function open(url: string): Promise<void> {
 export type PackageManagerType =
   | 'pnpm'
   | 'npm'
-  | 'yarn'
+  | 'yarn';
 
-export function inferUserPackageManager(): PackageManagerType { 
-    const defaultPackageManager = 'npm';
-    const packageManagersMap: Record<string, PackageManagerType> = {
+export function inferUserPackageManager(): PackageManagerType {
+  const defaultPackageManager = 'npm';
+  const packageManagersMap: Record<string, PackageManagerType> = {
     '^npm/.*': 'npm',
     '^pnpm/.*': 'pnpm',
     '^yarn/.*': 'yarn',
   };
 
-  let packageManagerUserAgent = process.env['npm_config_user_agent'] as string;
+  const packageManagerUserAgent = process.env.npm_config_user_agent as string;
 
   for (const key in packageManagersMap) {
     if (new RegExp(key).test(packageManagerUserAgent)) {
-        return packageManagersMap[key];
+      return packageManagersMap[key];
     }
   }
 
