@@ -34,6 +34,7 @@ function buildExec(command: string, args: string[], options?: ExecOptions): Exec
 
 export async function exec(command: string, args: string[], options?: ExecOptions): Promise<void> {
   const commandProcess = buildExec(command, args, options);
+
   if (options?.stderr && options.stderr !== 'inherit') {
     commandProcess.stderr?.pipe(options.stderr, { end: false });
   }
@@ -89,4 +90,28 @@ export async function open(url: string): Promise<void> {
   const _open = await import('open');
 
   await _open.default(url);
+}
+
+export type PackageManagerType =
+  | 'pnpm'
+  | 'npm'
+  | 'yarn';
+
+export function inferUserPackageManager(): PackageManagerType {
+  const defaultPackageManager = 'npm';
+  const packageManagersMap: Record<string, PackageManagerType> = {
+    '^npm/.*': 'npm',
+    '^pnpm/.*': 'pnpm',
+    '^yarn/.*': 'yarn',
+  };
+
+  const packageManagerUserAgent = process.env.npm_config_user_agent as string;
+
+  for (const key in packageManagersMap) {
+    if (new RegExp(key).test(packageManagerUserAgent)) {
+      return packageManagersMap[key];
+    }
+  }
+
+  return defaultPackageManager;
 }
