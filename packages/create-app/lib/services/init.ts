@@ -1,24 +1,21 @@
 import path from 'path';
 import type { Cli } from '@youcan/cli-kit';
 import { Filesystem, Git, Github, Path, String, System, Tasks } from '@youcan/cli-kit';
-import type { inferUserPackageManager } from '@youcan/cli-kit/dist/node/system';
-
-type PackageManagersType =
-  | 'pnpm'
-  | 'npm'
-  | 'yarn'
+import { inferUserPackageManager } from '@youcan/cli-kit/dist/node/system';
+import path from 'path';
 
 interface InitServiceOptions {
   name: string
   directory: string
   template?: string,
-  packageManager: PackageManagersType
+  packageManager: ReturnType<typeof inferUserPackageManager>
 }
 
 async function initService(command: Cli.Command, options: InitServiceOptions) {
+
   const slug = String.hyphenate(options.name);
   const outdir = Path.join(options.directory, slug);
-  const relativeOutdir = path.relative(process.cwd(), outdir);
+  const relativeOutDir = path.relative(process.cwd(), outdir);
 
   await assertDirectoryAvailability(outdir, slug);
 
@@ -57,16 +54,15 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
         },
       },
       {
-        title: `Copying files to ${relativeOutdir}...`,
+        title: `Copying files to ${relativeOutDir}...`,
         task: async () => {
           await Filesystem.move(templateDownloadDirectory, outdir);
         },
       },
       {
-        title: 'Installing dependencies...',
-        loadable: false,
+        title: `Installing dependencies...`,
         task: async () => {
-          await System.exec(options.packageManager, ['install'], {
+          await System.exec('npm', ['install', '--no-progress'], {
             stdout: 'inherit',
             stderr: 'inherit',
             cwd: outdir,
@@ -80,8 +76,8 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
   command.output.info('   Developer Docs: https://developer.youcan.shop\n\n');
 
   command.output.info('   To preview your app, run');
-  command.output.info(`      cd ${relativeOutdir}`);
-  command.output.info(`      ${options.packageManager} dev`);
+  command.output.info(`      cd ${relativeOutDir}`);
+  command.output.info('      pnpm dev');
   command.output.info('   For an overview of all the command, run `pnpm youcan app help`');
 }
 
