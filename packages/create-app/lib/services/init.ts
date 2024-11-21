@@ -14,7 +14,7 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
 
   const slug = String.hyphenate(options.name);
   const outdir = Path.join(options.directory, slug);
-  const relativeOutDir = path.relative(process.cwd(), outdir);
+  const relativeOutdir = path.relative(process.cwd(), outdir);
 
   await assertDirectoryAvailability(outdir, slug);
 
@@ -53,15 +53,16 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
         },
       },
       {
-        title: `Copying files to ${relativeOutDir}...`,
+        title: `Copying files to ${relativeOutdir}...`,
         task: async () => {
           await Filesystem.move(templateDownloadDirectory, outdir);
         },
       },
       {
         title: `Installing dependencies...`,
+        loadable: false,
         task: async () => {
-          await System.exec('npm', ['install', '--no-progress'], {
+          await System.exec(options.packageManager, ['install'], {
             stdout: 'inherit',
             stderr: 'inherit',
             cwd: outdir,
@@ -75,7 +76,7 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
   command.output.info('   Developer Docs: https://developer.youcan.shop\n\n');
 
   command.output.info('   To preview your app, run');
-  command.output.info(`      cd ${relativeOutDir}`);
+  command.output.info(`      cd ${relativeOutdir}`);
   command.output.info('      pnpm dev');
   command.output.info('   For an overview of all the command, run `pnpm youcan app help`');
 }

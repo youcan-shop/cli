@@ -34,6 +34,7 @@ function buildExec(command: string, args: string[], options?: ExecOptions): Exec
 
 export async function exec(command: string, args: string[], options?: ExecOptions): Promise<void> {
   const commandProcess = buildExec(command, args, options);
+
   if (options?.stderr && options.stderr !== 'inherit') {
     commandProcess.stderr?.pipe(options.stderr, { end: false });
   }

@@ -6,6 +6,7 @@ export interface Task<T = unknown> {
   errors?: Error[]
   skip?: (ctx: T) => boolean
   task: (context: T, task: Task<T>) => Promise<void | Task<T>[]>
+  loadable?: false
 }
 
 async function runTask<T>(task: Task<T>, ctx: T) {
@@ -16,18 +17,27 @@ async function runTask<T>(task: Task<T>, ctx: T) {
   return await task.task(ctx, task);
 }
 
-export async function run<T = unknown>(ctx: T, tasks: Task<T>[]) {
+export async function run<T = unknown>(ctx: T, tasks: Task<T>[]): Promise<T> {
   for await (const task of tasks) {
+    const runner = async () => {
+      const subtasks = await runTask<T>(task, ctx);
+
+      if (Array.isArray(subtasks) && subtasks.length > 0 && subtasks.every(t => 'task' in t)) {
+        for await (const subtask of subtasks) {
+          await runTask(subtask, ctx);
+        }
+      }
+    }
+
+    if (task.loadable === false) {
+      process.stdout.write(`${task.title}\n`);
+      await runner();
+      return ctx;
+    }
+
     await Loader.exec(task.title, async (loader) => {
       try {
-        const subtasks = await runTask<T>(task, ctx);
-
-        if (Array.isArray(subtasks) && subtasks.length > 0 && subtasks.every(t => 'task' in t)) {
-          for await (const subtask of subtasks) {
-            await runTask(subtask, ctx);
-          }
-        }
-
+        await runner();
         loader.stop();
       }
       catch (err) {
