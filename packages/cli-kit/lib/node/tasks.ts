@@ -27,12 +27,11 @@ export async function run<T = unknown>(ctx: T, tasks: Task<T>[]): Promise<T> {
           await runTask(subtask, ctx);
         }
       }
-    };
+    }
 
     if (task.loadable === false) {
       process.stdout.write(`${task.title}\n`);
       await runner();
-
       return ctx;
     }
 
