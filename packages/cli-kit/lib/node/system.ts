@@ -18,7 +18,6 @@ export interface ExecOptions {
 
 function buildExec(command: string, args: string[], options?: ExecOptions): ExecaChildProcess<string> {
   const env = options?.env ?? process.env;
-  
   const commandProcess = execa(command, args, {
     env,
     cwd: options?.cwd,
@@ -98,20 +97,20 @@ export type PackageManagerType =
   | 'yarn'
 
 export function inferUserPackageManager(): PackageManagerType { 
-    const defaultPm = 'npm';
-    const pmsMap: Record<string, PackageManagerType> = {
+    const defaultPackageManager = 'npm';
+    const packageManagersMap: Record<string, PackageManagerType> = {
     '^npm/.*': 'npm',
     '^pnpm/.*': 'pnpm',
     '^yarn/.*': 'yarn',
   };
 
-  let pmUserAgent = process.env['npm_config_user_agent'] as string;
+  let packageManagerUserAgent = process.env['npm_config_user_agent'] as string;
 
-  for (const key in pmsMap) {
-    if (new RegExp(key).test(pmUserAgent)) {
-        return pmsMap[key];
+  for (const key in packageManagersMap) {
+    if (new RegExp(key).test(packageManagerUserAgent)) {
+        return packageManagersMap[key];
     }
   }
 
-  return defaultPm;
+  return defaultPackageManager;
 }
