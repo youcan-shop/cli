@@ -31,6 +31,7 @@ export class Loader {
 
     process.stdout.write('\r');
     process.stdout.write(kleur.green(`✔ ${this.message}\n`));
+    process.stdout.write('\x1B[?25h');
 
     return this;
   }
