@@ -1,11 +1,12 @@
 ## JIRA Ticket
 
-[DOT-X](https://youcanshop.atlassian.net/browse/DOT-X)
+[APPS-X](https://youcanshop.atlassian.net/browse/APPS-X)
 
 ## QA Steps
 
-* [ ] Go to X and Y
-* [ ] See TEXT in page Z
+* [ ] Do X
+* [ ] Verify Y
+
 
 ## Note
 
