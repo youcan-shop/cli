@@ -7,7 +7,6 @@
 * [ ] Do X
 * [ ] Verify Y
 
-
 ## Note
 
 Leave empty when you have nothing to say
