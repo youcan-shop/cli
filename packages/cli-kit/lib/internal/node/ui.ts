@@ -20,6 +20,7 @@ export class Loader {
   }
 
   private flush() {
+    process.stdout.write('\x1B[?25h');
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
@@ -31,7 +32,6 @@ export class Loader {
 
     process.stdout.write('\r');
     process.stdout.write(kleur.green(`✔ ${this.message}\n`));
-    process.stdout.write('\x1B[?25h');
 
     return this;
   }
