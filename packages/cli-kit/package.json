@@ -34,7 +34,7 @@
     "env-paths": "^3.0.0",
     "execa": "^6.1.0",
     "find-process": "^1.4.7",
-    "formdata-node": "^5.0.1",
+    "formdata-node": "^6.0.3",
     "fs-extra": "^11.1.1",
     "glob": "^11.0.0",
     "kill-port-process": "^3.2.0",
