@@ -1,6 +1,5 @@
 import type { Cli } from '@youcan/cli-kit';
 import { Color, Env, Filesystem, Form, Http, Path, Session, Worker } from '@youcan/cli-kit';
-import type { FormDataResolvable } from '@youcan/cli-kit/dist/node/form';
 import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 
 export default class ThemeExtensionWorker extends Worker.Abstract {
@@ -21,7 +20,7 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger('stdout', 'extensions', Color.yellow);
+    this.logger = new Worker.Logger('extensions');
   }
 
   public async boot(): Promise<void> {
@@ -130,7 +129,7 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
     this.queue.push(async () => {
       const path = Path.join(this.extension.root, type, name);
 
-      const payload: Record<string, FormDataResolvable> = {
+      const payload: Record<string, Form.FormDataResolvable> = {
         file_name: name,
         file_type: type,
         file_operation: op,

@@ -1,7 +1,6 @@
 import { Writable } from 'stream';
-import { stderr, stdout } from 'process';
 import dayjs from 'dayjs';
-import type { Color } from '..';
+import { UI } from '..';
 
 export interface Interface {
   run(): Promise<void>
@@ -9,12 +8,17 @@ export interface Interface {
 }
 
 export class Logger extends Writable {
+  private static currentColorIndex: number = 0;
+  private static colors = ['yellow', 'cyan', 'magenta', 'green', 'blue', 'red'];
+
+  private color: typeof Logger.colors[number];
+
   constructor(
-    private channel: 'stdout' | 'stderr',
     private type: string,
-    private color: Color.Color,
+    color?: typeof Logger.colors[number],
   ) {
     super();
+    this.color = color ?? Logger.pickAlternateColor();
   }
 
   write(chunk: unknown): boolean {
@@ -22,26 +26,32 @@ export class Logger extends Writable {
       return false;
     }
 
-    const channel = this.channel === 'stdout' ? stdout : stderr;
-
     const time = dayjs().format('HH:mm:ss:SSS');
     const lines = chunk.toString().split('\n').map(s => s.trim()).filter(s => s !== '');
 
-    for (let i = 0; i < lines.length; i++) {
-      i === 0
-        ? channel.write(this.color(`${time} | ${this.pad(this.type, 10)} | ${lines[i]}\n`))
-        : channel.write(this.color(`                          | ${lines[i]}\n`));
+    for (const line of lines) {
+      UI.renderDevOutput.observable.emit({
+        timestamp: time,
+        color: this.color,
+        label: Logger.pad(this.type, 10),
+        buffer: line,
+      });
     }
 
     return true;
   }
 
-  private pad(subject: string, length: number, char = ' ') {
-    return subject.padEnd(length, char);
+  private static pad(subject: string, length: number, char = ' ') {
+    return subject.padStart(length, char);
+  }
+
+  private static pickAlternateColor(): typeof Logger.colors[number] {
+    const picked = (Logger.currentColorIndex++) % Logger.colors.length;
+    return Logger.colors[picked];
   }
 }
 
 export abstract class Abstract implements Interface {
-  public abstract boot(): Promise<void>;
   public abstract run(): Promise<void>;
+  public abstract boot(): Promise<void>;
 }

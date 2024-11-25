@@ -1,6 +1,5 @@
 import type { Worker } from '@youcan/cli-kit';
 import { Env, Form, Http, Path } from '@youcan/cli-kit';
-import type { FormDataResolvable } from '@youcan/cli-kit/dist/node/form';
 import type { Theme } from '@/types';
 import type { THEME_FILE_TYPES } from '@/constants';
 
@@ -14,7 +13,7 @@ export async function execute(
   try {
     const path = Path.join(theme.root, type, name);
 
-    const payload: Record<string, FormDataResolvable> = {
+    const payload: Record<string, Form.FormDataResolvable> = {
       file_name: name,
       file_type: type,
       file_operation: op,

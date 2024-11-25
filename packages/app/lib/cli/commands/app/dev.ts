@@ -1,5 +1,5 @@
 import type { Worker } from '@youcan/cli-kit';
-import { Env, Filesystem, Http, Path, Session, Tasks } from '@youcan/cli-kit';
+import { Env, Filesystem, Http, Path, Session, Tasks, UI } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/theme-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
@@ -44,7 +44,6 @@ class Dev extends AppCommand {
               client_id: res.client_id,
             },
           };
-
           await Filesystem.writeJsonFile(
             Path.join(app.root, APP_CONFIG_FILENAME),
             app.config,
@@ -66,6 +65,7 @@ class Dev extends AppCommand {
       },
     ]);
 
+    UI.renderDevOutput();
     await Promise.all(workers.map(async worker => await worker.run()));
   }
 }

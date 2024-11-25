@@ -4,15 +4,15 @@ import { nodeExternals } from 'rollup-plugin-node-externals';
 import { glob } from 'glob';
 
 export default {
-  input: glob.sync('lib/**/*.ts').map(f => fileURLToPath(new URL(f, import.meta.url))),
+  input: glob.sync('lib/**/*.{ts,tsx}').map(f => fileURLToPath(new URL(f, import.meta.url))),
   plugins: [
     nodeExternals(),
-    typescript({ tsconfig: 'tsconfig.json' }),
+    typescript({tsconfig: 'tsconfig.json'}),
   ],
   output: {
     dir: 'dist',
     exports: 'named',
-    format: 'es',
+    format: 'esm',
     preserveModules: true,
   },
 };

@@ -11,7 +11,7 @@ export default class WebWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger('stderr', this.web.config.name || 'web', Color.blue);
+    this.logger = new Worker.Logger(this.web.config.name || 'web');
   }
 
   public async boot(): Promise<void> {
@@ -23,7 +23,7 @@ export default class WebWorker extends Worker.Abstract {
     return System.exec(cmd, args, {
       stdout: this.logger,
       signal: this.command.controller.signal,
-      stderr: new Worker.Logger('stderr', this.web.config.name || 'web', Color.red),
+      stderr: new Worker.Logger(this.web.config.name || 'web', 'red'),
     });
   }
 }

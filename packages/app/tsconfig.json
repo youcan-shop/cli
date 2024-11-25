@@ -9,8 +9,4 @@
       ]
     }
   },
-  "include": [
-    "lib",
-    "rollup.config.js"
-  ]
 }

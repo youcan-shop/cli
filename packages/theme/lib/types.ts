@@ -42,3 +42,5 @@ export interface Store {
   domain: string
   slug: string
 }
+
+export default {}

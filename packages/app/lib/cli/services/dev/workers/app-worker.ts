@@ -11,7 +11,7 @@ export default class AppWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger('stdout', 'app', Color.cyan);
+    this.logger = new Worker.Logger('app');
   }
 
   public async boot(): Promise<void> {
