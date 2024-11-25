@@ -1,4 +1,4 @@
-import { type Cli, Color, System, Worker } from '@youcan/cli-kit';
+import { type Cli, System, Worker } from '@youcan/cli-kit';
 import type { App, Web } from '@/types';
 
 export default class WebWorker extends Worker.Abstract {

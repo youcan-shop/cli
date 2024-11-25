@@ -43,4 +43,4 @@ export interface Store {
   slug: string
 }
 
-export default {}
+export default {};

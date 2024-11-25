@@ -64,7 +64,8 @@ export async function writeFile(
 }
 
 export async function readJsonFile<T = Record<string, unknown>>(path: PathLike): Promise<T> {
-  const content = await readFile(path, {encoding: 'utf8'}) as string;
+  const content = await readFile(path, { encoding: 'utf8' }) as string;
+
   return JSON.parse(content);
 }
 

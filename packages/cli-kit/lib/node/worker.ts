@@ -8,7 +8,7 @@ export interface Interface {
 }
 
 export class Logger extends Writable {
-  private static currentColorIndex: number = 0;
+  private static currentColorIndex = 0;
   private static colors = ['yellow', 'cyan', 'magenta', 'green', 'blue', 'red'];
 
   private color: typeof Logger.colors[number];
@@ -47,6 +47,7 @@ export class Logger extends Writable {
 
   private static pickAlternateColor(): typeof Logger.colors[number] {
     const picked = (Logger.currentColorIndex++) % Logger.colors.length;
+
     return Logger.colors[picked];
   }
 }

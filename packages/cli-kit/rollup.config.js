@@ -7,7 +7,7 @@ export default {
   input: glob.sync('lib/**/*.{ts,tsx}').map(f => fileURLToPath(new URL(f, import.meta.url))),
   plugins: [
     nodeExternals(),
-    typescript({tsconfig: 'tsconfig.json'}),
+    typescript({ tsconfig: 'tsconfig.json' }),
   ],
   output: {
     dir: 'dist',

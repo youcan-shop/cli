@@ -1,5 +1,5 @@
 import type { Cli } from '@youcan/cli-kit';
-import { Color, Env, Filesystem, Form, Http, Path, Session, Worker } from '@youcan/cli-kit';
+import { Env, Filesystem, Form, Http, Path, Session, Worker } from '@youcan/cli-kit';
 import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 
 export default class ThemeExtensionWorker extends Worker.Abstract {

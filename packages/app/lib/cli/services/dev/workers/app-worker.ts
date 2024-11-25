@@ -1,4 +1,4 @@
-import { type Cli, Color, Filesystem, Path, Worker } from '@youcan/cli-kit';
+import { type Cli, Filesystem, Path, Worker } from '@youcan/cli-kit';
 import type { App } from '@/types';
 import { APP_CONFIG_FILENAME } from '@/constants';
 
