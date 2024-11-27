@@ -19,7 +19,7 @@ class Dev extends AppCommand {
 
     const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
-        title: 'Syncing app configuration..', 
+        title: 'Syncing app configuration..',
         async task() {
           const endpoint = app.config.id == null
             ? `${Env.apiHostname()}/apps/create`
@@ -71,21 +71,21 @@ class Dev extends AppCommand {
         handler: async () => {
           const { url } = await Http.get<{ url: string }>(`${Env.apiHostname()}/apps/${app.config.id}/authorization-url`);
           System.open(url);
-        }
+        },
       },
       {
         keyboardKey: 'q',
         description: 'quit',
-        handler: () => this.exit(0)
+        handler: () => this.exit(0),
       },
     ];
 
     UI.renderDevOutput({
       hotKeys,
-      cmd: this
+      cmd: this,
     });
 
-    await Promise.all(workers.map( async worker => await worker.run()));
+    await Promise.all(workers.map(async worker => await worker.run()));
   }
 }
 

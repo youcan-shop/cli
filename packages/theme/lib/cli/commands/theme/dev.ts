@@ -93,7 +93,7 @@ export default class Dev extends ThemeCommand {
 
     UI.renderDevOutput({
       hotKeys: [],
-      cmd: this
+      cmd: this,
     });
 
     await Promise.all(context.workers.map(async w => await w.run()));

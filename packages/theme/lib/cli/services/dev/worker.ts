@@ -1,4 +1,4 @@
-import { Color, Filesystem, Http, Path, System, Worker } from '@youcan/cli-kit';
+import { Filesystem, Http, Path, System, Worker } from '@youcan/cli-kit';
 import { Server } from 'socket.io';
 import debounce from 'debounce';
 import { execute } from './execute';
@@ -20,8 +20,8 @@ export default class ThemeWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger( 'themes', 'magenta');
-    this.previewLogger = new Worker.Logger( 'preview', 'dim');
+    this.logger = new Worker.Logger('themes', 'magenta');
+    this.previewLogger = new Worker.Logger('preview', 'dim');
   }
 
   async boot(): Promise<void> {

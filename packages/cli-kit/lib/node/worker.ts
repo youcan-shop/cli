@@ -7,14 +7,10 @@ export interface Interface {
   boot(): Promise<void>
 }
 
-const colors = ['yellow', 'cyan', 'magenta', 'green', 'blue', 'red', 'dim'];
-type NeededUnionType<T extends unknown[]> = T[number];
-
 export class Logger extends Writable {
-
   constructor(
     private readonly type: string,
-    private readonly color: NeededUnionType<['yellow', 'cyan', 'magenta', 'green', 'blue', 'red', 'dim']>,
+    private readonly color: 'yellow' | 'cyan' | 'magenta' | 'green' | 'blue' | 'red' | 'dim',
   ) {
     super();
   }
