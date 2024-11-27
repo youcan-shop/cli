@@ -84,6 +84,7 @@ export abstract class Command extends BaseCommand {
 
   exit(code?: number): never {
     this.controller.abort();
+
     return process.exit(code);
   }
 }

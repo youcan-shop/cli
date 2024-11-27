@@ -12,8 +12,8 @@ type KeyType = {
 
 const HotKey = ({ keyboardKey, description, handler } : KeyType) => {
   useInput((input) => {
-		if (input === keyboardKey) handler();
-	});
+    if (input === keyboardKey) handler();
+  });
 
   return (
     <Box flexDirection="column">

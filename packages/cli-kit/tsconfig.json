@@ -10,5 +10,5 @@
       ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["lib/**/*.ts", "lib/**/*.tsx"]
 }
