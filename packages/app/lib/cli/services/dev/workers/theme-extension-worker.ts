@@ -20,7 +20,7 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger('extensions');
+    this.logger = new Worker.Logger('extensions', 'dim');
   }
 
   public async boot(): Promise<void> {

@@ -11,7 +11,7 @@ export default class AppWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger('app');
+    this.logger = new Worker.Logger('app', 'green');
   }
 
   public async boot(): Promise<void> {
@@ -32,11 +32,10 @@ export default class AppWorker extends Worker.Abstract {
 
     watcher.once('change', async () => {
       await watcher.close();
+      this.logger.write('config update detected, reloading workers...');
       this.command.controller.abort();
 
-      this.logger.write('config update detected, reloading workers...');
-
-      this.command.config.runCommand(this.command.id!, this.command.argv);
+      this.command.config.runCommand(this.command.id!, this.command.argv);      
     });
   }
 }

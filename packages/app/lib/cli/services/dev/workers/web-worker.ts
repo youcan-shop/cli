@@ -11,7 +11,7 @@ export default class WebWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger(this.web.config.name || 'web');
+    this.logger = new Worker.Logger(this.web.config.name || 'web', 'blue');
   }
 
   public async boot(): Promise<void> {

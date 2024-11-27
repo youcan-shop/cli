@@ -20,8 +20,8 @@ export default class ThemeWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger('stdout', 'themes', Color.magenta);
-    this.previewLogger = new Worker.Logger('stdout', 'preview', Color.dim);
+    this.logger = new Worker.Logger( 'themes', 'magenta');
+    this.previewLogger = new Worker.Logger( 'preview', 'dim');
   }
 
   async boot(): Promise<void> {

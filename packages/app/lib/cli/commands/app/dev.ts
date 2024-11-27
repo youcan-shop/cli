@@ -1,5 +1,5 @@
 import type { Worker } from '@youcan/cli-kit';
-import { Env, Filesystem, Http, Path, Session, Tasks, UI } from '@youcan/cli-kit';
+import { Env, Filesystem, Http, Path, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/theme-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
@@ -19,7 +19,7 @@ class Dev extends AppCommand {
 
     const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
-        title: 'Syncing app configuration..',
+        title: 'Syncing app configuration..', 
         async task() {
           const endpoint = app.config.id == null
             ? `${Env.apiHostname()}/apps/create`
@@ -59,14 +59,33 @@ class Dev extends AppCommand {
 
           app.webs.forEach(web => promises.unshift(bootWebWorker(ctx.cmd, app, web)));
           app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(ctx.cmd, app, ext)));
-
           ctx.workers = await Promise.all(promises);
         },
       },
     ]);
 
-    UI.renderDevOutput();
-    await Promise.all(workers.map(async worker => await worker.run()));
+    const hotKeys = [
+      {
+        keyboardKey: 'p',
+        description: 'preview in your dev store',
+        handler: async () => {
+          const { url } = await Http.get<{ url: string }>(`${Env.apiHostname()}/apps/${app.config.id}/authorization-url`);
+          System.open(url);
+        }
+      },
+      {
+        keyboardKey: 'q',
+        description: 'quit',
+        handler: () => this.exit(0)
+      },
+    ];
+
+    UI.renderDevOutput({
+      hotKeys,
+      cmd: this
+    });
+
+    await Promise.all(workers.map( async worker => await worker.run()));
   }
 }
 

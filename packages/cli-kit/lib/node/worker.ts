@@ -7,18 +7,16 @@ export interface Interface {
   boot(): Promise<void>
 }
 
-export class Logger extends Writable {
-  private static currentColorIndex = 0;
-  private static colors = ['yellow', 'cyan', 'magenta', 'green', 'blue', 'red'];
+const colors = ['yellow', 'cyan', 'magenta', 'green', 'blue', 'red', 'dim'];
+type NeededUnionType<T extends unknown[]> = T[number];
 
-  private color: typeof Logger.colors[number];
+export class Logger extends Writable {
 
   constructor(
-    private type: string,
-    color?: typeof Logger.colors[number],
+    private readonly type: string,
+    private readonly color: NeededUnionType<['yellow', 'cyan', 'magenta', 'green', 'blue', 'red', 'dim']>,
   ) {
     super();
-    this.color = color ?? Logger.pickAlternateColor();
   }
 
   write(chunk: unknown): boolean {
@@ -30,25 +28,15 @@ export class Logger extends Writable {
     const lines = chunk.toString().split('\n').map(s => s.trim()).filter(s => s !== '');
 
     for (const line of lines) {
-      UI.renderDevOutput.observable.emit({
+      UI.renderDevOutput.outputSubject.emit({
         timestamp: time,
         color: this.color,
-        label: Logger.pad(this.type, 10),
+        label: this.type,
         buffer: line,
       });
     }
 
     return true;
-  }
-
-  private static pad(subject: string, length: number, char = ' ') {
-    return subject.padStart(length, char);
-  }
-
-  private static pickAlternateColor(): typeof Logger.colors[number] {
-    const picked = (Logger.currentColorIndex++) % Logger.colors.length;
-
-    return Logger.colors[picked];
   }
 }
 
