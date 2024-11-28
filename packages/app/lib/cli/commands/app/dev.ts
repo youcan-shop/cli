@@ -23,9 +23,7 @@ class Dev extends AppCommand {
     const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
         title: 'Syncing app configuration..',
-        task: async () => {
-          await this.syncAppConfig();
-        },
+        task: async () => await this.syncAppConfig(),
       },
       {
         title: 'Preparing dev processes...',
@@ -48,10 +46,7 @@ class Dev extends AppCommand {
       },
     ];
 
-    UI.renderDevOutput({
-      hotKeys,
-      cmd: this,
-    });
+    UI.renderDevOutput({ hotKeys, cmd: this});
 
     this.runWorkers(workers);
   }
@@ -107,7 +102,7 @@ class Dev extends AppCommand {
     this.app.webs.forEach(web => promises.unshift(bootWebWorker(this, this.app, web)));
     this.app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(this, this.app, ext)));
 
-    return Promise.all(promises);
+    return Promise.all(promises); // TODO: understand this later
   }
 
   private async openAppPreview() {
