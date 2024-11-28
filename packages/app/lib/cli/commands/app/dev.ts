@@ -53,15 +53,15 @@ class Dev extends AppCommand {
 
   async startDev() {
     this.app = await load();
-
     await this.syncAppConfig();
-    const workers = await this.prePareDevProcesses();
 
-    this.runWorkers(workers);
+    this.runWorkers(
+      await this.prePareDevProcesses()
+    );
   }
 
-  private runWorkers(workers: Worker.Interface[]) {
-    Promise.all(workers.map(async worker => await worker.run()));
+  private async runWorkers(workers: Worker.Interface[]) {
+    await Promise.all(workers.map( worker => worker.run()));
   }
 
   private async syncAppConfig(): Promise<void> {
@@ -102,11 +102,13 @@ class Dev extends AppCommand {
     this.app.webs.forEach(web => promises.unshift(bootWebWorker(this, this.app, web)));
     this.app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(this, this.app, ext)));
 
-    return Promise.all(promises); // TODO: understand this later
+    return Promise.all(promises);
   }
 
   private async openAppPreview() {
-    const { url } = await Http.get<{ url: string }>(`${Env.apiHostname()}/apps/${this.app.config.id}/authorization-url`);
+    const endpointUrl = `${Env.apiHostname()}/apps/${this.app.config.id}/authorization-url`;
+    const { url } = await Http.get<{ url: string }>(endpointUrl);
+
     System.open(url);
   }
 }
