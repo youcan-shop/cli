@@ -3,7 +3,7 @@ import ThemeExtensionWorker from './theme-extension-worker';
 import WebWorker from './web-worker';
 import AppWorker from './app-worker';
 import type { App, Extension, Web } from '@/types';
-import DevCommand from '@/cli/commands/app/dev';
+import type DevCommand from '@/cli/commands/app/dev';
 
 export interface ExtensionWorkerCtor {
   new(command: Cli.Command, app: App, extension: Extension): Worker.Interface

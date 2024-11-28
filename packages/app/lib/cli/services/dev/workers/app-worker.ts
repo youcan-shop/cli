@@ -1,7 +1,7 @@
 import { Filesystem, Path, Worker } from '@youcan/cli-kit';
 import type { App } from '@/types';
 import { APP_CONFIG_FILENAME } from '@/constants';
-import DevCommand from '@/cli/commands/app/dev';
+import type DevCommand from '@/cli/commands/app/dev';
 
 export default class AppWorker extends Worker.Abstract {
   private logger: Worker.Logger;

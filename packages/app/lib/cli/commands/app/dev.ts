@@ -4,7 +4,7 @@ import { AppCommand } from '@/util/theme-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
 import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
-import { App } from '@/types';
+import type { App } from '@/types';
 
 interface Context {
   cmd: Dev
@@ -24,7 +24,7 @@ class Dev extends AppCommand {
       {
         title: 'Syncing app configuration..',
         task: async () => {
-          await this.syncAppConfig()
+          await this.syncAppConfig();
         },
       },
       {
@@ -39,10 +39,7 @@ class Dev extends AppCommand {
       {
         keyboardKey: 'p',
         description: 'preview in your dev store',
-        handler: async () => {
-          const { url } = await Http.get<{ url: string }>(`${Env.apiHostname()}/apps/${this.app.config.id}/authorization-url`);
-          System.open(url);
-        },
+        handler: async () => this.openAppPreview(),
       },
       {
         keyboardKey: 'q',
@@ -74,8 +71,8 @@ class Dev extends AppCommand {
 
   private async syncAppConfig(): Promise<void> {
     const endpoint = this.app.config.id == null
-    ? `${Env.apiHostname()}/apps/create`
-    : `${Env.apiHostname()}/apps/${this.app.config.id}/update`;
+      ? `${Env.apiHostname()}/apps/create`
+      : `${Env.apiHostname()}/apps/${this.app.config.id}/update`;
 
     const res = await Http.post<Record<string, any>>(endpoint, {
       headers: { Authorization: `Bearer ${this.session.access_token}` },
@@ -109,7 +106,13 @@ class Dev extends AppCommand {
 
     this.app.webs.forEach(web => promises.unshift(bootWebWorker(this, this.app, web)));
     this.app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(this, this.app, ext)));
+
     return Promise.all(promises);
+  }
+
+  private async openAppPreview() {
+    const { url } = await Http.get<{ url: string }>(`${Env.apiHostname()}/apps/${this.app.config.id}/authorization-url`);
+    System.open(url);
   }
 }
 
