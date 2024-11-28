@@ -1,12 +1,13 @@
-import { type Cli, Filesystem, Path, Worker } from '@youcan/cli-kit';
+import { Filesystem, Path, Worker } from '@youcan/cli-kit';
 import type { App } from '@/types';
 import { APP_CONFIG_FILENAME } from '@/constants';
+import DevCommand from '@/cli/commands/app/dev';
 
 export default class AppWorker extends Worker.Abstract {
   private logger: Worker.Logger;
 
   constructor(
-    private command: Cli.Command,
+    private command: DevCommand,
     private app: App,
   ) {
     super();
@@ -35,7 +36,7 @@ export default class AppWorker extends Worker.Abstract {
       this.logger.write('config update detected, reloading workers...');
       this.command.controller.abort();
 
-      this.command.config.runCommand(this.command.id!, this.command.argv);
+      this.command.startDev();
     });
   }
 }

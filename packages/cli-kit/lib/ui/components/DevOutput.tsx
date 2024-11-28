@@ -56,7 +56,6 @@ interface RenderDevOutputType {
 
 export const DevOutput = ({cmd, hotKeys = []} : DevOutputPropsType) => {
   const [linesBuffers, setLinesBuffers] = useState<SubjectDataType[]>([]);
-  const { exit } = useApp();
 
   useInput((input, key) => {
     if (input === 'c' && key.ctrl) {
@@ -67,13 +66,6 @@ export const DevOutput = ({cmd, hotKeys = []} : DevOutputPropsType) => {
   useEffect(() => {
     outputSubject.listen((data) => {
       setLinesBuffers((previousLines) => [...previousLines, data]);
-    });
-  }, []);
-
-  useEffect(() => {
-    cmd.controller.signal.addEventListener('abort', () => {
-      console.clear();
-      exit();
     });
   }, []);
 
@@ -97,7 +89,8 @@ export const DevOutput = ({cmd, hotKeys = []} : DevOutputPropsType) => {
   );
 };
 
-const renderDevOutput: RenderDevOutputType = ((props) => render(<DevOutput {...props} />, { exitOnCtrlC: false })) as RenderDevOutputType;
+const renderDevOutput: RenderDevOutputType =
+  ((props) => render(<DevOutput {...props} />, { exitOnCtrlC: false })) as RenderDevOutputType;
 
 renderDevOutput.outputSubject = outputSubject;
 
