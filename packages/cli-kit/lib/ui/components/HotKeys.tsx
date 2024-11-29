@@ -1,8 +1,7 @@
-import React from "react";
+import React from 'react';
 
-import { Box, render, Text, useInput } from "ink";
-
-import { RightChevron, VerticalDivider } from "./utils/symbols";
+import { RightChevron, VerticalDivider } from './utils/symbols';
+import { Box, render, Text, useInput } from 'ink';
 
 type KeyType = {
   keyboardKey: string
@@ -16,7 +15,7 @@ const HotKey = ({ keyboardKey, description, handler } : KeyType) => {
   });
 
   return (
-    <Box flexDirection="column">
+    <Box flexDirection='column'>
       <Text>
         <RightChevron /> Press <Text dimColor>{keyboardKey}</Text> <VerticalDivider /> {description}
       </Text>
@@ -29,7 +28,7 @@ export type HotKeysPropsType = {
 };
 
 export const HotKeys = ({ hotKeys } : HotKeysPropsType) => {
-  return (<Box flexDirection="column">{hotKeys.map((hotKey) => <HotKey key={hotKey.keyboardKey} {...hotKey} />)}</Box>);
+  return (<Box flexDirection='column'>{hotKeys.map((hotKey) => <HotKey key={hotKey.keyboardKey} {...hotKey} />)}</Box>);
 }
 
 export const renderHotKeys = (props: HotKeysPropsType) => render(<HotKeys {...props} />, { exitOnCtrlC: false });

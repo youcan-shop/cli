@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Instance, render, Static, Text, useApp, useInput } from 'ink';
-import { ReplaySubject } from 'rxjs'
-import { map } from 'rxjs/operators'
+import React from 'react';
 
-import { VerticalDivider } from './utils/symbols';
+import { Box, Instance, render, Static, Text, useInput } from 'ink';
 import { HotKeys, HotKeysPropsType } from './HotKeys';
+import { VerticalDivider } from './utils/symbols';
+import { useState, useEffect } from 'react';
 import { Command } from '@/node/cli';
+import { map } from 'rxjs/operators';
+import { ReplaySubject } from 'rxjs';
 
 interface SubjectDataType {
   timestamp: string
@@ -72,7 +73,7 @@ export const DevOutput = ({cmd, hotKeys = []} : DevOutputPropsType) => {
     <>
       <Static items={linesBuffers}>
         {(line, i) => (
-          <Box flexDirection="column" key={i}>
+          <Box flexDirection='column' key={i}>
             <Text>
               <Text>{line.timestamp} <VerticalDivider /></Text>
               <Text color={line.color}>{line.label}</Text>
@@ -93,4 +94,4 @@ const renderDevOutput: RenderDevOutputType =
 
 renderDevOutput.outputSubject = outputSubject;
 
-export {renderDevOutput};
+export { renderDevOutput };
