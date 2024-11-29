@@ -28,7 +28,7 @@ class Dev extends AppCommand {
       {
         title: 'Preparing dev processes...',
         task: async (ctx) => {
-          ctx.workers = await this.prePareDevProcesses();
+          ctx.workers = await this.prepareDevProcesses();
         },
       },
     ]);
@@ -51,16 +51,16 @@ class Dev extends AppCommand {
     this.runWorkers(workers);
   }
 
-  async startDev() {
+  async reloadWorkers() {
     this.app = await load();
     await this.syncAppConfig();
 
     this.runWorkers(
-      await this.prePareDevProcesses()
+      await this.prepareDevProcesses()
     );
   }
 
-  private async runWorkers(workers: Worker.Interface[]) {
+  private async runWorkers(workers: Worker.Interface[]): Promise<void> {
     await Promise.all(workers.map( worker => worker.run()));
   }
 
@@ -94,7 +94,7 @@ class Dev extends AppCommand {
     );
   }
 
-  private async prePareDevProcesses(): Promise<Worker.Interface[]> {
+  private async prepareDevProcesses(): Promise<Worker.Interface[]> {
     const promises: Promise<Worker.Interface>[] = [
       bootAppWorker(this, this.app),
     ];

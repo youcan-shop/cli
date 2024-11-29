@@ -36,7 +36,7 @@ export default class AppWorker extends Worker.Abstract {
       this.logger.write('config update detected, reloading workers...');
       this.command.controller.abort();
 
-      this.command.startDev();
+      this.command.reloadWorkers();
     });
   }
 }

@@ -17,14 +17,15 @@ interface SubjectDataType {
 class OutputSubject {
   private readonly subject = new ReplaySubject<SubjectDataType>
 
-  listen(handler: (data: SubjectDataType) => void) {
+  listen(handler: (data: SubjectDataType) => void): void {
     let lastLineKey: string | null = null;
 
     this.subject.pipe(map(item => {
-        if (`${item.label}-${item.color}` !== lastLineKey) {
-          lastLineKey = `${item.label}-${item.color}`;
-          item.label = this.pad(item.label, 10);
-          return item;
+      const currentLineKey = `${item.label}-${item.color}`;
+
+        if (currentLineKey !== lastLineKey) {
+          lastLineKey = currentLineKey;
+          return {...item, label: this.pad(item.label, 10)};
         }
 
         return { ...item, label: this.pad('', 10) };
@@ -33,12 +34,12 @@ class OutputSubject {
     .subscribe(handler);
   }
 
-  emit(data: SubjectDataType) {
+  emit(data: SubjectDataType): void {
     this.subject.next(data);
   }
 
-  private pad(subject: string, length: number, char = ' ') {
-    return subject.padStart(length, char);
+  private pad(subject: string, length: number, char = ' '): string {
+    return subject.padEnd(length, char);
   }
 }
 
@@ -58,9 +59,7 @@ export const DevOutput = ({cmd, hotKeys = []} : DevOutputPropsType) => {
   const [linesBuffers, setLinesBuffers] = useState<SubjectDataType[]>([]);
 
   useInput((input, key) => {
-    if (input === 'c' && key.ctrl) {
-      cmd.exit(130);
-    }
+    if (input === 'c' && key.ctrl) cmd.exit(130);
   });
 
   useEffect(() => {
