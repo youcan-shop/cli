@@ -13,7 +13,7 @@ export default {
   output: {
     dir: 'dist',
     exports: 'named',
-    format: 'es',
+    format: 'esm',
     preserveModules: true,
   },
 };

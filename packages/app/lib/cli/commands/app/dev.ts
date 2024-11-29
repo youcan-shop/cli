@@ -46,7 +46,7 @@ class Dev extends AppCommand {
       },
     ];
 
-    UI.renderDevOutput({ hotKeys, cmd: this});
+    UI.renderDevOutput({ hotKeys, cmd: this });
 
     this.runWorkers(workers);
   }
@@ -56,12 +56,12 @@ class Dev extends AppCommand {
     await this.syncAppConfig();
 
     this.runWorkers(
-      await this.prepareDevProcesses()
+      await this.prepareDevProcesses(),
     );
   }
 
   private async runWorkers(workers: Worker.Interface[]): Promise<void> {
-    await Promise.all(workers.map( worker => worker.run()));
+    await Promise.all(workers.map(worker => worker.run()));
   }
 
   private async syncAppConfig(): Promise<void> {
