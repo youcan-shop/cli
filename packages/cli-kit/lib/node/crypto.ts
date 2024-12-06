@@ -1,3 +1,4 @@
+import type { BinaryLike } from 'crypto';
 import crypto from 'crypto';
 
 export function randomHex(size: number): string {
@@ -8,11 +9,11 @@ export function base64URLEncode(str: Buffer): string {
   return str.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/[=]/g, '');
 }
 
-export function sha256(str: string): Buffer {
+export function sha256(str: BinaryLike): Buffer {
   return crypto.createHash('sha256').update(str).digest();
 }
 
-export function sha1(str: Buffer | string): string {
+export function sha1(str: BinaryLike): string {
   return crypto.createHash('sha1').update(str).digest('hex');
 }
 
@@ -20,7 +21,7 @@ export function hashString(str: string): string {
   return crypto.createHash('sha1').update(str).digest('hex');
 }
 
-export function fileHash(buff: Buffer): string {
+export function fileHash(buff: BinaryLike): string {
   return crypto.createHash('md5').update(buff).digest('hex');
 }
 
