@@ -12,19 +12,7 @@ export function oauthClientId(): string {
       return '11';
     case 'prod':
     default:
-      return '8';
-  }
-}
-
-export function oauthClientSecret(): string {
-  switch (get('HOST_ENV')) {
-    case 'dev':
-      return 'kvvtjXFCeuvvNX2nwD30SAfh7DMbVXm16E0MPCTu';
-    case 'test':
-      return 'UkNttuRvqjPtX08nSzwGssnKPb21Kg0s0NJNKMAo';
-    case 'prod':
-    default:
-      return 'lvUw2mQ7nXp4WqZ9CZlURMgRGAra3KuOrYhFlU7X';
+      return '398';
   }
 }
 

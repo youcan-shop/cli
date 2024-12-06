@@ -3,11 +3,21 @@ import { Callback, type Cli, Config, Crypto, Env, Http, System } from '..';
 const LS_PORT = 3000;
 const LS_HOST = 'localhost';
 
+function generatePkcePair(length: number): [string, string] {
+  const verifier = Crypto.randomHex(length);
+
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const hash = Crypto.sha256(data)
+
+  return [verifier, Crypto.base64URLEncode(hash)];
+}
+
 async function isSessionValid(session: StoreSession): Promise<boolean> {
   try {
     const store = await Http.get<{ status: number }>(
-        `${Env.apiHostname()}/me`,
-        { headers: { Authorization: `Bearer ${session.access_token}` } },
+      `${Env.apiHostname()}/me`,
+      { headers: { Authorization: `Bearer ${session.access_token}` } },
     );
 
     return store.status === 1;
@@ -17,13 +27,13 @@ async function isSessionValid(session: StoreSession): Promise<boolean> {
   }
 }
 
-async function exchange(code: string) {
+async function exchange(code: string, verifier: string) {
   const params = {
     code,
     client_id: Env.oauthClientId(),
     grant_type: 'authorization_code',
-    client_secret: Env.oauthClientSecret(),
     redirect_uri: `http://${LS_HOST}:${LS_PORT}/`,
+    code_verifier: verifier,
   };
 
   const result = await Http.post<{ access_token: string }>(
@@ -57,12 +67,16 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
     await System.killPortProcess(LS_PORT);
   }
 
+  const [verifier, challenge] = await generatePkcePair(64);
+
   const params = {
     state,
     response_type: 'code',
     scope: '*',
     client_id: Env.oauthClientId(),
     redirect_uri: `http://${LS_HOST}:${LS_PORT}/`,
+    code_challenge: challenge,
+    code_challenge_method: 'S256',
   };
 
   await command.output.anykey('Press any key to open the login page on your browser..');
@@ -77,7 +91,7 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
     throw new Error('Authorization state mismatch..');
   }
 
-  return result.code;
+  return { code: result.code, codeVerifier: verifier };
 }
 
 export interface StoreSession {
@@ -100,7 +114,9 @@ export async function authenticate(command: Cli.Command): Promise<StoreSession> 
     return existingSession;
   }
 
-  const accessToken = await exchange(await authorize(command));
+  const { code, codeVerifier } = await authorize(command);
+
+  const accessToken = await exchange(code, codeVerifier);
 
   const store = await Http.get<{ id: string; slug: string }>(
     `${Env.apiHostname()}/me`,
