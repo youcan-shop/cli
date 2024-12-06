@@ -1,13 +1,12 @@
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { createReadStream, existsSync, mkdir, mkdirSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync } from 'node:fs';
 
-import {finished} from 'node:stream/promises'
 import {pipeline} from 'node:stream/promises'
 import * as tar from 'tar'
 import FsExtra from 'fs-extra';
 
-import { createGunzip, createUnzip, unzip } from 'node:zlib'
+import { createGunzip } from 'node:zlib'
 
 import {createWriteStream} from 'node:fs'
 import { basename } from "node:path";
@@ -100,6 +99,7 @@ async function installForMacOs(url: string, destination: string): Promise<void> 
 
 async function installForLinux(url: string, destination: string): Promise<void> { 
     const parentDir = dirname(destination);
+    if (!existsSync(parentDir)) mkdirSync(parentDir, { mode: 0o777, recursive: true });
     await downloadFromRelease(url, destination);
 }
 
@@ -118,7 +118,7 @@ function installTryCloudflare(platform = process.platform, arch = process.arch) 
             installForMacOs(downloadUrl, destinationPath);
             break;
         case 'linux':
-            installForLinux();
+            installForLinux(downloadUrl, destinationPath);
             break;
         case 'win32':
         default:
