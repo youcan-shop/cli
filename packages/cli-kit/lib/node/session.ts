@@ -114,9 +114,9 @@ export async function authenticate(command: Cli.Command): Promise<StoreSession> 
     return existingSession;
   }
 
-  const { code, verifier: codeVerifier } = await authorize(command);
+  const { code, verifier } = await authorize(command);
 
-  const accessToken = await exchange(code, codeVerifier);
+  const accessToken = await exchange(code, verifier);
 
   const store = await Http.get<{ id: string; slug: string }>(
     `${Env.apiHostname()}/me`,
