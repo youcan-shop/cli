@@ -8,7 +8,7 @@ function generatePkcePair(length: number): [string, string] {
 
   const encoder = new TextEncoder();
   const data = encoder.encode(verifier);
-  const hash = Crypto.sha256(data)
+  const hash = Crypto.sha256(data);
 
   return [verifier, Crypto.base64URLEncode(hash)];
 }
@@ -91,7 +91,7 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
     throw new Error('Authorization state mismatch..');
   }
 
-  return { code: result.code, codeVerifier: verifier };
+  return { code: result.code, verifier };
 }
 
 export interface StoreSession {
@@ -114,7 +114,7 @@ export async function authenticate(command: Cli.Command): Promise<StoreSession> 
     return existingSession;
   }
 
-  const { code, codeVerifier } = await authorize(command);
+  const { code, verifier: codeVerifier } = await authorize(command);
 
   const accessToken = await exchange(code, codeVerifier);
 
