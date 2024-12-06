@@ -7,7 +7,7 @@ export abstract class AppCommand extends Cli.Command {
   protected app!: App;
   protected session!: Session.StoreSession;
 
-  protected async syncAppConfig(): Promise<App> {
+  public async syncAppConfig(): Promise<App> {
     const endpoint = this.app.config.id == null
       ? `${Env.apiHostname()}/apps/create`
       : `${Env.apiHostname()}/apps/${this.app.config.id}/update`;
