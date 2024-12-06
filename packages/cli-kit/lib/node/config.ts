@@ -1,9 +1,7 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-/** @ts-expect-error */
 import Conf from 'conf';
 
 class Manager<T extends { [key: string]: any }> {
-  private readonly store: Conf;
+  private readonly store: Conf<T>;
 
   public constructor(options: { projectName?: string; cwd?: string }) {
     this.store = new Conf(options);
