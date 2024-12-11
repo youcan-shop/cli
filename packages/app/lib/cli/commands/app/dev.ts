@@ -16,6 +16,19 @@ class Dev extends AppCommand {
   private app!: App;
   private session!: Session.StoreSession;
 
+  private readonly hotKeys = [
+    {
+      keyboardKey: 'p',
+      description: 'preview in your dev store',
+      handler: async () => this.openAppPreview(),
+    },
+    {
+      keyboardKey: 'q',
+      description: 'quit',
+      handler: () => this.exit(0),
+    },
+  ];
+
   async run(): Promise<any> {
     this.session = await Session.authenticate(this);
     this.app = await load();
@@ -33,20 +46,7 @@ class Dev extends AppCommand {
       },
     ]);
 
-    const hotKeys = [
-      {
-        keyboardKey: 'p',
-        description: 'preview in your dev store',
-        handler: async () => this.openAppPreview(),
-      },
-      {
-        keyboardKey: 'q',
-        description: 'quit',
-        handler: () => this.exit(0),
-      },
-    ];
-
-    UI.renderDevOutput({ hotKeys, cmd: this });
+    UI.renderDevOutput({ hotKeys: this.hotKeys, cmd: this });
 
     this.runWorkers(workers);
   }
