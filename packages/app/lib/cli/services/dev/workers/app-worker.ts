@@ -1,17 +1,18 @@
-import { type Cli, Color, Filesystem, Path, Worker } from '@youcan/cli-kit';
+import { Filesystem, Path, Worker } from '@youcan/cli-kit';
 import type { App } from '@/types';
 import { APP_CONFIG_FILENAME } from '@/constants';
+import type DevCommand from '@/cli/commands/app/dev';
 
 export default class AppWorker extends Worker.Abstract {
   private logger: Worker.Logger;
 
   constructor(
-    private command: Cli.Command,
+    private command: DevCommand,
     private app: App,
   ) {
     super();
 
-    this.logger = new Worker.Logger('stdout', 'app', Color.cyan);
+    this.logger = new Worker.Logger('app', 'green');
   }
 
   public async boot(): Promise<void> {
@@ -32,11 +33,10 @@ export default class AppWorker extends Worker.Abstract {
 
     watcher.once('change', async () => {
       await watcher.close();
+      this.logger.write('config update detected, reloading workers...');
       this.command.controller.abort();
 
-      this.logger.write('config update detected, reloading workers...');
-
-      this.command.config.runCommand(this.command.id!, this.command.argv);
+      this.command.reloadWorkers();
     });
   }
 }

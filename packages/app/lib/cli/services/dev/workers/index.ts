@@ -3,6 +3,7 @@ import ThemeExtensionWorker from './theme-extension-worker';
 import WebWorker from './web-worker';
 import AppWorker from './app-worker';
 import type { App, Extension, Web } from '@/types';
+import type DevCommand from '@/cli/commands/app/dev';
 
 export interface ExtensionWorkerCtor {
   new(command: Cli.Command, app: App, extension: Extension): Worker.Interface
@@ -12,7 +13,7 @@ const EXTENSION_WORKERS: Record<string, ExtensionWorkerCtor> = {
   theme: ThemeExtensionWorker,
 };
 
-export async function bootAppWorker(command: Cli.Command, app: App) {
+export async function bootAppWorker(command: DevCommand, app: App) {
   const worker = new AppWorker(command, app);
 
   await worker.boot();

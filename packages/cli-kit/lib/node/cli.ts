@@ -82,9 +82,9 @@ export abstract class Command extends BaseCommand {
     console.clear();
   }
 
-  exit(code?: number | undefined): never {
+  exit(code?: number): never {
     this.controller.abort();
 
-    return super.exit(code);
+    return process.exit(code);
   }
 }

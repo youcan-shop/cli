@@ -1,5 +1,5 @@
 import type { Worker } from '@youcan/cli-kit';
-import { Crypto, Env, Filesystem, Http, Path, Session, Tasks } from '@youcan/cli-kit';
+import { Crypto, Env, Filesystem, Http, Path, Session, Tasks, UI } from '@youcan/cli-kit';
 import { ThemeCommand } from '@/util/theme-command';
 import { load } from '@/util/theme-loader';
 import ThemeWorker from '@/cli/services/dev/worker';
@@ -90,6 +90,8 @@ export default class Dev extends ThemeCommand {
         },
       },
     ]);
+
+    UI.renderDevOutput({ hotKeys: [], cmd: this });
 
     await Promise.all(context.workers.map(async w => await w.run()));
   }

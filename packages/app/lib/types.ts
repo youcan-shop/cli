@@ -79,6 +79,5 @@ export interface ExtensionFileDescriptor {
 }
 
 export interface ExtensionMetadata {
-
   [key: string]: ExtensionFileDescriptor[]
 }

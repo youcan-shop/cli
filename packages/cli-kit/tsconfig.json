@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "jsx": "react",
+    "rootDir": "lib",
     "baseUrl": ".",
     "paths": {
       "@/*": [
@@ -8,8 +10,5 @@
       ]
     }
   },
-  "include": [
-    "lib",
-    "rollup.config.js"
-  ]
+  "include": ["lib/**/*.ts", "lib/**/*.tsx"]
 }

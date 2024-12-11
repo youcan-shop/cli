@@ -1,7 +1,6 @@
 import { Writable } from 'stream';
-import { stderr, stdout } from 'process';
 import dayjs from 'dayjs';
-import type { Color } from '..';
+import { UI } from '..';
 
 export interface Interface {
   run(): Promise<void>
@@ -10,9 +9,8 @@ export interface Interface {
 
 export class Logger extends Writable {
   constructor(
-    private channel: 'stdout' | 'stderr',
-    private type: string,
-    private color: Color.Color,
+    private readonly type: string,
+    private readonly color: 'yellow' | 'cyan' | 'magenta' | 'green' | 'blue' | 'red' | 'dim',
   ) {
     super();
   }
@@ -22,26 +20,23 @@ export class Logger extends Writable {
       return false;
     }
 
-    const channel = this.channel === 'stdout' ? stdout : stderr;
-
     const time = dayjs().format('HH:mm:ss:SSS');
     const lines = chunk.toString().split('\n').map(s => s.trim()).filter(s => s !== '');
 
-    for (let i = 0; i < lines.length; i++) {
-      i === 0
-        ? channel.write(this.color(`${time} | ${this.pad(this.type, 10)} | ${lines[i]}\n`))
-        : channel.write(this.color(`                          | ${lines[i]}\n`));
+    for (const line of lines) {
+      UI.renderDevOutput.outputSubject.emit({
+        timestamp: time,
+        color: this.color,
+        label: this.type,
+        buffer: line,
+      });
     }
 
     return true;
   }
-
-  private pad(subject: string, length: number, char = ' ') {
-    return subject.padEnd(length, char);
-  }
 }
 
 export abstract class Abstract implements Interface {
-  public abstract boot(): Promise<void>;
   public abstract run(): Promise<void>;
+  public abstract boot(): Promise<void>;
 }
