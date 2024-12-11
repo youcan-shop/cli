@@ -52,16 +52,18 @@ class Dev extends AppCommand {
   }
 
   async reloadWorkers() {
+    this.controller = new AbortController();
+    
     this.app = await load();
     await this.syncAppConfig();
 
-    this.runWorkers(
+    await this.runWorkers(
       await this.prepareDevProcesses(),
     );
   }
 
   private async runWorkers(workers: Worker.Interface[]): Promise<void> {
-    await Promise.all(workers.map(worker => worker.run()));
+    await Promise.all(workers.map(worker => worker.run())).catch(_ => {});
   }
 
   private async syncAppConfig(): Promise<void> {

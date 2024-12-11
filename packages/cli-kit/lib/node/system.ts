@@ -24,6 +24,7 @@ function buildExec(command: string, args: string[], options?: ExecOptions): Exec
     input: options?.input,
     stdio: options?.stdio,
     stdin: options?.stdin,
+    signal: options?.signal,
     stdout: options?.stdout === 'inherit' ? 'inherit' : undefined,
     stderr: options?.stderr === 'inherit' ? 'inherit' : undefined,
     windowsHide: false,
