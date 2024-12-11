@@ -75,7 +75,10 @@ export const DevOutput = ({cmd, hotKeys = []} : DevOutputPropsType) => {
         {(line, i) => (
           <Box flexDirection='column' key={i}>
             <Text>
-              <Text>{line.timestamp} <VerticalDivider /></Text>
+              <Text dimColor>{line.timestamp}</Text>
+              {' '}
+              <VerticalDivider />
+              {' '}
               <Text color={line.color}>{line.label}</Text>
               <Text>{' '}<VerticalDivider />{' '}{line.buffer}</Text>
             </Text>
