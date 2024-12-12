@@ -7,7 +7,7 @@ export function get(key: keyof typeof ENV_VARS) {
 export function oauthClientId(): string {
   switch (get('HOST_ENV')) {
     case 'dev':
-      return '3';
+      return '1';
     case 'test':
       return '11';
     case 'prod':
