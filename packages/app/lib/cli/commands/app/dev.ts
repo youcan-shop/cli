@@ -53,7 +53,7 @@ class Dev extends AppCommand {
 
   async reloadWorkers() {
     this.controller = new AbortController();
-    
+
     this.app = await load();
     await this.syncAppConfig();
 
@@ -63,7 +63,7 @@ class Dev extends AppCommand {
   }
 
   private async runWorkers(workers: Worker.Interface[]): Promise<void> {
-    await Promise.all(workers.map(worker => worker.run())).catch(_ => {});
+    await Promise.all(workers.map(worker => worker.run())).catch((_) => {});
   }
 
   private async syncAppConfig(): Promise<void> {
@@ -109,11 +109,11 @@ class Dev extends AppCommand {
 
     this.app.webs.forEach(web => promises.unshift(
       bootWebWorker(
-        this, 
+        this,
         this.app,
         web,
-        this.buildEnvVars()
-      )
+        this.buildEnvVars(),
+      ),
     ));
 
     this.app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(this, this.app, ext)));
@@ -122,12 +122,16 @@ class Dev extends AppCommand {
   }
 
   private buildEnvVars(): Record<string, string> {
+    if (!this.app.remoteConfig) {
+      throw new Error('remote app config not loaded');
+    }
+
     return {
-      'YOUCAN_API_KEY': this.app.remoteConfig?.client_id!,
-      'YOUCAN_API_SECRET': this.app.remoteConfig?.client_secret!,
-      'APP_URL': 'localhost',
-      'HOST': 'localhost',
-      'PORT': '3000',
+      YOUCAN_API_KEY: this.app.remoteConfig.client_id,
+      YOUCAN_API_SECRET: this.app.remoteConfig.client_secret,
+      APP_URL: 'localhost',
+      HOST: 'localhost',
+      PORT: '3000',
     };
   }
 

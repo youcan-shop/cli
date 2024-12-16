@@ -14,13 +14,13 @@ export type AppConfig = {
   }
 } & InitialAppConfig;
 
-export type RemoteAppConfig = {
+export interface RemoteAppConfig {
   id: string
   name: string
   app_url: string
   owner_id: string
   client_id: string
-  client_secret: string | null
+  client_secret: string
   redirect_urls: string[]
   scopes: string[]
 }

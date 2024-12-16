@@ -8,7 +8,7 @@ export default class WebWorker extends Worker.Abstract {
     private readonly command: Cli.Command,
     private readonly app: App,
     private readonly web: Web,
-    private readonly env: Record<string, string> 
+    private readonly env: Record<string, string>,
   ) {
     super();
 
