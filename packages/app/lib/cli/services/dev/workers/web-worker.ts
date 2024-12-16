@@ -5,9 +5,10 @@ export default class WebWorker extends Worker.Abstract {
   private logger: Worker.Logger;
 
   public constructor(
-    private command: Cli.Command,
-    private app: App,
-    private web: Web,
+    private readonly command: Cli.Command,
+    private readonly app: App,
+    private readonly web: Web,
+    private readonly env: Record<string, string> 
   ) {
     super();
 
@@ -24,6 +25,7 @@ export default class WebWorker extends Worker.Abstract {
       stdout: this.logger,
       signal: this.command.controller.signal,
       stderr: new Worker.Logger(this.web.config.name || 'web', 'red'),
+      env: this.env,
     });
   }
 }

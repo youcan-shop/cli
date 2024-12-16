@@ -4,7 +4,7 @@ import { AppCommand } from '@/util/theme-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
 import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
-import type { App } from '@/types';
+import type { App, RemoteAppConfig } from '@/types';
 
 interface Context {
   cmd: Dev
@@ -71,7 +71,7 @@ class Dev extends AppCommand {
       ? `${Env.apiHostname()}/apps/create`
       : `${Env.apiHostname()}/apps/${this.app.config.id}/update`;
 
-    const res = await Http.post<Record<string, any>>(endpoint, {
+    const res = await Http.post<RemoteAppConfig>(endpoint, {
       headers: { Authorization: `Bearer ${this.session.access_token}` },
       body: JSON.stringify({
         name: this.app.config.name,
@@ -79,6 +79,9 @@ class Dev extends AppCommand {
         redirect_urls: this.app.config.redirect_urls,
       }),
     });
+
+    // mock
+    res.client_secret = 'test-secret';
 
     this.app.config = {
       name: res.name,
@@ -90,10 +93,13 @@ class Dev extends AppCommand {
         client_id: res.client_id,
       },
     };
+
     await Filesystem.writeJsonFile(
       Path.join(this.app.root, APP_CONFIG_FILENAME),
       this.app.config,
     );
+
+    this.app.remoteConfig = res;
   }
 
   private async prepareDevProcesses(): Promise<Worker.Interface[]> {
@@ -101,10 +107,28 @@ class Dev extends AppCommand {
       bootAppWorker(this, this.app),
     ];
 
-    this.app.webs.forEach(web => promises.unshift(bootWebWorker(this, this.app, web)));
+    this.app.webs.forEach(web => promises.unshift(
+      bootWebWorker(
+        this, 
+        this.app,
+        web,
+        this.buildEnvVars()
+      )
+    ));
+
     this.app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(this, this.app, ext)));
 
     return Promise.all(promises);
+  }
+
+  private buildEnvVars(): Record<string, string> {
+    return {
+      'YOUCAN_API_KEY': this.app.remoteConfig?.client_id!,
+      'YOUCAN_API_SECRET': this.app.remoteConfig?.client_secret!,
+      'APP_URL': 'localhost',
+      'HOST': 'localhost',
+      'PORT': '3000',
+    };
   }
 
   private async openAppPreview() {

@@ -30,8 +30,8 @@ export async function bootExtensionWorker(command: Cli.Command, app: App, extens
   return worker;
 }
 
-export async function bootWebWorker(command: Cli.Command, app: App, web: Web) {
-  const worker = new WebWorker(command, app, web);
+export async function bootWebWorker(command: Cli.Command, app: App, web: Web, env: Record<string, string>) {
+  const worker = new WebWorker(command, app, web, env);
 
   await worker.boot();
 
