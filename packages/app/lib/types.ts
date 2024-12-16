@@ -14,6 +14,17 @@ export type AppConfig = {
   }
 } & InitialAppConfig;
 
+export interface RemoteAppConfig {
+  id: string
+  name: string
+  app_url: string
+  owner_id: string
+  client_id: string
+  client_secret: string
+  redirect_urls: string[]
+  scopes: string[]
+}
+
 export interface ExtensionConfig {
   [key: string]: unknown
   type: string
@@ -66,6 +77,7 @@ export interface App {
   root: string
   webs: Web[]
   config: AppConfig
+  remoteConfig?: RemoteAppConfig
   extensions: Extension[]
 }
 
