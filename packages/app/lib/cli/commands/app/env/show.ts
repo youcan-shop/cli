@@ -9,7 +9,7 @@ class EnvShow extends AppCommand {
     this.app = await load();
     this.session = await Session.authenticate(this);
 
-    await Tasks.run(null, [
+    await Tasks.run({}, [
       {
         title: 'Syncing app configuration..',
         task: async () => { await this.syncAppConfig(); },
