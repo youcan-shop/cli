@@ -1,10 +1,8 @@
 import type { Worker } from '@youcan/cli-kit';
-import { Env, Filesystem, Http, Path, Session, System, Tasks, UI } from '@youcan/cli-kit';
+import { Env, Http, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { APP_CONFIG_FILENAME } from '@/constants';
 import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
-import type { App, RemoteAppConfig } from '@/types';
 
 interface Context {
   cmd: Dev
@@ -13,8 +11,6 @@ interface Context {
 
 class Dev extends AppCommand {
   static description = 'Run the app in dev mode';
-  private app!: App;
-  private session!: Session.StoreSession;
 
   private readonly hotKeys = [
     {
@@ -36,7 +32,7 @@ class Dev extends AppCommand {
     const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
         title: 'Syncing app configuration..',
-        task: async () => await this.syncAppConfig(),
+        task: async () => {await this.syncAppConfig()},
       },
       {
         title: 'Preparing dev processes...',
@@ -53,8 +49,8 @@ class Dev extends AppCommand {
 
   async reloadWorkers() {
     this.controller = new AbortController();
-
     this.app = await load();
+
     await this.syncAppConfig();
 
     await this.runWorkers(
@@ -64,39 +60,6 @@ class Dev extends AppCommand {
 
   private async runWorkers(workers: Worker.Interface[]): Promise<void> {
     await Promise.all(workers.map(worker => worker.run())).catch((_) => {});
-  }
-
-  private async syncAppConfig(): Promise<void> {
-    const endpoint = this.app.config.id == null
-      ? `${Env.apiHostname()}/apps/create`
-      : `${Env.apiHostname()}/apps/${this.app.config.id}/update`;
-
-    const res = await Http.post<RemoteAppConfig>(endpoint, {
-      headers: { Authorization: `Bearer ${this.session.access_token}` },
-      body: JSON.stringify({
-        name: this.app.config.name,
-        app_url: this.app.config.app_url,
-        redirect_urls: this.app.config.redirect_urls,
-      }),
-    });
-
-    this.app.config = {
-      name: res.name,
-      id: res.id,
-      app_url: res.app_url,
-      redirect_urls: res.redirect_urls,
-      oauth: {
-        scopes: res.scopes,
-        client_id: res.client_id,
-      },
-    };
-
-    await Filesystem.writeJsonFile(
-      Path.join(this.app.root, APP_CONFIG_FILENAME),
-      this.app.config,
-    );
-
-    this.app.remoteConfig = res;
   }
 
   private async prepareDevProcesses(): Promise<Worker.Interface[]> {
