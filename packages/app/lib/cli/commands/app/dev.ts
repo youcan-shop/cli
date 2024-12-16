@@ -1,6 +1,6 @@
 import type { Worker } from '@youcan/cli-kit';
 import { Env, Filesystem, Http, Path, Session, System, Tasks, UI } from '@youcan/cli-kit';
-import { AppCommand } from '@/util/theme-command';
+import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 import { APP_CONFIG_FILENAME } from '@/constants';
 import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';

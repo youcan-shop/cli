@@ -1,6 +1,6 @@
 import { Env, Http, Session, System, Tasks } from '@youcan/cli-kit';
 import { load } from '@/util/app-loader';
-import { AppCommand } from '@/util/theme-command';
+import { AppCommand } from '@/util/app-command';
 
 export default class Install extends AppCommand {
   static description = 'Generate an app installation URL';

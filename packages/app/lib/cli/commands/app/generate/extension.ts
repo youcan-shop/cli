@@ -1,5 +1,5 @@
 import { Filesystem, Path, String, Tasks } from '@youcan/cli-kit';
-import { AppCommand } from '@/util/theme-command';
+import { AppCommand } from '@/util/app-command';
 import type { AppConfig, InitialAppConfig } from '@/types';
 import extensions from '@/cli/services/generate/extensions';
 import { ensureExtensionDirectoryExists, initThemeExtension } from '@/cli/services/generate/generate';
