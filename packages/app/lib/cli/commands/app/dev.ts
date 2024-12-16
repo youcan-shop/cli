@@ -32,7 +32,7 @@ class Dev extends AppCommand {
     const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
         title: 'Syncing app configuration..',
-        task: async () => {await this.syncAppConfig()},
+        task: async () => { await this.syncAppConfig(); },
       },
       {
         title: 'Preparing dev processes...',

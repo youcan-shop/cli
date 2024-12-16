@@ -34,7 +34,7 @@
     "commands": "./dist/cli/commands",
     "topics": {
       "app:env": {
-        "description" : "Manage app environment variables"
+        "description": "Manage app environment variables"
       }
     }
   }
