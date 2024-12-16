@@ -80,9 +80,6 @@ class Dev extends AppCommand {
       }),
     });
 
-    // mock
-    res.client_secret = 'test-secret';
-
     this.app.config = {
       name: res.name,
       id: res.id,
