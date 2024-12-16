@@ -25,9 +25,9 @@ class EnvShow extends AppCommand {
     }
 
     this.log();
-    this.log(`${Color.green('YOUCAN_API_KEY')}=%s`, this.app.remoteConfig.client_id);
-    this.log(`${Color.green('YOUCAN_API_SECRET')}=%s`, this.app.remoteConfig.client_secret);
-    this.log(`${Color.green('YOUCAN_API_SCOPES')}=%s`, this.app.remoteConfig.scopes.join(','));
+    this.log(`${Color.yellow('YOUCAN_API_KEY')}=%s`, this.app.remoteConfig.client_id);
+    this.log(`${Color.yellow('YOUCAN_API_SECRET')}=%s`, this.app.remoteConfig.client_secret);
+    this.log(`${Color.yellow('YOUCAN_API_SCOPES')}=%s`, this.app.remoteConfig.scopes.join(','));
   }
 }
 
