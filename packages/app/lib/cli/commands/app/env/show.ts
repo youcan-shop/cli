@@ -30,7 +30,7 @@ class EnvShow extends AppCommand {
     await this.log();
     await this.log(Color.green('YOUCAN_API_KEY') + '=%s', this.app.remoteConfig.client_id);
     await this.log(Color.green('YOUCAN_API_SECRET') + '=%s', this.app.remoteConfig.client_secret);
-    await this.log(Color.green('SCOPES') + '=%s', this.app.remoteConfig.scopes.join(','));
+    await this.log(Color.green('YOUCAN_API_SCOPES') + '=%s', this.app.remoteConfig.scopes.join(','));
   }
 
     private async syncAppConfig(): Promise<void> {    
