@@ -16,18 +16,18 @@ class EnvShow extends AppCommand {
       },
     ]);
 
-    await this.printEnvVars();
+    await this.printEnvironmentVariables();
   }
 
-  private async printEnvVars() {
+  private async printEnvironmentVariables() {
     if (!this.app.remoteConfig) {
       throw new Error('remote app config not loaded');
     }
 
-    await this.log();
-    await this.log(`${Color.green('YOUCAN_API_KEY')}=%s`, this.app.remoteConfig.client_id);
-    await this.log(`${Color.green('YOUCAN_API_SECRET')}=%s`, this.app.remoteConfig.client_secret);
-    await this.log(`${Color.green('YOUCAN_API_SCOPES')}=%s`, this.app.remoteConfig.scopes.join(','));
+    this.log();
+    this.log(`${Color.green('YOUCAN_API_KEY')}=%s`, this.app.remoteConfig.client_id);
+    this.log(`${Color.green('YOUCAN_API_SECRET')}=%s`, this.app.remoteConfig.client_secret);
+    this.log(`${Color.green('YOUCAN_API_SCOPES')}=%s`, this.app.remoteConfig.scopes.join(','));
   }
 }
 

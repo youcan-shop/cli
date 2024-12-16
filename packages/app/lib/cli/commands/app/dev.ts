@@ -72,7 +72,7 @@ class Dev extends AppCommand {
         this,
         this.app,
         web,
-        this.buildEnvVars(),
+        this.buildEnvironmentVariables(),
       ),
     ));
 
@@ -81,7 +81,7 @@ class Dev extends AppCommand {
     return Promise.all(promises);
   }
 
-  private buildEnvVars(): Record<string, string> {
+  private buildEnvironmentVariables(): Record<string, string> {
     if (!this.app.remoteConfig) {
       throw new Error('remote app config not loaded');
     }
