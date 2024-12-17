@@ -12,12 +12,20 @@ export abstract class AppCommand extends Cli.Command {
       ? `${Env.apiHostname()}/apps/create`
       : `${Env.apiHostname()}/apps/${this.app.config.id}/update`;
 
+    if (!this.app.networkConfig) {
+      throw new Error('app network config is not set');
+    }
+
+    const backUrl = new URL('/auth/callback', this.app.networkConfig.appUrl).toString();
+
     const res = await Http.post<RemoteAppConfig>(endpoint, {
       headers: { Authorization: `Bearer ${this.session.access_token}` },
       body: JSON.stringify({
         name: this.app.config.name,
-        app_url: this.app.config.app_url,
-        redirect_urls: this.app.config.redirect_urls,
+        app_url: this.app.networkConfig!.appUrl,
+        redirect_urls: [
+          backUrl,
+        ],
       }),
     });
 
