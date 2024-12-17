@@ -127,7 +127,7 @@ class Dev extends AppCommand {
       YOUCAN_API_KEY: this.app.remoteConfig.client_id,
       YOUCAN_API_SECRET: this.app.remoteConfig.client_secret,
       YOUCAN_API_SCOPES: this.app.remoteConfig.scopes.join(','),
-      APP_URL: 'localhost',
+      APP_URL: 'http://localhost:3000',
       HOST: 'localhost',
       PORT: '3000',
     };
