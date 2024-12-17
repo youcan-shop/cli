@@ -36,9 +36,7 @@ class Dev extends AppCommand {
       },
       {
         title: 'Syncing app configuration...',
-        task: async () => {
-          await this.syncAppConfig();
-        },
+        task: async () => { await this.syncAppConfig(); },
       },
       {
         title: 'Preparing dev processes...',
@@ -57,7 +55,7 @@ class Dev extends AppCommand {
     const port = 3000; // to rotate based on availability
     const appUrl = `http://localhost:${port}`;
 
-    this.app.networkConfig = {port, appUrl}
+    this.app.networkConfig = { port, appUrl };
   }
 
   async reloadWorkers() {
