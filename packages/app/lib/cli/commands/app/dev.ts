@@ -54,7 +54,7 @@ class Dev extends AppCommand {
   }
 
   private async prepareNetworkOptions() {
-    const port = 300; // to rotate based on availability
+    const port = 3000; // to rotate based on availability
     const appUrl = `http://localhost:${port}`;
 
     this.app.networkConfig = {port, appUrl}
