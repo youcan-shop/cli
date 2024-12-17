@@ -31,7 +31,11 @@ class Dev extends AppCommand {
 
     const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
-        title: 'Syncing app configuration..',
+        title: 'Preparing network options...',
+        task: async () => { await this.prepareNetworkOptions(); },
+      },
+      {
+        title: 'Syncing app configuration...',
         task: async () => { await this.syncAppConfig(); },
       },
       {
@@ -45,6 +49,13 @@ class Dev extends AppCommand {
     UI.renderDevOutput({ hotKeys: this.hotKeys, cmd: this });
 
     this.runWorkers(workers);
+  }
+
+  private async prepareNetworkOptions() {
+    const port = 3000; // to rotate based on availability
+    const appUrl = `http://localhost:${port}`;
+
+    this.app.networkConfig = { port, appUrl };
   }
 
   async reloadWorkers() {
@@ -85,14 +96,16 @@ class Dev extends AppCommand {
     if (!this.app.remoteConfig) {
       throw new Error('remote app config not loaded');
     }
+    if (!this.app.networkConfig) {
+      throw new Error('app network config is not set');
+    }
 
     return {
       YOUCAN_API_KEY: this.app.remoteConfig.client_id,
       YOUCAN_API_SECRET: this.app.remoteConfig.client_secret,
       YOUCAN_API_SCOPES: this.app.remoteConfig.scopes.join(','),
-      APP_URL: 'http://localhost:3000',
-      HOST: 'localhost',
-      PORT: '3000',
+      APP_URL: this.app.networkConfig.appUrl,
+      PORT: this.app.networkConfig.port.toString(),
     };
   }
 

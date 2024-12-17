@@ -78,6 +78,10 @@ export interface App {
   webs: Web[]
   config: AppConfig
   remoteConfig?: RemoteAppConfig
+  networkConfig?: {
+    appUrl: string
+    port: number
+  }
   extensions: Extension[]
 }
 
