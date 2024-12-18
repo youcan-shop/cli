@@ -1,20 +1,21 @@
-import { Cli, System, Worker } from '@youcan/cli-kit';
-import type { App } from '@/types';
 import { Writable } from 'stream';
+import type { Cli } from '@youcan/cli-kit';
+import { System, Worker } from '@youcan/cli-kit';
+import type { App } from '@/types';
 
-export type ExecutableType = {
-    command: string,
-    args: string[]
+export interface ExecutableType {
+  command: string
+  args: string[]
 }
 
 export default class TunnelWorker extends Worker.Abstract {
   private logger: Worker.Logger;
-  private outputBuffer: string = '';
+  private outputBuffer = '';
 
   constructor(
     private command: Cli.Command,
     private app: App,
-    private executable: ExecutableType
+    private executable: ExecutableType,
   ) {
     super();
 
@@ -36,7 +37,7 @@ export default class TunnelWorker extends Worker.Abstract {
           }
 
           this.outputBuffer += chunk.toString();
-        }
+        },
       }),
     });
   }
