@@ -2,9 +2,9 @@
   "name": "playground",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "playground.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "run": "tsx playground.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +14,7 @@
     "tar": "^7.4.3"
   },
   "devDependencies": {
-    "@types/fs-extra": "^11.0.2"
+    "@types/fs-extra": "^11.0.2",
+    "tsx": "^4.19.2"
   }
 }

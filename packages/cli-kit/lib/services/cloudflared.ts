@@ -11,6 +11,7 @@ import { createGunzip } from 'node:zlib'
 import {createWriteStream} from 'node:fs'
 import { basename } from "node:path";
 import { Readable } from "node:stream";
+import { Filesystem } from "..";
 
 type PlatformArchitectureType = 'arm' | 'arm64' | 'x64' | 'ia32';
 type PlatformType = 'linux' | 'darwin' | 'win32';
@@ -73,28 +74,21 @@ async function downloadFromRelease(url: string, downloadPath: string) { // <-- t
 
 async function installForMacOs(url: string, destination: string): Promise<void> {    
     const parentDir = dirname(destination);
-    const tmpPath = path.resolve(parentDir, 'tmp');
+    const tmpDir = path.resolve(parentDir, 'tmp');
     const executableName = basename(destination);
-    const downloadFile = path.resolve(tmpPath, `${executableName}.tgz`);
-    const unzipedFile = path.resolve(tmpPath, `${executableName}.gz`);
+    const downloadedFile = path.resolve(tmpDir, `${executableName}.tgz`);
+    const decompressedFile = path.resolve(tmpDir, `${executableName}.gz`);
 
-    // create base dirs
-    if (!existsSync(parentDir)) mkdirSync(parentDir, { mode: 0o777, recursive: true });
-    if (!existsSync(tmpPath)) mkdirSync(tmpPath, { mode: 0o777, recursive: true });
+    Filesystem.mkdir(parentDir);
+    Filesystem.mkdir(tmpDir);
 
-    await downloadFromRelease(url, downloadFile);
+    await downloadFromRelease(url, downloadedFile);
 
-    const unzip = createGunzip();
+    Filesystem.decompress(downloadedFile, decompressedFile);
+    Filesystem.extractTar(decompressedFile, tmpDir);
 
-    await pipeline(
-        createReadStream(downloadFile) ,
-         unzip,
-        createWriteStream(unzipedFile, { mode: 0o777 }),
-    );
-
-    await tar.extract({ cwd: tmpPath, file: unzipedFile });
-    await FsExtra.move(path.resolve(tmpPath, 'cloudflared'), destination, { overwrite: true });
-    await FsExtra.rm(tmpPath, { recursive: true });
+    Filesystem.move(path.resolve(tmpDir, executableName), executableName, { overwrite: true });
+    Filesystem.rm(tmpDir);
 }
 
 async function installForLinux(url: string, destination: string): Promise<void> {
@@ -109,7 +103,7 @@ async function installForWindows(url: string, destination: string): Promise<void
     await downloadFromRelease(url, destination);
 }
 
-function installTryCloudflare(platform = process.platform, arch = process.arch) { // double check the name here --->
+export function installCloudflared(platform = process.platform, arch = process.arch) {
     if (!isPlatformSupported(platform))
         throw new Error(`Unsupported platform: ${platform}`);
 
@@ -119,7 +113,7 @@ function installTryCloudflare(platform = process.platform, arch = process.arch) 
     const downloadUrl = composeDownloadUrl(platform, arch);
     const destinationPath = composeDestinationPath(platform);
 
-    installForWindows(downloadUrl, destinationPath);
+    // installForWindows(downloadUrl, destinationPath);
     switch (platform) {
         case 'darwin':
             installForMacOs(downloadUrl, destinationPath);
@@ -132,5 +126,3 @@ function installTryCloudflare(platform = process.platform, arch = process.arch) 
         default:
     }
 }
-
-installTryCloudflare()

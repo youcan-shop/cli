@@ -1,6 +1,5 @@
 import FilesystemPromises from 'fs/promises';
 import type { Mode, OpenMode, PathLike, Stats } from 'fs';
-import { createWriteStream } from 'fs';
 import { temporaryDirectoryTask } from 'tempy';
 import FsExtra from 'fs-extra';
 import archiver from 'archiver';
@@ -9,6 +8,10 @@ import type { GlobOptions } from 'glob';
 import { glob as _glob } from 'glob';
 
 import { Path } from '..';
+import { createGunzip } from 'zlib';
+import { pipeline } from 'node:stream/promises';
+import { createReadStream, createWriteStream } from 'node:fs';
+import * as tar from 'tar'
 
 export async function exists(path: string): Promise<boolean> {
   try {
@@ -38,6 +41,10 @@ export async function tapIntoTmp<T>(callback: (tmp: string) => T | Promise<T>): 
 
 export async function mkdir(path: string): Promise<void> {
   await FilesystemPromises.mkdir(path, { recursive: true });
+}
+
+export async function rm(path: string): Promise<void> {
+  await FilesystemPromises.rm(path, { recursive: true });
 }
 
 interface MoveFileOptions {
@@ -130,3 +137,15 @@ export async function stat(path: string): Promise<Stats> {
 }
 
 export const watch = chokidar.watch;
+
+export async function decompress(file: string, destination: string, mode : number = 0o777) {
+  const unzip = createGunzip();
+  const readStream = createReadStream(file);
+  const writeStream = createWriteStream(destination, { mode });
+
+  await pipeline(readStream,unzip, writeStream);
+}
+
+export async function extractTar(file: string, cwd: string) {
+  await tar.extract({ cwd, file });
+}
