@@ -8,7 +8,7 @@ import { basename } from "node:path";
 import { Readable } from "node:stream";
 import { Filesystem } from "..";
 
-const TUNNEL_URL = 'trycloudflare.com';
+const TUNNEL_BASE_DOMAIN = 'trycloudflare.com';
 
 type PlatformArchitectureType = 'arm' | 'arm64' | 'x64' | 'ia32';
 type PlatformType = 'linux' | 'darwin' | 'win32';
@@ -123,5 +123,19 @@ export async function install(platform = process.platform, arch = process.arch) 
             break;
         case 'win32':
             await installForWindows(downloadUrl, destinationPath);
-    }    
+    }
+}
+
+export function extractUrl(outputBuffer: string): string | null {
+  const regex = new RegExp(`(https:\\/\\/[^\\s]+\\.${TUNNEL_BASE_DOMAIN})`);
+  return outputBuffer.match(regex)?.[0] || null;
+}
+
+export function getTunnelingCommand(port: number, host: string = 'localhost') {
+    const command = composeDestinationPath(process.platform as PlatformType);
+
+    return {
+        command,
+        args: ['tunnel', `--url=${host}:${port}`, '--no-autoupdate']
+    }
 }

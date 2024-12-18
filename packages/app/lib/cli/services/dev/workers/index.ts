@@ -4,6 +4,7 @@ import WebWorker from './web-worker';
 import AppWorker from './app-worker';
 import type { App, Extension, Web } from '@/types';
 import type DevCommand from '@/cli/commands/app/dev';
+import TunnelWorker from './tunnel-worker';
 
 export interface ExtensionWorkerCtor {
   new(command: Cli.Command, app: App, extension: Extension): Worker.Interface
@@ -32,6 +33,15 @@ export async function bootExtensionWorker(command: Cli.Command, app: App, extens
 
 export async function bootWebWorker(command: Cli.Command, app: App, web: Web, env: Record<string, string>) {
   const worker = new WebWorker(command, app, web, env);
+
+  await worker.boot();
+
+  return worker;
+}
+
+
+export async function bootTunnelWorker(command: Cli.Command, app: App, executable : {command: string, args: string[]}) {
+  const worker = new TunnelWorker(command, app, executable);
 
   await worker.boot();
 

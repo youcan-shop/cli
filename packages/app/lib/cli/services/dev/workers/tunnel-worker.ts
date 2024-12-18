@@ -1,6 +1,6 @@
-import { System, Worker } from '@youcan/cli-kit';
+import { Cli, System, Worker } from '@youcan/cli-kit';
 import type { App } from '@/types';
-import type DevCommand from '@/cli/commands/app/dev';
+import { Writable } from 'stream';
 
 export type ExecutableType = {
     command: string,
@@ -9,9 +9,10 @@ export type ExecutableType = {
 
 export default class TunnelWorker extends Worker.Abstract {
   private logger: Worker.Logger;
+  private outputBuffer: string = '';
 
   constructor(
-    private command: DevCommand,
+    private command: Cli.Command,
     private app: App,
     private executable: ExecutableType
   ) {
@@ -27,7 +28,16 @@ export default class TunnelWorker extends Worker.Abstract {
 
     return System.exec(this.executable.command, this.executable.args, {
       signal: this.command.controller.signal,
-      stderr: new Worker.Logger('tunnel', 'red'),
+      stdout: new Writable({ write: () => {} }),
+      stderr: new Writable({
+        write: (chunk) => {
+          if (!(chunk instanceof Buffer) && typeof chunk !== 'string') {
+            return false;
+          }
+
+          this.outputBuffer += chunk.toString();
+        }
+      }),
     });
   }
 }
