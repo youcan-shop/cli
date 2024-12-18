@@ -8,6 +8,8 @@ import { basename } from "node:path";
 import { Readable } from "node:stream";
 import { Filesystem } from "..";
 
+const TUNNEL_URL = 'trycloudflare.com';
+
 type PlatformArchitectureType = 'arm' | 'arm64' | 'x64' | 'ia32';
 type PlatformType = 'linux' | 'darwin' | 'win32';
 
@@ -114,12 +116,12 @@ export async function install(platform = process.platform, arch = process.arch) 
 
     switch (platform) {
         case 'darwin':
-            installForMacOs(downloadUrl, destinationPath);
+            await installForMacOs(downloadUrl, destinationPath);
             break;
         case 'linux':
-            installForLinux(downloadUrl, destinationPath);
+            await installForLinux(downloadUrl, destinationPath);
             break;
         case 'win32':
-            installForWindows(downloadUrl, destinationPath);
+            await installForWindows(downloadUrl, destinationPath);
     }    
 }
