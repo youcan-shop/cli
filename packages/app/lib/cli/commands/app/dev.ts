@@ -54,6 +54,8 @@ class Dev extends AppCommand {
   private async prepareNetworkOptions() {
     await Services.Cloudflared.install();
 
+    // console.log('instaaaaaaled');
+    
     const port = 3000; // to rotate based on availability
     const appUrl = `http://localhost:${port}`;
 

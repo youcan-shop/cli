@@ -24,10 +24,11 @@ export async function exists(path: string): Promise<boolean> {
   }
 }
 
-export async function isExecutable(path: string) {
+export async function isExecutable(path: string) {  
+  if (! await exists(path)) return false;
+
   try {
     await FilesystemPromises.access(path, FilesystemPromises.constants.X_OK);
-
     return true;
   } catch {
     return false;

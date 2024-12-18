@@ -1,6 +1,5 @@
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { existsSync, mkdirSync } from 'node:fs';
 
 import {pipeline} from 'node:stream/promises'
 
@@ -47,7 +46,7 @@ function composeDownloadUrl(platform: PlatformType, arch: PlatformArchitectureTy
 }
 
 function composeDestinationPath(platform: PlatformType): string {
-    const parentDir = fileURLToPath(new URL('..', import.meta.url));
+    const parentDir = fileURLToPath(new URL('../'.repeat(2), import.meta.url));
 
     return path.join(parentDir, 'bin', platform === 'win32' ? 'cloudflared.exe' : 'cloudflared');
 }
@@ -62,7 +61,7 @@ function isArchSupported(arch: NodeJS.Architecture, platform: PlatformType): arc
 
 async function downloadFromRelease(url: string, downloadPath: string) { // <-- todo: rename this.
     const response = await fetch(url, { redirect: 'follow' });
-    if (!response.ok) throw new Error(`Failed to download cloudflared: ${response.statusText}`);
+    if (!response.ok) throw new Error(`failed to download cloudflared: ${response.statusText}`);
     const { body } = response;
     const fileWriteStream = createWriteStream(downloadPath, { mode: 0o777 });
     await pipeline(Readable.fromWeb(body!), fileWriteStream);
@@ -75,21 +74,21 @@ async function installForMacOs(url: string, destination: string): Promise<void> 
     const downloadedFile = path.resolve(tmpDir, `${executableName}.tgz`);
     const decompressedFile = path.resolve(tmpDir, `${executableName}.gz`);
 
-    Filesystem.mkdir(parentDir);
-    Filesystem.mkdir(tmpDir);
+    await Filesystem.mkdir(parentDir);
+    await Filesystem.mkdir(tmpDir);
 
     await downloadFromRelease(url, downloadedFile);
 
-    Filesystem.decompress(downloadedFile, decompressedFile);
-    Filesystem.extractTar(decompressedFile, tmpDir);
+    await Filesystem.decompress(downloadedFile, decompressedFile);
+    await Filesystem.extractTar(decompressedFile, tmpDir);
 
-    Filesystem.move(path.resolve(tmpDir, executableName), executableName, { overwrite: true });
-    Filesystem.rm(tmpDir);
+    await Filesystem.move(path.resolve(tmpDir, executableName), destination, { overwrite: true });
+    await Filesystem.rm(tmpDir);
 }
 
 async function installForLinux(url: string, destination: string): Promise<void> {
     const parentDir = dirname(destination);
-    Filesystem.mkdir(parentDir);
+    await Filesystem.mkdir(parentDir);
     await downloadFromRelease(url, destination);
 }
 
@@ -122,5 +121,5 @@ export async function install(platform = process.platform, arch = process.arch) 
             break;
         case 'win32':
             installForWindows(downloadUrl, destinationPath);
-    }
+    }    
 }
