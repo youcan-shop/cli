@@ -1,12 +1,8 @@
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { createReadStream, existsSync, mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 
 import {pipeline} from 'node:stream/promises'
-import * as tar from 'tar'
-import FsExtra from 'fs-extra';
-
-import { createGunzip } from 'node:zlib'
 
 import {createWriteStream} from 'node:fs'
 import { basename } from "node:path";
@@ -93,17 +89,17 @@ async function installForMacOs(url: string, destination: string): Promise<void> 
 
 async function installForLinux(url: string, destination: string): Promise<void> {
     const parentDir = dirname(destination);
-    if (!existsSync(parentDir)) mkdirSync(parentDir, { mode: 0o777, recursive: true });
+    Filesystem.mkdir(parentDir);
     await downloadFromRelease(url, destination);
 }
 
 async function installForWindows(url: string, destination: string): Promise<void> { 
     const parentDir = dirname(destination);
-    if (!existsSync(parentDir)) mkdirSync(parentDir, { recursive: true });
+    Filesystem.mkdir(parentDir);
     await downloadFromRelease(url, destination);
 }
 
-export function installCloudflared(platform = process.platform, arch = process.arch) {
+export async function install(platform = process.platform, arch = process.arch) {
     if (!isPlatformSupported(platform))
         throw new Error(`Unsupported platform: ${platform}`);
 
@@ -113,7 +109,10 @@ export function installCloudflared(platform = process.platform, arch = process.a
     const downloadUrl = composeDownloadUrl(platform, arch);
     const destinationPath = composeDestinationPath(platform);
 
-    // installForWindows(downloadUrl, destinationPath);
+    if (await Filesystem.isExecutable(destinationPath)) {
+        return ;
+    }
+
     switch (platform) {
         case 'darwin':
             installForMacOs(downloadUrl, destinationPath);
@@ -123,6 +122,5 @@ export function installCloudflared(platform = process.platform, arch = process.a
             break;
         case 'win32':
             installForWindows(downloadUrl, destinationPath);
-        default:
     }
 }

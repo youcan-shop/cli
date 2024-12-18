@@ -24,6 +24,16 @@ export async function exists(path: string): Promise<boolean> {
   }
 }
 
+export async function isExecutable(path: string) {
+  try {
+    await FilesystemPromises.access(path, FilesystemPromises.constants.X_OK);
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function isDirectory(path: string): Promise<boolean> {
   try {
     const stats: Stats = await FilesystemPromises.stat(path);

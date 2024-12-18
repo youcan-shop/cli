@@ -1,5 +1,5 @@
 import type { Worker } from '@youcan/cli-kit';
-import { Env, Http, Session, System, Tasks, UI } from '@youcan/cli-kit';
+import { Env, Http, Session, System, Tasks, UI, Services } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
@@ -52,6 +52,8 @@ class Dev extends AppCommand {
   }
 
   private async prepareNetworkOptions() {
+    await Services.Cloudflared.install();
+
     const port = 3000; // to rotate based on availability
     const appUrl = `http://localhost:${port}`;
 
