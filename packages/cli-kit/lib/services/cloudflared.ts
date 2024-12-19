@@ -5,8 +5,8 @@ import { pipeline } from 'node:stream/promises';
 
 import { createWriteStream } from 'node:fs';
 import { basename } from 'node:path';
-import { Readable } from 'node:stream';
-import { Filesystem } from '..';
+import { Readable, Writable } from 'node:stream';
+import { Filesystem, System } from '..';
 
 const TUNNEL_BASE_DOMAIN = 'trycloudflare.com';
 
@@ -103,7 +103,7 @@ async function installForWindows(url: string, destination: string): Promise<void
   await downloadFromRelease(url, destination);
 }
 
-export async function install(platform: PlatformType, downloadUrl: string, destinationPath: string) {
+async function install(platform: PlatformType, downloadUrl: string, destinationPath: string) {
   switch (platform) {
     case 'darwin':
       await installForMacOs(downloadUrl, destinationPath);
@@ -121,13 +121,50 @@ type SystemType = {
   arch: PlatformArchitectureType,
 }
 
-export default class Cloudflared {
+class OutputStream extends Writable {
+  private tunnelUrl: string|null = null;
+  private buffer = '';
+
+  write(chunk: unknown, encoding?: unknown, callback?: unknown){
+    if (this.tunnelUrl) {
+      return true;
+    }
+
+    if (!(chunk instanceof Buffer) && typeof chunk !== 'string') {
+      return false;
+    }
+    
+    this.buffer += chunk.toString();
+    this.tunnelUrl = this.extractTunnelUrl();
+
+    if (this.tunnelUrl) {
+      this.buffer = '';
+    }
+
+    if (callback && typeof callback === 'function') {
+      callback()
+    }
+
+    return true;
+  }
+
+  private extractTunnelUrl(): string | null {
+    const regex = new RegExp(`(https:\\/\\/[^\\s]+\\.${TUNNEL_BASE_DOMAIN})`);
+    return this.buffer.match(regex)?.[0] || null;
+  }
+
+  public getTunnelUrl() {
+    return this.tunnelUrl;
+  }
+}
+
+export class Cloudflared {
   private readonly bin: string;
   private readonly system: SystemType;
 
+  private readonly output = new OutputStream;
+
   constructor(
-    private readonly port: number,
-    private readonly host = 'localhost',
   ) {
     const platform = process.platform;
     const arch = process.arch;
@@ -145,16 +182,12 @@ export default class Cloudflared {
     this.system = { platform, arch }
   }
 
-  public async tunnel() {
+  public async tunnel(port: number, host = 'localhost') {
+    console.log(port, host);
+    
     await this.install();
-    const command = this.composeTunnelingCommand(this.port);
-  }
-
-  public async extractTunnelUrl(): Promise<string | null> {
-    const regex = new RegExp(`(https:\\/\\/[^\\s]+\\.${TUNNEL_BASE_DOMAIN})`);
-  
-    return null;
-    // return outputBuffer.match(regex)?.[0] || null;
+    const { bin, args } = this.composeTunnelingCommand(port, host);
+    this.exec(bin, args);
   }
 
   private async install() {
@@ -171,5 +204,16 @@ export default class Cloudflared {
       bin: this.bin,
       args: ['tunnel', `--url=${host}:${port}`, '--no-autoupdate'],
     };
+  }
+
+  private async exec(bin: string, args: string[]) {    
+    System.exec(bin, args, {
+      // Wired choice of cloudflared to write to stderr.
+      stderr: this.output,
+    });
+  }
+
+  public getUrl() {
+    return this.output.getTunnelUrl();
   }
 }

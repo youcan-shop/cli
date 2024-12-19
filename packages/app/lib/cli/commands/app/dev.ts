@@ -33,7 +33,7 @@ class Dev extends AppCommand {
       {
         title: 'Preparing network options...',
         task: async (ctx) => {
-          ctx.workers = await this.prepareNetworkOptions();
+          ctx.workers.push(await this.prepareNetworkOptions());
         },
       },
       {
@@ -55,25 +55,25 @@ class Dev extends AppCommand {
 
   private async prepareNetworkOptions() {
     const port = 3000; // to rotate based on availability
-    // await Services.Cloudflared.install();
-
-    const worker = await bootTunnelWorker(
-      this,
-      this.app,
-      // Services.Cloudflared.getTunnelingCommand(port),
-    );
-
     // Start by `localhost` until a tunneled url is available
     const appUrl = `http://localhost:${port}`;
 
     this.app.networkConfig = { port, appUrl };
 
-    return [worker];
+    const worker = await bootTunnelWorker(
+      this,
+      this.app,
+      new Services.Cloudflared,
+    );
+    return worker;
   }
 
   async reloadWorkers() {
     this.controller = new AbortController();
+    // Preserve network config.
+    const networkConfig = this.app.networkConfig;
     this.app = await load();
+    this.app.networkConfig = networkConfig;
 
     await this.syncAppConfig();
 

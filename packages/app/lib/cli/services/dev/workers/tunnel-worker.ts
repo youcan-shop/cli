@@ -1,21 +1,15 @@
-import { Writable } from 'stream';
-import type { Cli } from '@youcan/cli-kit';
-import { Services, System, Worker } from '@youcan/cli-kit';
+import type { Services } from '@youcan/cli-kit';
+import { Worker } from '@youcan/cli-kit';
 import type { App } from '@/types';
-
-export interface ExecutableType {
-  bin: string
-  args: string[]
-}
-
+import { AppCommand } from '@/util/app-command';
 export default class TunnelWorker extends Worker.Abstract {
   private readonly logger: Worker.Logger;
-  private buffer = '';
+  private url: string|null = null;
 
   constructor(
-    private command: Cli.Command,
+    private command: AppCommand,
     private app: App,
-    private executable: ExecutableType,
+    private tunnelService: Services.Cloudflared,
   ) {
     super();
 
@@ -23,27 +17,41 @@ export default class TunnelWorker extends Worker.Abstract {
   }
 
   public async boot(): Promise<void> {
-    // Start the tunnel ahead of time
-    this.startTunnel();
+    // Start the tunnel ahead of time.
+    this.logger.write('start tunneling the app');
+    this.tunnelService.tunnel(this.app.networkConfig?.port!);
+
+    // Stop the execution for while and see if the tunnel is available.
+    await new Promise((resolve) => {
+      setTimeout(resolve, 5 * 1000);
+    });
+
+    const url = this.tunnelService.getUrl();
+    if (url) {
+      this.logger.write(`tunneled url obtained: \`${this.url}\``);
+      this.url = url;
+    }
   }
 
   public async run(): Promise<void> {
-    this.logger.write('tunneling the connection...');
-    return ;
-  }
-  
-  public async startTunnel() {
-    System.exec(this.executable.bin, this.executable.args, {
-      signal: this.command.controller.signal,
-      stderr: new Writable({
-        write: (chunk: unknown, _encoding, next) => {
-          if (!(chunk instanceof Buffer) && typeof chunk !== 'string') {
-            return false;
-          }
-          this.buffer += chunk.toString();
-          next();
-        },
-      }),
-    });
+    const timeInterval = 500;
+    let intervalId: NodeJS.Timeout;
+
+    if (this.url) {
+      return;
+    }
+
+    intervalId = setInterval(() => {
+      this.url = this.tunnelService.getUrl();
+      if (this.url) {
+        this.logger.write(`tunneled url obtained: \`${this.url}\``);
+        this.app.networkConfig!.appUrl = this.url;
+
+        this.command.syncAppConfig();
+
+        clearTimeout(intervalId);
+      }
+
+    }, timeInterval);
   }
 }
