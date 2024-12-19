@@ -47,7 +47,7 @@ function composeDownloadUrl(platform: PlatformType, arch: PlatformArchitectureTy
   return `${releaseDownloadUrl}/${supportedVersion}/${filename}`;
 }
 
-function composeDestinationPath(platform: PlatformType): string {
+function resolveBinaryPath(platform: PlatformType): string {
   const parentDir = fileURLToPath(new URL('../'.repeat(2), import.meta.url));
 
   return path.join(parentDir, 'bin', platform === 'win32' ? 'cloudflared.exe' : 'cloudflared');
@@ -61,7 +61,7 @@ function isArchSupported(arch: NodeJS.Architecture, platform: PlatformType): arc
   return arch in TARGET_NAMES[platform];
 }
 
-async function downloadFromRelease(url: string, downloadPath: string) { // <-- todo: rename this.
+async function downloadFromRelease(url: string, downloadPath: string) {
   const response = await fetch(url, { redirect: 'follow' });
   if (!response.ok) {
     throw new Error(`failed to download cloudflared: ${response.statusText}`);
@@ -103,22 +103,7 @@ async function installForWindows(url: string, destination: string): Promise<void
   await downloadFromRelease(url, destination);
 }
 
-export async function install(platform = process.platform, arch = process.arch) {
-  if (!isPlatformSupported(platform)) {
-    throw new Error(`Unsupported platform: ${platform}`);
-  }
-
-  if (!isArchSupported(arch, platform)) {
-    throw new Error(`Unsupported architecture: ${arch}`);
-  }
-
-  const downloadUrl = composeDownloadUrl(platform, arch);
-  const destinationPath = composeDestinationPath(platform);
-
-  if (await Filesystem.isExecutable(destinationPath)) {
-    return;
-  }
-
+export async function install(platform: PlatformType, downloadUrl: string, destinationPath: string) {
   switch (platform) {
     case 'darwin':
       await installForMacOs(downloadUrl, destinationPath);
@@ -131,17 +116,60 @@ export async function install(platform = process.platform, arch = process.arch) 
   }
 }
 
-export function extractTunnelUrl(outputBuffer: string): string | null {
-  const regex = new RegExp(`(https:\\/\\/[^\\s]+\\.${TUNNEL_BASE_DOMAIN})`);
-
-  return outputBuffer.match(regex)?.[0] || null;
+type SystemType = {
+  platform: PlatformType,
+  arch: PlatformArchitectureType,
 }
 
-export function getTunnelingCommand(port: number, host = 'localhost') {
-  const command = composeDestinationPath(process.platform as PlatformType);
+export default class Cloudflared {
+  private readonly bin: string;
+  private readonly system: SystemType;
 
-  return {
-    bin: command,
-    args: ['tunnel', `--url=${host}:${port}`, '--no-autoupdate'],
-  };
+  constructor(
+    private readonly port: number,
+    private readonly host = 'localhost',
+  ) {
+    const platform = process.platform;
+    const arch = process.arch;
+
+    if (!isPlatformSupported(platform)) {
+      throw new Error(`Unsupported platform: ${platform}`);
+    }
+  
+    if (!isArchSupported(arch, platform)) {
+      throw new Error(`Unsupported architecture: ${arch}`);
+    }
+  
+    this.bin = resolveBinaryPath(platform);
+
+    this.system = { platform, arch }
+  }
+
+  public async tunnel() {
+    await this.install();
+    const command = this.composeTunnelingCommand(this.port);
+  }
+
+  public async extractTunnelUrl(): Promise<string | null> {
+    const regex = new RegExp(`(https:\\/\\/[^\\s]+\\.${TUNNEL_BASE_DOMAIN})`);
+  
+    return null;
+    // return outputBuffer.match(regex)?.[0] || null;
+  }
+
+  private async install() {
+    if (await Filesystem.isExecutable(this.bin)) {
+      return;
+    }
+
+    const downloadUrl = composeDownloadUrl(this.system.platform, this.system.arch);
+    await install(this.system.platform, downloadUrl, this.bin)
+  }
+
+  private composeTunnelingCommand(port: number, host = 'localhost') {
+    return {
+      bin: this.bin,
+      args: ['tunnel', `--url=${host}:${port}`, '--no-autoupdate'],
+    };
+  }
 }

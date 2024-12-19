@@ -1,1 +1,1 @@
-export * as Cloudflared from './cloudflared';
+export * from './cloudflared';
