@@ -1,8 +1,8 @@
 import type { Worker } from '@youcan/cli-kit';
-import { Env, Http, Session, System, Tasks, UI } from '@youcan/cli-kit';
+import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
+import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
 
 interface Context {
   cmd: Dev
@@ -32,7 +32,9 @@ class Dev extends AppCommand {
     const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
         title: 'Preparing network options...',
-        task: async () => { await this.prepareNetworkOptions(); },
+        task: async (ctx) => {
+          ctx.workers.push(await this.prepareNetworkOptions());
+        },
       },
       {
         title: 'Syncing app configuration...',
@@ -41,7 +43,7 @@ class Dev extends AppCommand {
       {
         title: 'Preparing dev processes...',
         task: async (ctx) => {
-          ctx.workers = await this.prepareDevProcesses();
+          ctx.workers.push(...await this.prepareDevProcesses());
         },
       },
     ]);
@@ -53,14 +55,26 @@ class Dev extends AppCommand {
 
   private async prepareNetworkOptions() {
     const port = 3000; // to rotate based on availability
+    // Start by `localhost` until a tunneled url is available
     const appUrl = `http://localhost:${port}`;
 
     this.app.networkConfig = { port, appUrl };
+
+    const worker = await bootTunnelWorker(
+      this,
+      this.app,
+      new Services.Cloudflared(),
+    );
+
+    return worker;
   }
 
   async reloadWorkers() {
     this.controller = new AbortController();
+    // Preserve network config.
+    const networkConfig = this.app.networkConfig;
     this.app = await load();
+    this.app.networkConfig = networkConfig;
 
     await this.syncAppConfig();
 
