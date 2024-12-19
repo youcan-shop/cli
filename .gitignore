@@ -106,3 +106,7 @@ dist
 .DS_Store
 
 package-lock.json
+
+# TODO: remove this (it's created by pnpm in linux container).
+.pnpm-store
+bin

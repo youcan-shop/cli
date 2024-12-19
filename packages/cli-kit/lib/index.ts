@@ -14,6 +14,7 @@ export * as Session from './node/session';
 export * as Callback from './node/callback';
 export * as Filesystem from './node/filesystem';
 export * as UI from './ui';
+export * as Services from './services';
 
 export * as String from './common/string';
 
