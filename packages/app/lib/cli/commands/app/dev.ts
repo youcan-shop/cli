@@ -63,7 +63,7 @@ class Dev extends AppCommand {
       Services.Cloudflared.getTunnelingCommand(port),
     );
 
-    // Start by `localhost` until a host is available
+    // Start by `localhost` until a tunneled url is available
     const appUrl = `http://localhost:${port}`;
 
     this.app.networkConfig = { port, appUrl };

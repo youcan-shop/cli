@@ -131,7 +131,7 @@ export async function install(platform = process.platform, arch = process.arch) 
   }
 }
 
-export function extractUrl(outputBuffer: string): string | null {
+export function extractTunnelUrl(outputBuffer: string): string | null {
   const regex = new RegExp(`(https:\\/\\/[^\\s]+\\.${TUNNEL_BASE_DOMAIN})`);
 
   return outputBuffer.match(regex)?.[0] || null;
@@ -141,7 +141,7 @@ export function getTunnelingCommand(port: number, host = 'localhost') {
   const command = composeDestinationPath(process.platform as PlatformType);
 
   return {
-    command,
+    bin: command,
     args: ['tunnel', `--url=${host}:${port}`, '--no-autoupdate'],
   };
 }

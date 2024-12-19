@@ -39,7 +39,7 @@ export async function bootWebWorker(command: Cli.Command, app: App, web: Web, en
   return worker;
 }
 
-export async function bootTunnelWorker(command: Cli.Command, app: App, executable: { command: string; args: string[] }) {
+export async function bootTunnelWorker(command: Cli.Command, app: App, executable: { bin: string; args: string[] }) {
   const worker = new TunnelWorker(command, app, executable);
 
   await worker.boot();
