@@ -73,9 +73,9 @@ async function downloadFromRelease(url: string, downloadPath: string) {
 async function installForMacOs(url: string, destination: string): Promise<void> {
   const parentDir = dirname(destination);
   const tmpDir = path.resolve(parentDir, 'tmp');
-  const executableName = basename(destination);
-  const downloadedFile = path.resolve(tmpDir, `${executableName}.tgz`);
-  const decompressedFile = path.resolve(tmpDir, `${executableName}.gz`);
+  const binaryName = basename(destination);
+  const downloadedFile = path.resolve(tmpDir, `${binaryName}.tgz`);
+  const decompressedFile = path.resolve(tmpDir, `${binaryName}.gz`);
 
   await Filesystem.mkdir(parentDir);
   await Filesystem.mkdir(tmpDir);
@@ -85,7 +85,7 @@ async function installForMacOs(url: string, destination: string): Promise<void> 
   await Filesystem.decompressGzip(downloadedFile, decompressedFile);
   await Filesystem.extractTar(decompressedFile, tmpDir, 0o755);
 
-  await Filesystem.move(path.resolve(tmpDir, executableName), destination, { overwrite: true });
+  await Filesystem.move(path.resolve(tmpDir, binaryName), destination, { overwrite: true });
   await Filesystem.rm(tmpDir);
 }
 
