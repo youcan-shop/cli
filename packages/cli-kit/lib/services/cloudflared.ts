@@ -146,7 +146,7 @@ class OutputStream extends Writable {
   }
 
   private extractTunnelUrl(): string | null {
-    const regex = /(https:\\\/[^\\s]+\\.trycloudflare.com)/;
+    const regex = /(https:\/\/[^\s]+\.trycloudflare.com)/;
 
     return this.buffer.match(regex)?.[0] || null;
   }

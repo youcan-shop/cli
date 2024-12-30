@@ -32,7 +32,7 @@ export default class TunnelWorker extends Worker.Abstract {
 
     const url = this.tunnelService.getUrl();
     if (url) {
-      this.logger.write(`tunneled url obtained: \`${this.url}\``);
+      this.logger.write(`tunneled url obtained: \`${url}\``);
       this.url = url;
       this.app.networkConfig!.appUrl = this.url;
     }
