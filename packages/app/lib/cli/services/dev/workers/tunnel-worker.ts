@@ -1,5 +1,5 @@
 import type { Services } from '@youcan/cli-kit';
-import { Worker } from '@youcan/cli-kit';
+import { System, Worker } from '@youcan/cli-kit';
 import type { App } from '@/types';
 import type { AppCommand } from '@/util/app-command';
 
@@ -26,9 +26,7 @@ export default class TunnelWorker extends Worker.Abstract {
     this.tunnelService.tunnel(this.app.networkConfig.port);
 
     // Stop the execution for while and see if the tunnel is available.
-    await new Promise((resolve) => {
-      setTimeout(resolve, 5 * 1000);
-    });
+    await System.sleep(5);
 
     const url = this.tunnelService.getUrl();
     if (url) {

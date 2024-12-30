@@ -1,10 +1,8 @@
 import { fileURLToPath } from 'url';
-
 import { pipeline } from 'node:stream/promises';
-
 import { createWriteStream } from 'node:fs';
 import { Readable, Writable } from 'node:stream';
-import { Filesystem, System, Path } from '..';
+import { Filesystem, Path, System } from '..';
 
 type PlatformArchitectureType = 'arm' | 'arm64' | 'x64' | 'ia32';
 type PlatformType = 'linux' | 'darwin' | 'win32';
@@ -74,17 +72,17 @@ async function installForMacOs(url: string, destination: string): Promise<void> 
     const binaryName = Path.basename(destination);
     const downloadedFile = Path.resolve(tmpDir, `${binaryName}.tgz`);
     const decompressedFile = Path.resolve(tmpDir, `${binaryName}.gz`);
-  
+
     await Filesystem.mkdir(parentDir);
     await Filesystem.mkdir(tmpDir);
-  
+
     await downloadFromRelease(url, downloadedFile);
-  
+
     await Filesystem.decompressGzip(downloadedFile, decompressedFile);
     await Filesystem.extractTar(decompressedFile, tmpDir, 0o755);
-  
+
     await Filesystem.move(Path.resolve(tmpDir, binaryName), destination, { overwrite: true });
-  })
+  });
 }
 
 async function installForLinux(url: string, destination: string): Promise<void> {
