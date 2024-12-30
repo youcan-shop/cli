@@ -55,7 +55,6 @@ class Dev extends AppCommand {
 
   private async prepareNetworkOptions() {
     const port = await System.getNextAvailablePort(3000);
-    console.log(`${port}`);
 
     // Start by `localhost` until a tunneled url is available
     const appUrl = `http://localhost:${port}`;
