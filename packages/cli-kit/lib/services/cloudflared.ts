@@ -7,6 +7,7 @@ import { createWriteStream } from 'node:fs';
 import { basename } from 'node:path';
 import { Readable, Writable } from 'node:stream';
 import { Filesystem, System } from '..';
+import { tapIntoTmp } from '@/node/filesystem';
 
 type PlatformArchitectureType = 'arm' | 'arm64' | 'x64' | 'ia32';
 type PlatformType = 'linux' | 'darwin' | 'win32';
@@ -71,22 +72,22 @@ async function downloadFromRelease(url: string, downloadPath: string) {
 }
 
 async function installForMacOs(url: string, destination: string): Promise<void> {
-  const parentDir = dirname(destination);
-  const tmpDir = path.resolve(parentDir, 'tmp');
-  const binaryName = basename(destination);
-  const downloadedFile = path.resolve(tmpDir, `${binaryName}.tgz`);
-  const decompressedFile = path.resolve(tmpDir, `${binaryName}.gz`);
-
-  await Filesystem.mkdir(parentDir);
-  await Filesystem.mkdir(tmpDir);
-
-  await downloadFromRelease(url, downloadedFile);
-
-  await Filesystem.decompressGzip(downloadedFile, decompressedFile);
-  await Filesystem.extractTar(decompressedFile, tmpDir, 0o755);
-
-  await Filesystem.move(path.resolve(tmpDir, binaryName), destination, { overwrite: true });
-  await Filesystem.rm(tmpDir);
+  await tapIntoTmp(async (tmpDir) => {
+    const parentDir = dirname(destination);
+    const binaryName = basename(destination);
+    const downloadedFile = path.resolve(tmpDir, `${binaryName}.tgz`);
+    const decompressedFile = path.resolve(tmpDir, `${binaryName}.gz`);
+  
+    await Filesystem.mkdir(parentDir);
+    await Filesystem.mkdir(tmpDir);
+  
+    await downloadFromRelease(url, downloadedFile);
+  
+    await Filesystem.decompressGzip(downloadedFile, decompressedFile);
+    await Filesystem.extractTar(decompressedFile, tmpDir, 0o755);
+  
+    await Filesystem.move(path.resolve(tmpDir, binaryName), destination, { overwrite: true });
+  })
 }
 
 async function installForLinux(url: string, destination: string): Promise<void> {
@@ -183,6 +184,7 @@ export class Cloudflared {
   public async tunnel(port: number, host = 'localhost') {
     await this.install();
     const { bin, args } = this.composeTunnelingCommand(port, host);
+
     this.exec(bin, args);
   }
 
