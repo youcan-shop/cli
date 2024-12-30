@@ -153,7 +153,7 @@ export async function stat(path: string): Promise<Stats> {
 
 export const watch = chokidar.watch;
 
-export async function decompress(file: string, destination: string, mode = 0o777) {
+export async function decompressGzip(file: string, destination: string, mode = 0o755) {
   const unzip = createGunzip();
   const readStream = createReadStream(file);
   const writeStream = createWriteStream(destination, { mode });
@@ -161,6 +161,6 @@ export async function decompress(file: string, destination: string, mode = 0o777
   await pipeline(readStream, unzip, writeStream);
 }
 
-export async function extractTar(file: string, cwd: string) {
-  await tar.extract({ cwd, file });
+export async function extractTar(file: string, cwd: string, mode: number) {
+  await tar.extract({ cwd, file, mode });
 }

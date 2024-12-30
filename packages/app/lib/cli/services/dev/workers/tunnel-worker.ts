@@ -14,7 +14,7 @@ export default class TunnelWorker extends Worker.Abstract {
   ) {
     super();
 
-    this.logger = new Worker.Logger('tunnel', 'cyan');
+    this.logger = new Worker.Logger('tunnel', 'dim');
   }
 
   public async boot(): Promise<void> {
@@ -22,7 +22,6 @@ export default class TunnelWorker extends Worker.Abstract {
       throw new Error('app network config is not set');
     }
 
-    // Start the tunnel ahead of time.
     this.logger.write('start tunneling the app');
     this.tunnelService.tunnel(this.app.networkConfig.port);
 

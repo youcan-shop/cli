@@ -66,7 +66,7 @@ async function downloadFromRelease(url: string, downloadPath: string) {
   }
 
   const { body } = response;
-  const fileWriteStream = createWriteStream(downloadPath, { mode: 0o777 });
+  const fileWriteStream = createWriteStream(downloadPath, { mode: 0o664 });
   await pipeline(Readable.fromWeb(body!), fileWriteStream);
 }
 
@@ -82,8 +82,8 @@ async function installForMacOs(url: string, destination: string): Promise<void> 
 
   await downloadFromRelease(url, downloadedFile);
 
-  await Filesystem.decompress(downloadedFile, decompressedFile);
-  await Filesystem.extractTar(decompressedFile, tmpDir);
+  await Filesystem.decompressGzip(downloadedFile, decompressedFile);
+  await Filesystem.extractTar(decompressedFile, tmpDir, 0o755);
 
   await Filesystem.move(path.resolve(tmpDir, executableName), destination, { overwrite: true });
   await Filesystem.rm(tmpDir);
@@ -111,6 +111,7 @@ async function install(platform: PlatformType, downloadUrl: string, destinationP
       break;
     case 'win32':
       await installForWindows(downloadUrl, destinationPath);
+      break;
   }
 }
 
@@ -147,7 +148,7 @@ class OutputStream extends Writable {
   }
 
   private extractTunnelUrl(): string | null {
-    const regex = new RegExp('(https:\\/\\/[^\\s]+\\.trycloudflare.com)');
+    const regex = /(https:\\\/[^\\s]+\\.trycloudflare.com)/;
 
     return this.buffer.match(regex)?.[0] || null;
   }
@@ -160,20 +161,18 @@ class OutputStream extends Writable {
 export class Cloudflared {
   private readonly bin: string;
   private readonly system: SystemType;
-
   private readonly output = new OutputStream();
 
-  constructor(
-  ) {
+  constructor() {
     const platform = process.platform;
     const arch = process.arch;
 
     if (!isPlatformSupported(platform)) {
-      throw new Error(`Unsupported platform: ${platform}`);
+      throw new Error(`unsupported platform: ${platform}`);
     }
 
     if (!isArchSupported(arch, platform)) {
-      throw new Error(`Unsupported architecture: ${arch}`);
+      throw new Error(`unsupported architecture: ${arch}`);
     }
 
     this.bin = resolveBinaryPath(platform);
