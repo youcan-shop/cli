@@ -1,6 +1,8 @@
 import FilesystemPromises from 'fs/promises';
 import type { Mode, OpenMode, PathLike, Stats } from 'fs';
-import { createWriteStream } from 'fs';
+import { createGunzip } from 'zlib';
+import { pipeline } from 'node:stream/promises';
+import { createReadStream, createWriteStream } from 'node:fs';
 import { temporaryDirectoryTask } from 'tempy';
 import FsExtra from 'fs-extra';
 import archiver from 'archiver';
@@ -8,11 +10,27 @@ import chokidar from 'chokidar';
 import type { GlobOptions } from 'glob';
 import { glob as _glob } from 'glob';
 
+import * as tar from 'tar';
 import { Path } from '..';
 
 export async function exists(path: string): Promise<boolean> {
   try {
     await FilesystemPromises.access(path);
+
+    return true;
+  }
+  catch {
+    return false;
+  }
+}
+
+export async function isExecutable(path: string) {
+  if (!await exists(path)) {
+    return false;
+  }
+
+  try {
+    await FilesystemPromises.access(path, FilesystemPromises.constants.X_OK);
 
     return true;
   }
@@ -38,6 +56,10 @@ export async function tapIntoTmp<T>(callback: (tmp: string) => T | Promise<T>): 
 
 export async function mkdir(path: string): Promise<void> {
   await FilesystemPromises.mkdir(path, { recursive: true });
+}
+
+export async function rm(path: string): Promise<void> {
+  await FilesystemPromises.rm(path, { recursive: true });
 }
 
 interface MoveFileOptions {
@@ -130,3 +152,15 @@ export async function stat(path: string): Promise<Stats> {
 }
 
 export const watch = chokidar.watch;
+
+export async function decompressGzip(file: string, destination: string, mode = 0o755) {
+  const unzip = createGunzip();
+  const readStream = createReadStream(file);
+  const writeStream = createWriteStream(destination, { mode });
+
+  await pipeline(readStream, unzip, writeStream);
+}
+
+export async function extractTar(file: string, cwd: string, mode: number) {
+  await tar.extract({ cwd, file, mode });
+}
