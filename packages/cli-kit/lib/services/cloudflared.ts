@@ -1,13 +1,10 @@
-import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 import { pipeline } from 'node:stream/promises';
 
 import { createWriteStream } from 'node:fs';
-import { basename } from 'node:path';
 import { Readable, Writable } from 'node:stream';
-import { Filesystem, System } from '..';
-import { tapIntoTmp } from '@/node/filesystem';
+import { Filesystem, System, Path } from '..';
 
 type PlatformArchitectureType = 'arm' | 'arm64' | 'x64' | 'ia32';
 type PlatformType = 'linux' | 'darwin' | 'win32';
@@ -49,7 +46,7 @@ function composeDownloadUrl(platform: PlatformType, arch: PlatformArchitectureTy
 function resolveBinaryPath(platform: PlatformType): string {
   const parentDir = fileURLToPath(new URL('../'.repeat(2), import.meta.url));
 
-  return path.join(parentDir, 'bin', platform === 'win32' ? 'cloudflared.exe' : 'cloudflared');
+  return Path.join(parentDir, 'bin', platform === 'win32' ? 'cloudflared.exe' : 'cloudflared');
 }
 
 function isPlatformSupported(platform: NodeJS.Platform): platform is PlatformType {
@@ -72,11 +69,11 @@ async function downloadFromRelease(url: string, downloadPath: string) {
 }
 
 async function installForMacOs(url: string, destination: string): Promise<void> {
-  await tapIntoTmp(async (tmpDir) => {
-    const parentDir = dirname(destination);
-    const binaryName = basename(destination);
-    const downloadedFile = path.resolve(tmpDir, `${binaryName}.tgz`);
-    const decompressedFile = path.resolve(tmpDir, `${binaryName}.gz`);
+  await Filesystem.tapIntoTmp(async (tmpDir) => {
+    const parentDir = Path.dirname(destination);
+    const binaryName = Path.basename(destination);
+    const downloadedFile = Path.resolve(tmpDir, `${binaryName}.tgz`);
+    const decompressedFile = Path.resolve(tmpDir, `${binaryName}.gz`);
   
     await Filesystem.mkdir(parentDir);
     await Filesystem.mkdir(tmpDir);
@@ -86,18 +83,18 @@ async function installForMacOs(url: string, destination: string): Promise<void> 
     await Filesystem.decompressGzip(downloadedFile, decompressedFile);
     await Filesystem.extractTar(decompressedFile, tmpDir, 0o755);
   
-    await Filesystem.move(path.resolve(tmpDir, binaryName), destination, { overwrite: true });
+    await Filesystem.move(Path.resolve(tmpDir, binaryName), destination, { overwrite: true });
   })
 }
 
 async function installForLinux(url: string, destination: string): Promise<void> {
-  const parentDir = dirname(destination);
+  const parentDir = Path.dirname(destination);
   await Filesystem.mkdir(parentDir);
   await downloadFromRelease(url, destination);
 }
 
 async function installForWindows(url: string, destination: string): Promise<void> {
-  const parentDir = dirname(destination);
+  const parentDir = Path.dirname(destination);
   Filesystem.mkdir(parentDir);
   await downloadFromRelease(url, destination);
 }
