@@ -120,6 +120,14 @@ class OutputStream extends Writable {
   private tunnelUrl: string | null = null;
   private buffer = '';
 
+  private static ErrorsRegex = [
+    /failed to build quick tunnel request/,
+    /failed to request quick Tunnel/,
+    /failed to read quick-tunnel response/,
+    /failed to parse quick Tunnel ID/,
+    /Couldn't start tunnel/,
+  ];
+
   write(chunk: unknown, encoding?: unknown, callback?: unknown) {
     if (this.tunnelUrl) {
       return true;
@@ -128,6 +136,8 @@ class OutputStream extends Writable {
     if (!(chunk instanceof Buffer) && typeof chunk !== 'string') {
       return false;
     }
+
+    console.log(this.buffer);
 
     this.buffer += chunk.toString();
     this.tunnelUrl = this.extractTunnelUrl();
