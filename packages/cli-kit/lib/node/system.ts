@@ -75,6 +75,14 @@ export async function isPortAvailable(port: number): Promise<boolean> {
   return !await tpu.check(port);
 }
 
+export async function getNextAvailablePort(port: number): Promise<number> {
+  if (await isPortAvailable(port)) {
+    return port;
+  }
+
+  return await getNextAvailablePort(port + 1);
+}
+
 export async function getPortProcessName(port: number): Promise<string> {
   const info = await findProcess('port', port);
 
@@ -91,6 +99,12 @@ export async function open(url: string): Promise<void> {
   const _open = await import('open');
 
   await _open.default(url);
+}
+
+export async function sleep(seconds: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 1000 * seconds);
+  });
 }
 
 export type PackageManagerType =

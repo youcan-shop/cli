@@ -54,17 +54,15 @@ class Dev extends AppCommand {
   }
 
   private async prepareNetworkOptions() {
-    const port = 3000; // to rotate based on availability
+    const port = await System.getNextAvailablePort(3000);
+    console.log(`${port}`);
+
     // Start by `localhost` until a tunneled url is available
     const appUrl = `http://localhost:${port}`;
 
     this.app.networkConfig = { port, appUrl };
 
-    const worker = await bootTunnelWorker(
-      this,
-      this.app,
-      new Services.Cloudflared(),
-    );
+    const worker = await bootTunnelWorker(this, this.app, new Services.Cloudflared());
 
     return worker;
   }
