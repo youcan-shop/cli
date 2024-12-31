@@ -1,6 +1,7 @@
-import type { Services } from '@youcan/cli-kit';
 import { System, Worker } from '@youcan/cli-kit';
+
 import type { App } from '@/types';
+import type { Services } from '@youcan/cli-kit';
 import type { AppCommand } from '@/util/app-command';
 
 export default class TunnelWorker extends Worker.Abstract {

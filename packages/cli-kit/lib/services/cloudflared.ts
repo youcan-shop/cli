@@ -1,8 +1,8 @@
-import { fileURLToPath } from 'url';
-import { pipeline } from 'node:stream/promises';
-import { createWriteStream } from 'node:fs';
 import { Readable, Writable } from 'node:stream';
+import { pipeline } from 'node:stream/promises';
 import { Filesystem, Path, System } from '..';
+import { createWriteStream } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 type PlatformArchitectureType = 'arm' | 'arm64' | 'x64' | 'ia32';
 type PlatformType = 'linux' | 'darwin' | 'win32';
@@ -120,14 +120,6 @@ class OutputStream extends Writable {
   private tunnelUrl: string | null = null;
   private buffer = '';
 
-  private static ErrorsRegex = [
-    /failed to build quick tunnel request/,
-    /failed to request quick Tunnel/,
-    /failed to read quick-tunnel response/,
-    /failed to parse quick Tunnel ID/,
-    /Couldn't start tunnel/,
-  ];
-
   write(chunk: unknown, encoding?: unknown, callback?: unknown) {
     if (this.tunnelUrl) {
       return true;
@@ -136,8 +128,6 @@ class OutputStream extends Writable {
     if (!(chunk instanceof Buffer) && typeof chunk !== 'string') {
       return false;
     }
-
-    console.log(this.buffer);
 
     this.buffer += chunk.toString();
     this.tunnelUrl = this.extractTunnelUrl();
@@ -213,6 +203,8 @@ export class Cloudflared {
     System.exec(bin, args, {
       // Weird choice of cloudflared to write to stderr.
       stderr: this.output,
+      errorHandler: async (error) => {
+      }
     });
   }
 

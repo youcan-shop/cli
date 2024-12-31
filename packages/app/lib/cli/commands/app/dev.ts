@@ -1,8 +1,9 @@
-import type { Worker } from '@youcan/cli-kit';
+import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
+
+import type { Worker } from '@youcan/cli-kit';
 
 interface Context {
   cmd: Dev
