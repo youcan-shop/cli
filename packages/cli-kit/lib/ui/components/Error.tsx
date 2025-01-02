@@ -2,8 +2,8 @@ import React from 'react';
 import { Box, Newline, render, Text } from 'ink';
 
 type ErrorPropsType = {
-    message: string;
-    suggestions?: string[];
+    message: string
+    suggestions?: string[]
 }
 
 const Error = ({ message, suggestions = [] }: ErrorPropsType) => {
