@@ -1,5 +1,6 @@
 import { Command as BaseCommand, Flags, ux } from '@oclif/core';
 import prompts from 'prompts';
+import { UI } from '..';
 import { truthy } from './context/helpers';
 import { isDevelopment } from './context/local';
 
@@ -29,11 +30,23 @@ function setupColorMode(): void {
   }
 }
 
+function errorHandler(error: Error): never {
+  let suggestions: string[] = ['Run the command again'];
+  const message: string = error.message;
+
+  if (error instanceof CommandError && error.suggestions) {
+    suggestions = error.suggestions;
+  }
+
+  UI.renderError({ message, suggestions });
+  process.exit(1);
+}
+
 export async function exec(options: ExecOptions): Promise<void> {
   setupEnvVars(options);
   setupColorMode();
 
-  const { run, settings, flush, Errors } = await import('@oclif/core');
+  const { run, settings, flush } = await import('@oclif/core');
 
   if (isDevelopment()) {
     settings.debug = true;
@@ -41,8 +54,10 @@ export async function exec(options: ExecOptions): Promise<void> {
 
   run(undefined, options.moduleUrl)
     .then(() => flush())
-    .catch(err => Errors.handle(err));
+    .catch(errorHandler);
 }
+
+process.on('uncaughtException', errorHandler);
 
 export async function execCreate(cmdlet: string, options: ExecOptions): Promise<void> {
   setupEnvVars(options);
@@ -82,9 +97,18 @@ export abstract class Command extends BaseCommand {
     console.clear();
   }
 
-  exit(code?: number): never {
+  public exit(code?: number): never {
     this.controller.abort();
 
     return process.exit(code);
+  }
+}
+
+export class CommandError extends Error {
+  constructor(
+    message: string,
+    public readonly suggestions?: string[],
+  ) {
+    super(message);
   }
 }

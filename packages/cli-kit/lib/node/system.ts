@@ -1,8 +1,9 @@
 import type { Readable, Writable } from 'stream';
-import type { ExecaChildProcess } from 'execa';
-import { execa } from 'execa';
-import tpu from 'tcp-port-used';
 import findProcess from 'find-process';
+import tpu from 'tcp-port-used';
+import { execa } from 'execa';
+
+import type { ExecaChildProcess, ExecaError } from 'execa';
 
 export interface ExecOptions {
   cwd?: string
@@ -13,7 +14,7 @@ export interface ExecOptions {
   stdio?: 'inherit'
   input?: string
   signal?: AbortSignal
-  errorHandler?: (error: unknown) => Promise<void>
+  errorHandler?: (error: unknown | ExecaError) => Promise<void>
 }
 
 function buildExec(command: string, args: string[], options?: ExecOptions): ExecaChildProcess<string> {
@@ -56,7 +57,7 @@ export async function exec(command: string, args: string[], options?: ExecOption
   try {
     await commandProcess;
   }
-  catch (err: any) {
+  catch (err: unknown | ExecaError) {
     if (aborted) {
       return;
     }

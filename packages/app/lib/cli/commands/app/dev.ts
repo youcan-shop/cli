@@ -1,9 +1,8 @@
-import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
+import type { Worker } from '@youcan/cli-kit';
+import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-
-import type { Worker } from '@youcan/cli-kit';
 
 interface Context {
   cmd: Dev
@@ -69,6 +68,7 @@ class Dev extends AppCommand {
 
   async reloadWorkers() {
     this.controller = new AbortController();
+
     // Preserve network config.
     const networkConfig = this.app.networkConfig;
     this.app = await load();
@@ -76,9 +76,7 @@ class Dev extends AppCommand {
 
     await this.syncAppConfig();
 
-    await this.runWorkers(
-      await this.prepareDevProcesses(),
-    );
+    await this.runWorkers(await this.prepareDevProcesses());
   }
 
   private async runWorkers(workers: Worker.Interface[]): Promise<void> {
