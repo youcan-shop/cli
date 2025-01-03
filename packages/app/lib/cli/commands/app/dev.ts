@@ -1,8 +1,10 @@
-import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
+import { Env, Http, Path, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import type { Worker } from '@youcan/cli-kit';
 import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
+import { writeJsonFile } from 'node_modules/@youcan/cli-kit/dist/node/filesystem';
+import { APP_CONFIG_FILENAME } from '@/constants';
 
 interface Context {
   cmd: Dev
@@ -56,12 +58,25 @@ class Dev extends AppCommand {
   private async prepareNetworkOptions() {
     const port = await System.getNextAvailablePort(3000);
 
-    // Start by `localhost` until a tunneled url is available
-    const appUrl = `http://localhost:${port}`;
-
-    this.app.networkConfig = { port, appUrl };
+    this.app.network_config = {
+      app_port: port,
+      app_url: `http://localhost:${port}`
+    }
 
     const worker = await bootTunnelWorker(this, this.app, new Services.Cloudflared());
+
+    this.app.config = {
+      ...this.app.config,
+      app_url: worker.getUrl(),
+      redirect_urls: this.app.config.redirect_urls
+        ? this.app.config.redirect_urls.map(r => new URL(new URL(r).pathname, worker.getUrl()).toString())
+        : [new URL('/auth/callback', worker.getUrl()).toString()]
+    }
+
+    await writeJsonFile(
+      Path.join(this.app.root, APP_CONFIG_FILENAME),
+      this.app.config
+    )
 
     return worker;
   }
@@ -70,9 +85,9 @@ class Dev extends AppCommand {
     this.controller = new AbortController();
 
     // Preserve network config.
-    const networkConfig = this.app.networkConfig;
+    const networkConfig = this.app.network_config;
     this.app = await load();
-    this.app.networkConfig = networkConfig;
+    this.app.network_config = networkConfig;
 
     await this.syncAppConfig();
 
@@ -80,7 +95,7 @@ class Dev extends AppCommand {
   }
 
   private async runWorkers(workers: Worker.Interface[]): Promise<void> {
-    await Promise.all(workers.map(worker => worker.run())).catch((_) => {});
+    await Promise.all(workers.map(worker => worker.run())).catch((_) => { });
   }
 
   private async prepareDevProcesses(): Promise<Worker.Interface[]> {
@@ -103,19 +118,19 @@ class Dev extends AppCommand {
   }
 
   private buildEnvironmentVariables(): Record<string, string> {
-    if (!this.app.remoteConfig) {
+    if (!this.app.remote_config) {
       throw new Error('remote app config not loaded');
     }
-    if (!this.app.networkConfig) {
+    if (!this.app.network_config) {
       throw new Error('app network config is not set');
     }
 
     return {
-      YOUCAN_API_KEY: this.app.remoteConfig.client_id,
-      YOUCAN_API_SECRET: this.app.remoteConfig.client_secret,
-      YOUCAN_API_SCOPES: this.app.remoteConfig.scopes.join(','),
-      APP_URL: this.app.networkConfig.appUrl,
-      PORT: this.app.networkConfig.port.toString(),
+      YOUCAN_API_KEY: this.app.remote_config.client_id,
+      YOUCAN_API_SECRET: this.app.remote_config.client_secret,
+      YOUCAN_API_SCOPES: this.app.remote_config.scopes.join(','),
+      APP_URL: this.app.network_config.app_url,
+      PORT: this.app.network_config.app_port.toString(),
     };
   }
 
