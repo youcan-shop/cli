@@ -1,7 +1,7 @@
-import { fileURLToPath } from 'url';
+import { Readable, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { createWriteStream } from 'node:fs';
-import { Readable, Writable } from 'node:stream';
+import { fileURLToPath } from 'node:url';
 import { Filesystem, Path, System } from '..';
 
 type PlatformArchitectureType = 'arm' | 'arm64' | 'x64' | 'ia32';
@@ -42,9 +42,9 @@ function composeDownloadUrl(platform: PlatformType, arch: PlatformArchitectureTy
 }
 
 function resolveBinaryPath(platform: PlatformType): string {
-  const parentDir = fileURLToPath(new URL('../'.repeat(2), import.meta.url));
+  const rootDir = fileURLToPath(new URL('../'.repeat(2), import.meta.url));
 
-  return Path.join(parentDir, 'bin', platform === 'win32' ? 'cloudflared.exe' : 'cloudflared');
+  return Path.join(rootDir, 'bin', platform === 'win32' ? 'cloudflared.exe' : 'cloudflared');
 }
 
 function isPlatformSupported(platform: NodeJS.Platform): platform is PlatformType {
@@ -118,22 +118,27 @@ interface SystemType {
 
 class OutputStream extends Writable {
   private tunnelUrl: string | null = null;
+  private tunnelError: string | null = null;
+
   private buffer = '';
 
-  write(chunk: unknown, encoding?: unknown, callback?: unknown) {
-    if (this.tunnelUrl) {
-      return true;
-    }
+  private static ErrorsRegex = [
+    /failed to build quick tunnel request/,
+    /failed to request quick Tunnel/,
+    /failed to read quick-tunnel response/,
+    /failed to parse quick Tunnel ID/,
+    /Couldn't start tunnel/,
+  ];
 
+  write(chunk: unknown, encoding?: unknown, callback?: unknown) {
     if (!(chunk instanceof Buffer) && typeof chunk !== 'string') {
       return false;
     }
 
     this.buffer += chunk.toString();
-    this.tunnelUrl = this.extractTunnelUrl();
 
-    if (this.tunnelUrl) {
-      this.buffer = '';
+    if (this.tunnelUrl === null) {
+      this.tunnelUrl = this.extractTunnelUrl();
     }
 
     if (callback && typeof callback === 'function') {
@@ -144,13 +149,27 @@ class OutputStream extends Writable {
   }
 
   private extractTunnelUrl(): string | null {
-    const regex = /(https:\/\/[^\s]+\.trycloudflare.com)/;
+    const regex = /https:\/\/(?!api\.trycloudflare\.com)[^\s]+\.trycloudflare\.com/;
 
     return this.buffer.match(regex)?.[0] || null;
   }
 
+  public extractError(): string | null {
+    for (const errorRegex of OutputStream.ErrorsRegex) {
+      if (errorRegex.test(this.buffer)) {
+        return errorRegex.source;
+      }
+    }
+
+    return null;
+  }
+
   public getTunnelUrl() {
     return this.tunnelUrl;
+  }
+
+  public clearBuffer() {
+    this.buffer = '';
   }
 }
 
@@ -199,14 +218,30 @@ export class Cloudflared {
     };
   }
 
-  private async exec(bin: string, args: string[]) {
-    System.exec(bin, args, {
+  private async exec(bin: string, args: string[], maxRetries = 3) {
+    if (this.getUrl()) {
+      return;
+    }
+
+    if (maxRetries === 0) {
+      throw new Error(this.output.extractError() ?? 'cloudflared failed for unknown reason');
+    }
+
+    this.output.clearBuffer();
+    await System.exec(bin, args, {
       // Weird choice of cloudflared to write to stderr.
       stderr: this.output,
+      errorHandler: async () => {
+        await this.exec(bin, args, maxRetries - 1);
+      },
     });
   }
 
-  public getUrl() {
+  public getUrl(): string | null {
     return this.output.getTunnelUrl();
+  }
+
+  public getError(): string | null {
+    return this.output.extractError();
   }
 }

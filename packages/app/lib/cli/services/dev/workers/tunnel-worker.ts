@@ -1,5 +1,6 @@
-import type { Services } from '@youcan/cli-kit';
 import { System, Worker } from '@youcan/cli-kit';
+
+import type { Services } from '@youcan/cli-kit';
 import type { App } from '@/types';
 import type { AppCommand } from '@/util/app-command';
 
@@ -23,7 +24,8 @@ export default class TunnelWorker extends Worker.Abstract {
     }
 
     this.logger.write('start tunneling the app');
-    this.tunnelService.tunnel(this.app.networkConfig.port);
+
+    await this.tunnelService.tunnel(this.app.networkConfig.port);
 
     // Stop the execution for while and see if the tunnel is available.
     await System.sleep(5);
@@ -43,16 +45,28 @@ export default class TunnelWorker extends Worker.Abstract {
       return;
     }
 
-    const intervalId = setInterval(() => {
+    setInterval(() => {
+      if (this.url !== null) {
+        this.checkForError();
+
+        return;
+      }
+
       this.url = this.tunnelService.getUrl();
       if (this.url) {
         this.logger.write(`tunneled url obtained: \`${this.url}\``);
         this.app.networkConfig!.appUrl = this.url;
 
         this.command.syncAppConfig();
-
-        clearTimeout(intervalId);
       }
     }, timeInterval);
+  }
+
+  private checkForError() {
+    const error = this.tunnelService.getError();
+
+    if (error) {
+      throw new Error(`Tunnel stopped: ${error}`);
+    }
   }
 }
