@@ -67,7 +67,7 @@ class Dev extends AppCommand {
     this.app.config = {
       ...this.app.config,
       app_url: worker.getUrl(),
-      redirect_urls: this.app.config.redirect_urls.length > 0
+      redirect_urls: this.app.config.redirect_urls?.length > 0
         ? this.app.config.redirect_urls.map(r => new URL(new URL(r).pathname, worker.getUrl()).toString())
         : [new URL('/auth/callback', worker.getUrl()).toString()]
     }
