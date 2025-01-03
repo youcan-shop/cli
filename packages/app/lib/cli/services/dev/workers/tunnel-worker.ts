@@ -19,54 +19,50 @@ export default class TunnelWorker extends Worker.Abstract {
   }
 
   public async boot(): Promise<void> {
-    if (!this.app.networkConfig) {
+    if (!this.app.network_config) {
       throw new Error('app network config is not set');
     }
 
     this.logger.write('start tunneling the app');
 
-    await this.tunnelService.tunnel(this.app.networkConfig.port);
+    await this.tunnelService.tunnel(this.app.network_config.app_port);
 
-    // Stop the execution for while and see if the tunnel is available.
-    await System.sleep(5);
+    let attempts = 0;
 
-    const url = this.tunnelService.getUrl();
-    if (url) {
-      this.logger.write(`tunneled url obtained: \`${url}\``);
-      this.url = url;
-      this.app.networkConfig!.appUrl = this.url;
+    while (!this.url && attempts <= 28) {
+      const url = this.tunnelService.getUrl();
+
+      if (url) {
+        this.url = url;
+        this.app.network_config!.app_url = this.url;
+        this.logger.write(`tunneled url obtained: \`${url}\``);
+      }
+      
+      await System.sleep(0.5)
+    }
+
+    if (!this.url) {
+      this.logger.write('could not establish a tunnel, using localhost instead')
     }
   }
 
   public async run(): Promise<void> {
-    const timeInterval = 500;
-
-    if (this.url) {
-      return;
-    }
-
-    setInterval(() => {
-      if (this.url !== null) {
-        this.checkForError();
-
-        return;
-      }
-
-      this.url = this.tunnelService.getUrl();
-      if (this.url) {
-        this.logger.write(`tunneled url obtained: \`${this.url}\``);
-        this.app.networkConfig!.appUrl = this.url;
-
-        this.command.syncAppConfig();
-      }
-    }, timeInterval);
+    setInterval(() => this.checkForError, 500);
   }
 
   private checkForError() {
     const error = this.tunnelService.getError();
 
     if (error) {
-      throw new Error(`Tunnel stopped: ${error}`);
+      throw new Error(`tunnel stopped: ${error}`);
     }
+  }
+
+  public getUrl(): string {
+    if (!this.url) {
+      throw new Error('app url not set')
+    }
+
+    return this.url;
   }
 }
