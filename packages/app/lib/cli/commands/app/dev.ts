@@ -1,9 +1,8 @@
-import { Env, Http, Path, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
+import { Env, Http, Services, Path, Session, System, Tasks, UI, Filesystem } from '@youcan/cli-kit';
 import type { Worker } from '@youcan/cli-kit';
 import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { writeJsonFile } from 'node_modules/@youcan/cli-kit/dist/node/filesystem';
 import { APP_CONFIG_FILENAME } from '@/constants';
 
 interface Context {
@@ -68,12 +67,12 @@ class Dev extends AppCommand {
     this.app.config = {
       ...this.app.config,
       app_url: worker.getUrl(),
-      redirect_urls: this.app.config.redirect_urls
+      redirect_urls: this.app.config.redirect_urls.length > 0
         ? this.app.config.redirect_urls.map(r => new URL(new URL(r).pathname, worker.getUrl()).toString())
         : [new URL('/auth/callback', worker.getUrl()).toString()]
     }
 
-    await writeJsonFile(
+    await Filesystem.writeJsonFile(
       Path.join(this.app.root, APP_CONFIG_FILENAME),
       this.app.config
     )
