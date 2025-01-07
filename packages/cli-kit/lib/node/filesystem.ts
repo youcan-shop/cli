@@ -1,16 +1,17 @@
-import FilesystemPromises from 'fs/promises';
-import type { Mode, OpenMode, PathLike, Stats } from 'fs';
-import { createGunzip } from 'zlib';
-import { pipeline } from 'node:stream/promises';
+import type { GlobOptions } from 'glob';
+import type { Buffer } from 'node:buffer';
+import type { Mode, OpenMode, PathLike, Stats } from 'node:fs';
 import { createReadStream, createWriteStream } from 'node:fs';
-import { temporaryDirectoryTask } from 'tempy';
-import FsExtra from 'fs-extra';
+import FilesystemPromises from 'node:fs/promises';
+import { pipeline } from 'node:stream/promises';
+import { createGunzip } from 'node:zlib';
 import archiver from 'archiver';
 import chokidar from 'chokidar';
-import type { GlobOptions } from 'glob';
+import FsExtra from 'fs-extra';
 import { glob as _glob } from 'glob';
-
 import * as tar from 'tar';
+
+import { temporaryDirectoryTask } from 'tempy';
 import { Path } from '..';
 
 export async function exists(path: string): Promise<boolean> {
@@ -63,7 +64,7 @@ export async function rm(path: string): Promise<void> {
 }
 
 interface MoveFileOptions {
-  overwrite?: boolean
+  overwrite?: boolean;
 }
 
 export async function move(src: string, dest: string, options: MoveFileOptions = {}): Promise<void> {

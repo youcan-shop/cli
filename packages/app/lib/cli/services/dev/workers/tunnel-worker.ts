@@ -1,8 +1,8 @@
-import { System, Worker } from '@youcan/cli-kit';
-
-import type { Services } from '@youcan/cli-kit';
 import type { App } from '@/types';
+
 import type { AppCommand } from '@/util/app-command';
+import type { Services } from '@youcan/cli-kit';
+import { System, Worker } from '@youcan/cli-kit';
 
 export default class TunnelWorker extends Worker.Abstract {
   private readonly logger: Worker.Logger;

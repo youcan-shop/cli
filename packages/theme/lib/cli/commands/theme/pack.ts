@@ -1,7 +1,7 @@
-import { Filesystem, Path, Session, Tasks } from '@youcan/cli-kit';
+import type { Metadata } from '@/types';
 import { ThemeCommand } from '@/util/theme-command';
 import { load } from '@/util/theme-loader';
-import type { Metadata } from '@/types';
+import { Filesystem, Path, Session, Tasks } from '@youcan/cli-kit';
 
 const formatter = Intl.NumberFormat('en', {
   notation: 'compact',
@@ -30,7 +30,7 @@ export function date() {
 }
 
 interface Context {
-  path?: string
+  path?: string;
 }
 
 export default class Pack extends ThemeCommand {

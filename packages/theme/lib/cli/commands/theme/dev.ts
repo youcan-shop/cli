@@ -1,17 +1,17 @@
+import type { FileDescriptor, Metadata, Store } from '@/types';
 import type { Worker } from '@youcan/cli-kit';
-import { Crypto, Env, Filesystem, Http, Path, Session, Tasks, UI } from '@youcan/cli-kit';
+import { execute } from '@/cli/services/dev/execute';
+import ThemeWorker from '@/cli/services/dev/worker';
+import { THEME_FILE_TYPES } from '@/constants';
 import { ThemeCommand } from '@/util/theme-command';
 import { load } from '@/util/theme-loader';
-import ThemeWorker from '@/cli/services/dev/worker';
-import type { FileDescriptor, Metadata, Store } from '@/types';
-import { execute } from '@/cli/services/dev/execute';
-import { THEME_FILE_TYPES } from '@/constants';
+import { Crypto, Env, Filesystem, Http, Path, Session, Tasks, UI } from '@youcan/cli-kit';
 
 interface Context {
-  cmd: Dev
-  store?: Store
-  metadata?: Metadata
-  workers: Worker.Interface[]
+  cmd: Dev;
+  store?: Store;
+  metadata?: Metadata;
+  workers: Worker.Interface[];
 }
 
 export default class Dev extends ThemeCommand {

@@ -1,6 +1,6 @@
-import { Env, Http, Session } from '@youcan/cli-kit';
-import { ThemeCommand } from '@/util/theme-command';
 import type { ThemeInfo } from '@/types';
+import { ThemeCommand } from '@/util/theme-command';
+import { Env, Http, Session } from '@youcan/cli-kit';
 
 const formatter = Intl.NumberFormat('en', {
   notation: 'compact',

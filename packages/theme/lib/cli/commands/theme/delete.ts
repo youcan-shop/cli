@@ -1,6 +1,6 @@
-import { Env, Http, Session, Tasks } from '@youcan/cli-kit';
-import { ThemeCommand } from '@/util/theme-command';
 import type { ThemeInfo } from '@/types';
+import { ThemeCommand } from '@/util/theme-command';
+import { Env, Http, Session, Tasks } from '@youcan/cli-kit';
 
 export default class Delete extends ThemeCommand {
   static description = 'Select remote development themes to delete';

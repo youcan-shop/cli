@@ -1,6 +1,6 @@
+import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 import type { Cli } from '@youcan/cli-kit';
 import { Env, Filesystem, Form, Http, Path, Session, Worker } from '@youcan/cli-kit';
-import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 
 export default class ThemeExtensionWorker extends Worker.Abstract {
   private logger: Worker.Logger;

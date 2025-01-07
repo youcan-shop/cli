@@ -1,17 +1,17 @@
-import { File, FormData } from 'formdata-node';
 import type { FormDataEntryValue } from 'formdata-node';
+import { File, FormData } from 'formdata-node';
 import { fileFromPath } from 'formdata-node/file-from-path';
 
 export type FormDataResolvable =
-| Array<FormDataResolvable>
-| { [key: string]: FormDataResolvable }
-| FormDataEntryValue
-| undefined
-| boolean
-| number
-| Blob
-| Date
-| null;
+  | Array<FormDataResolvable>
+  | { [key: string]: FormDataResolvable }
+  | FormDataEntryValue
+  | undefined
+  | boolean
+  | number
+  | Blob
+  | Date
+  | null;
 
 export const file = fileFromPath;
 

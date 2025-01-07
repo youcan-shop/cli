@@ -1,9 +1,9 @@
-import { Filesystem, Path, String, Tasks } from '@youcan/cli-kit';
-import { AppCommand } from '@/util/app-command';
 import type { AppConfig, InitialAppConfig } from '@/types';
 import extensions from '@/cli/services/generate/extensions';
 import { ensureExtensionDirectoryExists, initThemeExtension } from '@/cli/services/generate/generate';
 import { APP_CONFIG_FILENAME } from '@/constants';
+import { AppCommand } from '@/util/app-command';
+import { Filesystem, Path, String, Tasks } from '@youcan/cli-kit';
 
 class GenerateExtension extends AppCommand {
   static description = 'Generate an app extension';

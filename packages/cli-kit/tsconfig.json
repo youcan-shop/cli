@@ -2,8 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react",
-    "rootDir": "lib",
     "baseUrl": ".",
+    "rootDir": "lib",
     "paths": {
       "@/*": [
         "./lib/*"

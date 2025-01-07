@@ -1,3 +1,4 @@
+import process from 'node:process';
 import { Command as BaseCommand, Flags, ux } from '@oclif/core';
 import prompts from 'prompts';
 import { UI } from '..';
@@ -5,8 +6,8 @@ import { truthy } from './context/helpers';
 import { isDevelopment } from './context/local';
 
 interface ExecOptions {
-  moduleUrl: string
-  development: boolean
+  moduleUrl: string;
+  development: boolean;
 }
 
 function setupEnvVars(options: Pick<ExecOptions, 'development'>) {
@@ -22,9 +23,9 @@ function setupEnvVars(options: Pick<ExecOptions, 'development'>) {
 function setupColorMode(): void {
   if (
     process.argv.includes('--no-color')
-        || truthy(process.env.NO_COLOR)
-        || truthy(process.env.YC_FLAG_NO_COLOR)
-        || process.env.TERM === 'dumb'
+    || truthy(process.env.NO_COLOR)
+    || truthy(process.env.YC_FLAG_NO_COLOR)
+    || process.env.TERM === 'dumb'
   ) {
     process.env.FORCE_COLOR = '0';
   }

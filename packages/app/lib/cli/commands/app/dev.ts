@@ -1,13 +1,13 @@
-import { Env, Filesystem, Http, Path, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import type { Worker } from '@youcan/cli-kit';
 import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
+import { APP_CONFIG_FILENAME } from '@/constants';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { APP_CONFIG_FILENAME } from '@/constants';
+import { Env, Filesystem, Http, Path, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 
 interface Context {
-  cmd: Dev
-  workers: Worker.Interface[]
+  cmd: Dev;
+  workers: Worker.Interface[];
 }
 
 class Dev extends AppCommand {

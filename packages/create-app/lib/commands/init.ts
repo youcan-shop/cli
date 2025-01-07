@@ -1,8 +1,8 @@
-import { cwd } from 'process';
-import { Flags } from '@oclif/core';
-import { Cli, Path, System } from '@youcan/cli-kit';
+import { cwd } from 'node:process';
 import initPrompt from '@/prompts/init';
 import initService from '@/services/init';
+import { Flags } from '@oclif/core';
+import { Cli, Path, System } from '@youcan/cli-kit';
 
 export default class Init extends Cli.Command {
   static aliases: string[] = ['create-app'];

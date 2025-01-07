@@ -26,9 +26,9 @@
     "youcan": "./bin/exec.js"
   },
   "files": [
-    "/dist",
-    "/bin/exec.js",
     "/bin/exec.cmd",
+    "/bin/exec.js",
+    "/dist",
     "/oclif.manifest.json"
   ],
   "scripts": {

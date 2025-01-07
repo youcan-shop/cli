@@ -1,14 +1,14 @@
-import type { Cli, Services, Worker } from '@youcan/cli-kit';
-import ThemeExtensionWorker from './theme-extension-worker';
-import WebWorker from './web-worker';
-import AppWorker from './app-worker';
-import TunnelWorker from './tunnel-worker';
-import type { App, Extension, Web } from '@/types';
 import type DevCommand from '@/cli/commands/app/dev';
+import type { App, Extension, Web } from '@/types';
 import type { AppCommand } from '@/util/app-command';
+import type { Cli, Services, Worker } from '@youcan/cli-kit';
+import AppWorker from './app-worker';
+import ThemeExtensionWorker from './theme-extension-worker';
+import TunnelWorker from './tunnel-worker';
+import WebWorker from './web-worker';
 
 export interface ExtensionWorkerCtor {
-  new(command: Cli.Command, app: App, extension: Extension): Worker.Interface
+  new(command: Cli.Command, app: App, extension: Extension): Worker.Interface;
 }
 
 const EXTENSION_WORKERS: Record<string, ExtensionWorkerCtor> = {

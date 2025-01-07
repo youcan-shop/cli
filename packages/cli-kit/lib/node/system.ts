@@ -1,20 +1,21 @@
-import type { Readable, Writable } from 'stream';
-import findProcess from 'find-process';
-import tpu from 'tcp-port-used';
-import { execa } from 'execa';
-
 import type { ExecaChildProcess, ExecaError } from 'execa';
+import type { Readable, Writable } from 'node:stream';
+import process from 'node:process';
+import { execa } from 'execa';
+import findProcess from 'find-process';
+
+import tpu from 'tcp-port-used';
 
 export interface ExecOptions {
-  cwd?: string
-  env?: { [key: string]: string | undefined }
-  stdin?: Readable | 'inherit'
-  stdout?: Writable | 'inherit'
-  stderr?: Writable | 'inherit'
-  stdio?: 'inherit'
-  input?: string
-  signal?: AbortSignal
-  errorHandler?: (error: unknown | ExecaError) => Promise<void>
+  cwd?: string;
+  env?: { [key: string]: string | undefined };
+  stdin?: Readable | 'inherit';
+  stdout?: Writable | 'inherit';
+  stderr?: Writable | 'inherit';
+  stdio?: 'inherit';
+  input?: string;
+  signal?: AbortSignal;
+  errorHandler?: (error: unknown | ExecaError) => Promise<void>;
 }
 
 function buildExec(command: string, args: string[], options?: ExecOptions): ExecaChildProcess<string> {

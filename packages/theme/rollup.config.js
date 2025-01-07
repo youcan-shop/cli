@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
-import typescript from 'rollup-plugin-typescript2';
-import { nodeExternals } from 'rollup-plugin-node-externals';
 import { glob } from 'glob';
+import { nodeExternals } from 'rollup-plugin-node-externals';
+import typescript from 'rollup-plugin-typescript2';
 
 /** @type {import('rollup').RollupOptions} */
 export default {

@@ -1,5 +1,5 @@
-import { type Cli, System, Worker } from '@youcan/cli-kit';
 import type { App, Web } from '@/types';
+import { type Cli, System, Worker } from '@youcan/cli-kit';
 
 export default class WebWorker extends Worker.Abstract {
   private logger: Worker.Logger;

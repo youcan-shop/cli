@@ -1,6 +1,8 @@
+import { Buffer } from 'node:buffer';
+import { createWriteStream } from 'node:fs';
+import process from 'node:process';
 import { Readable, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import { createWriteStream } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { Filesystem, Path, System } from '..';
 
@@ -112,8 +114,8 @@ async function install(platform: PlatformType, downloadUrl: string, destinationP
 }
 
 interface SystemType {
-  platform: PlatformType
-  arch: PlatformArchitectureType
+  platform: PlatformType;
+  arch: PlatformArchitectureType;
 }
 
 class OutputStream extends Writable {
@@ -149,7 +151,7 @@ class OutputStream extends Writable {
   }
 
   private extractTunnelUrl(): string | null {
-    const regex = /https:\/\/(?!api\.trycloudflare\.com)[^\s]+\.trycloudflare\.com/;
+    const regex = /https:\/\/(?!api\.trycloudflare\.com)\S+\.trycloudflare\.com/;
 
     return this.buffer.match(regex)?.[0] || null;
   }

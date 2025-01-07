@@ -1,3 +1,4 @@
+import process from 'node:process';
 import kleur from 'kleur';
 
 export class Loader {

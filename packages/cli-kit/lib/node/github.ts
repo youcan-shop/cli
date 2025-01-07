@@ -1,7 +1,7 @@
 export interface RepositoryReference {
-  baseUrl: string
-  branch?: string
-  path?: string
+  baseUrl: string;
+  branch?: string;
+  path?: string;
 }
 
 export function parseRepositoryReference(reference: string): RepositoryReference {

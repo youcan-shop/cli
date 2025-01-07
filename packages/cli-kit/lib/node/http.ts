@@ -1,9 +1,9 @@
 import type { RequestInit } from 'node-fetch';
+import { isJson } from '@/common/string';
 import fetch from 'node-fetch';
 import { is, mergeDeepLeft } from 'ramda';
 import { Session } from '..';
 import * as Env from './env';
-import { isJson } from '@/common/string';
 
 export function scheme(): 'http' | 'https' {
   return Env.get('HOST_ENV') === 'dev' ? 'http' : 'https';

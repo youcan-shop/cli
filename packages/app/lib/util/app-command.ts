@@ -1,7 +1,7 @@
-import type { Session } from '@youcan/cli-kit';
-import { Cli, Env, Filesystem, Http, Path } from '@youcan/cli-kit';
 import type { App, RemoteAppConfig } from '@/types';
+import type { Session } from '@youcan/cli-kit';
 import { APP_CONFIG_FILENAME } from '@/constants';
+import { Cli, Env, Filesystem, Http, Path } from '@youcan/cli-kit';
 
 export abstract class AppCommand extends Cli.Command {
   protected app!: App;
