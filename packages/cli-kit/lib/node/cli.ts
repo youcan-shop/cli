@@ -31,7 +31,7 @@ function setupColorMode(): void {
   }
 }
 
-function errorHandler(error: Error): never {
+function handleError(error: Error): never {
   let suggestions: string[] = [];
   const message: string = error.message;
 
@@ -55,10 +55,10 @@ export async function exec(options: ExecOptions): Promise<void> {
 
   run(undefined, options.moduleUrl)
     .then(() => flush())
-    .catch(errorHandler);
+    .catch(handleError);
 }
 
-process.on('uncaughtException', errorHandler);
+process.on('uncaughtException', handleError);
 
 export async function execCreate(cmdlet: string, options: ExecOptions): Promise<void> {
   setupEnvVars(options);
