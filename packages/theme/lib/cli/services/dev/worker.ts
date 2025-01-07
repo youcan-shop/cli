@@ -96,7 +96,7 @@ export default class ThemeWorker extends Worker.Abstract {
 
   private enqueue(op: 'save' | 'delete', type: typeof THEME_FILE_TYPES[number], name: string): void {
     this.queue.push(async () => {
-      await this.execute(op, type, name, true);
+      await this.execute(op, type, name);
 
       debounce(() => {
         this.io.emit('theme:update');
@@ -105,7 +105,7 @@ export default class ThemeWorker extends Worker.Abstract {
     });
   }
 
-  private async execute(op: 'save' | 'delete', type: typeof THEME_FILE_TYPES[number], name: string, log = false): Promise<void> {
+  private async execute(op: 'save' | 'delete', type: typeof THEME_FILE_TYPES[number], name: string): Promise<void> {
     return execute(this.theme, op, type, name, this.logger);
   }
 }

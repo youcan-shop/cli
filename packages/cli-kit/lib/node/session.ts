@@ -15,14 +15,10 @@ function generatePkcePair(length: number): [string, string] {
 
 async function isSessionValid(session: StoreSession): Promise<boolean> {
   try {
-    const store = await Http.get<{ status: number, is_dev?: boolean }>(
+    const store = await Http.get<{ status: number }>(
       `${Env.apiHostname()}/me`,
       { headers: { Authorization: `Bearer ${session.access_token}` } },
     );
-
-    if (!store.is_dev) {
-      throw new Error('The CLI can only be used with dev stores, you create one through YouCan Partners.')
-    }
 
     return store.status === 1;
   }
@@ -122,10 +118,14 @@ export async function authenticate(command: Cli.Command): Promise<StoreSession> 
 
   const accessToken = await exchange(code, verifier);
 
-  const store = await Http.get<{ id: string; slug: string }>(
+  const store = await Http.get<{ id: string; slug: string; is_dev?: boolean }>(
     `${Env.apiHostname()}/me`,
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
+
+  if (!store.is_dev) {
+    throw new Error('The CLI can only be used with dev stores, you create one through YouCan Partners.');
+  }
 
   const session = {
     slug: store.slug,

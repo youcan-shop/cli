@@ -17,7 +17,7 @@ export abstract class AppCommand extends Cli.Command {
       body: JSON.stringify({
         name: this.app.config.name,
         app_url: this.app.config.app_url,
-        redirect_urls: this.app.config.redirect_urls
+        redirect_urls: this.app.config.redirect_urls,
       }),
     });
 
