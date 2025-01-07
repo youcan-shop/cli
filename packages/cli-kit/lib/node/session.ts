@@ -20,7 +20,7 @@ async function isSessionValid(session: StoreSession): Promise<boolean> {
       { headers: { Authorization: `Bearer ${session.access_token}` } },
     );
 
-    if (store.is_dev) {
+    if (!store.is_dev) {
       throw new Error('The CLI can only be used with dev stores, you create one through YouCan Partners.')
     }
 
