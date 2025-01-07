@@ -1,12 +1,12 @@
-import { exit } from 'process';
+import process, { exit } from 'node:process';
 import { Loader } from '@/internal/node/ui';
 
 export interface Task<T = unknown> {
-  title: string
-  errors?: Error[]
-  skip?: (ctx: T) => boolean
-  task: (context: T, task: Task<T>) => Promise<void | Task<T>[]>
-  loadable?: false
+  title: string;
+  errors?: Error[];
+  skip?: (ctx: T) => boolean;
+  task: (context: T, task: Task<T>) => Promise<void | Task<T>[]>;
+  loadable?: false;
 }
 
 async function runTask<T>(task: Task<T>, ctx: T) {

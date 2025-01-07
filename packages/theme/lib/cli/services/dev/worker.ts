@@ -1,10 +1,10 @@
-import { Filesystem, Http, Path, System, Worker } from '@youcan/cli-kit';
-import { Server } from 'socket.io';
-import debounce from 'debounce';
-import { execute } from './execute';
-import type { ThemeCommand } from '@/util/theme-command';
 import type { Store, Theme } from '@/types';
+import type { ThemeCommand } from '@/util/theme-command';
 import { THEME_FILE_TYPES } from '@/constants';
+import { Filesystem, Http, Path, System, Worker } from '@youcan/cli-kit';
+import debounce from 'debounce';
+import { Server } from 'socket.io';
+import { execute } from './execute';
 
 export default class ThemeWorker extends Worker.Abstract {
   private logger: Worker.Logger;

@@ -14,11 +14,11 @@ export async function binaryExists(): Promise<boolean> {
 }
 
 export interface CloneOptions {
-  url: string
-  destination: string
-  progressUpdater?: (statusString: string) => void
-  shallow?: boolean
-  latestTag?: boolean
+  url: string;
+  destination: string;
+  progressUpdater?: (statusString: string) => void;
+  shallow?: boolean;
+  latestTag?: boolean;
 }
 
 export async function assertGitExists(): Promise<void> {

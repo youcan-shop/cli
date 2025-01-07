@@ -1,6 +1,6 @@
-import { Color, Session, Tasks } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
+import { Color, Session, Tasks } from '@youcan/cli-kit';
 
 class EnvShow extends AppCommand {
   static description = 'Display app environment variables';

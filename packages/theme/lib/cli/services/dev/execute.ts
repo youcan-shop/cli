@@ -1,7 +1,7 @@
+import type { THEME_FILE_TYPES } from '@/constants';
+import type { Theme } from '@/types';
 import type { Worker } from '@youcan/cli-kit';
 import { Env, Form, Http, Path } from '@youcan/cli-kit';
-import type { Theme } from '@/types';
-import type { THEME_FILE_TYPES } from '@/constants';
 
 export async function execute(
   theme: Theme,

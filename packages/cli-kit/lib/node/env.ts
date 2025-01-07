@@ -1,3 +1,4 @@
+import process from 'node:process';
 import { ENV_VARS } from '@/internal/node/constants';
 
 export function get(key: keyof typeof ENV_VARS) {

@@ -1,10 +1,11 @@
-import { Writable } from 'stream';
+import { Buffer } from 'node:buffer';
+import { Writable } from 'node:stream';
 import dayjs from 'dayjs';
 import { UI } from '..';
 
 export interface Interface {
-  run(): Promise<void>
-  boot(): Promise<void>
+  run: () => Promise<void>;
+  boot: () => Promise<void>;
 }
 
 export class Logger extends Writable {

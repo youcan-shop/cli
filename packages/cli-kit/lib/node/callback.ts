@@ -1,12 +1,12 @@
-import { type IncomingMessage, type Server, type ServerResponse, createServer } from 'http';
 import type { Cli } from '..';
+import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 
 type Callback = (listener: CallbackListener, error?: Error, state?: string, code?: string) => void;
 
 interface CallbackListenerOptions {
-  host: string
-  port: number
-  callback: Callback
+  host: string;
+  port: number;
+  callback: Callback;
 }
 
 class CallbackListener {

@@ -95,9 +95,9 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
 }
 
 export interface StoreSession {
-  id: string
-  slug: string
-  access_token: string
+  id: string;
+  slug: string;
+  access_token: string;
 }
 
 export async function get(): Promise<StoreSession | null> {

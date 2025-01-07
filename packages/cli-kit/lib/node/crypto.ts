@@ -1,5 +1,6 @@
-import type { BinaryLike } from 'crypto';
-import crypto from 'crypto';
+import type { Buffer } from 'node:buffer';
+import type { BinaryLike } from 'node:crypto';
+import crypto from 'node:crypto';
 
 export function randomHex(size: number): string {
   return crypto.randomBytes(size).toString('hex');

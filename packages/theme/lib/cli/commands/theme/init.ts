@@ -1,8 +1,8 @@
+import { THEME_CONFIG_FILENAME } from '@/constants';
+import { THEME_FLAGS } from '@/flags';
+import { ThemeCommand } from '@/util/theme-command';
 import { Args, Flags } from '@oclif/core';
 import { Cli, Env, Filesystem, Form, Git, Http, Path, Session, Tasks } from '@youcan/cli-kit';
-import { ThemeCommand } from '@/util/theme-command';
-import { THEME_FLAGS } from '@/flags';
-import { THEME_CONFIG_FILENAME } from '@/constants';
 
 class Init extends ThemeCommand {
   static description = 'Clones a theme template git repo';
@@ -45,7 +45,8 @@ class Init extends ThemeCommand {
         payload: answers,
         theme_id: null as string | null,
         cmd: this,
-      }, [
+      },
+      [
         {
           title: `Cloning ${flags.url} into ${dest}...`,
           skip: () => flags.inplace,
@@ -93,7 +94,8 @@ class Init extends ThemeCommand {
             ctx.cmd.output.info(`\nDevelopment theme '${ctx.theme_id}' initiated!`);
           },
         },
-      ]);
+      ],
+    );
   }
 }
 

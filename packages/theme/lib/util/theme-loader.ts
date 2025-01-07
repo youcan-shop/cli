@@ -1,6 +1,6 @@
-import { Filesystem, Path } from '@youcan/cli-kit';
-import { THEME_CONFIG_FILENAME } from '@/constants';
 import type { Theme } from '@/types';
+import { THEME_CONFIG_FILENAME } from '@/constants';
+import { Filesystem, Path } from '@youcan/cli-kit';
 
 export async function load(): Promise<Theme> {
   const path = Path.resolve(Path.cwd(), THEME_CONFIG_FILENAME);

@@ -1,12 +1,13 @@
-import path from 'path';
 import type { Cli } from '@youcan/cli-kit';
+import path from 'node:path';
+import process from 'node:process';
 import { Filesystem, Git, Github, Path, String, System, Tasks } from '@youcan/cli-kit';
 
 interface InitServiceOptions {
-  name: string
-  directory: string
-  template?: string
-  packageManager: System.PackageManagerType
+  name: string;
+  directory: string;
+  template?: string;
+  packageManager: System.PackageManagerType;
 }
 
 async function initService(command: Cli.Command, options: InitServiceOptions) {

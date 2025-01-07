@@ -1,3 +1,4 @@
+import process from 'node:process';
 import envpaths from 'env-paths';
 
 const identifier = 'youcan-cli';
