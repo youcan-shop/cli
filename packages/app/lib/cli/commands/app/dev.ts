@@ -1,4 +1,4 @@
-import { Env, Http, Services, Path, Session, System, Tasks, UI, Filesystem } from '@youcan/cli-kit';
+import { Env, Filesystem, Http, Path, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import type { Worker } from '@youcan/cli-kit';
 import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { AppCommand } from '@/util/app-command';
@@ -59,8 +59,8 @@ class Dev extends AppCommand {
 
     this.app.network_config = {
       app_port: port,
-      app_url: `http://localhost:${port}`
-    }
+      app_url: `http://localhost:${port}`,
+    };
 
     const worker = await bootTunnelWorker(this, this.app, new Services.Cloudflared());
 
@@ -69,13 +69,13 @@ class Dev extends AppCommand {
       app_url: worker.getUrl(),
       redirect_urls: this.app.config.redirect_urls?.length > 0
         ? this.app.config.redirect_urls.map(r => new URL(new URL(r).pathname, worker.getUrl()).toString())
-        : [new URL('/auth/callback', worker.getUrl()).toString()]
-    }
+        : [new URL('/auth/callback', worker.getUrl()).toString()],
+    };
 
     await Filesystem.writeJsonFile(
       Path.join(this.app.root, APP_CONFIG_FILENAME),
-      this.app.config
-    )
+      this.app.config,
+    );
 
     return worker;
   }

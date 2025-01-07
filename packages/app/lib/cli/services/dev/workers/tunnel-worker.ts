@@ -37,12 +37,13 @@ export default class TunnelWorker extends Worker.Abstract {
         this.app.network_config!.app_url = this.url;
         this.logger.write(`tunneled url obtained: \`${url}\``);
       }
-      
-      await System.sleep(0.5)
+
+      attempts++;
+      await System.sleep(0.5);
     }
 
     if (!this.url) {
-      this.logger.write('could not establish a tunnel, using localhost instead')
+      this.logger.write('could not establish a tunnel, using localhost instead');
     }
   }
 
@@ -60,7 +61,7 @@ export default class TunnelWorker extends Worker.Abstract {
 
   public getUrl(): string {
     if (!this.url) {
-      throw new Error('app url not set')
+      throw new Error('app url not set');
     }
 
     return this.url;

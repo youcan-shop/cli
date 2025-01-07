@@ -31,7 +31,7 @@ function setupColorMode(): void {
 }
 
 function errorHandler(error: Error): never {
-  let suggestions: string[] = ['Run the command again'];
+  let suggestions: string[] = [];
   const message: string = error.message;
 
   if (error instanceof CommandError && error.suggestions) {

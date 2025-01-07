@@ -38,7 +38,7 @@ export default class Dev extends ThemeCommand {
       },
       {
         title: 'Syncing theme files, please wait...',
-        async task(ctx) {
+        async task() {
           for (const type of THEME_FILE_TYPES) {
             const descriptors = theme.metadata![type] as FileDescriptor[] ?? [];
             const directory = Path.resolve(theme.root, type);

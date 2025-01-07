@@ -118,10 +118,14 @@ export async function authenticate(command: Cli.Command): Promise<StoreSession> 
 
   const accessToken = await exchange(code, verifier);
 
-  const store = await Http.get<{ id: string; slug: string }>(
+  const store = await Http.get<{ id: string; slug: string; is_dev?: boolean }>(
     `${Env.apiHostname()}/me`,
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
+
+  if (!store.is_dev) {
+    throw new Error('The CLI can only be used with dev stores, you create one through YouCan Partners.');
+  }
 
   const session = {
     slug: store.slug,
