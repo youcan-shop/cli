@@ -198,7 +198,6 @@ export class Cloudflared {
   }
 
   public async tunnel(port: number, host = 'localhost') {
-    await this.install();
     const { bin, args } = this.composeTunnelingCommand(port, host);
 
     this.exec(bin, args);
