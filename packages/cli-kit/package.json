@@ -23,7 +23,7 @@
     "dev": "shx rm -rf dist && rollup --config rollup.config.js --watch",
     "release": "pnpm publish --access public",
     "type-check": "tsc --noEmit",
-    "postinstall": "node -e 'const fs = require('fs'); if (fs.existsSync('./dist/scripts/install-cloudflared.js')) require('./dist/scripts/install-cloudflared.js');'"
+    "postinstall": "node -e \"import('fs').then(fs => { if (fs.existsSync('./dist/scripts/install-cloudflared.js')) import('./dist/scripts/install-cloudflared.js'); });\""
   },
   "dependencies": {
     "@oclif/core": "^2.15.0",
