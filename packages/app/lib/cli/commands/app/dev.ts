@@ -55,7 +55,7 @@ class Dev extends AppCommand {
   }
 
   private async prepareNetworkOptions() {
-    const port = await System.getNextAvailablePort(3000);
+    const port = await System.getPortOrNextOrRandom(3000);
 
     this.app.network_config = {
       app_port: port,

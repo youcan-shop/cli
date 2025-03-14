@@ -36,6 +36,7 @@
     "find-process": "^1.4.7",
     "formdata-node": "^6.0.3",
     "fs-extra": "^11.1.1",
+    "get-port": "^7.1.0",
     "glob": "^11.0.0",
     "ink": "^5.1.0",
     "kill-port-process": "^3.2.0",
