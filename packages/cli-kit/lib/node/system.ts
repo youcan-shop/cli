@@ -4,6 +4,7 @@ import process from 'node:process';
 import { execa } from 'execa';
 import findProcess from 'find-process';
 
+import getPort, { portNumbers } from 'get-port';
 import tpu from 'tcp-port-used';
 
 export interface ExecOptions {
@@ -77,12 +78,8 @@ export async function isPortAvailable(port: number): Promise<boolean> {
   return !await tpu.check(port);
 }
 
-export async function getNextAvailablePort(port: number): Promise<number> {
-  if (await isPortAvailable(port)) {
-    return port;
-  }
-
-  return await getNextAvailablePort(port + 1);
+export async function getPortOrNextOrRandom(port: number): Promise<number> {
+  return await getPort({ port: portNumbers(port, port + 1000) });
 }
 
 export async function getPortProcessName(port: number): Promise<string> {
