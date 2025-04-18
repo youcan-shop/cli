@@ -7,22 +7,6 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
-signals.forEach((signal) => {
-  process.once(signal, async () => {
-    try {
-      await System.killPortProcess(3000);
-      setTimeout(() => {
-        console.log('Shutting down...');
-        process.exit(0);
-      }, 100);
-    }
-    catch (err) {
-      process.exit(0);
-    }
-  });
-});
-
 async function execCli(development: boolean): Promise<void> {
   await Cli.exec({
     moduleUrl: import.meta.url,
