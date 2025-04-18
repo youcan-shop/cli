@@ -1,4 +1,5 @@
-import type { Worker } from '@youcan/cli-kit';
+import type { Cli, Worker } from '@youcan/cli-kit';
+import process from 'node:process';
 import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { APP_CONFIG_FILENAME } from '@/constants';
 import { AppCommand } from '@/util/app-command';
@@ -12,6 +13,42 @@ interface Context {
 
 class Dev extends AppCommand {
   static description = 'Run the app in dev mode';
+  private workers: Worker.Interface[] = [];
+
+  constructor(argv: string[], config: any) {
+    super(argv, config);
+
+    this.setupExitHandlers();
+  }
+
+  private setupExitHandlers() {
+    const cleanupAndExit = () => {
+      try {
+        if (this.controller) {
+          this.controller.abort();
+        }
+        this.workers = [];
+
+        console.log('Shutting down...');
+        setTimeout(() => {
+          process.exit(0);
+        }, 100);
+      }
+      catch (error) {
+        process.exit(0);
+      }
+    };
+
+    process.once('SIGINT', cleanupAndExit);
+    process.once('SIGTERM', cleanupAndExit);
+    process.once('SIGQUIT', cleanupAndExit);
+
+    process.once('exit', () => {
+      if (this.controller) {
+        this.controller.abort();
+      }
+    });
+  }
 
   private readonly hotKeys = [
     {
@@ -22,7 +59,21 @@ class Dev extends AppCommand {
     {
       keyboardKey: 'q',
       description: 'quit',
-      handler: () => this.exit(0),
+      handler: () => {
+        try {
+          if (this.controller) {
+            this.controller.abort();
+          }
+          this.workers = [];
+          console.log('Shutting down...');
+          setTimeout(() => {
+            process.exit(0);
+          }, 100);
+        }
+        catch (error) {
+          process.exit(0);
+        }
+      },
     },
   ];
 
@@ -83,7 +134,6 @@ class Dev extends AppCommand {
   async reloadWorkers() {
     this.controller = new AbortController();
 
-    // Preserve network config.
     const networkConfig = this.app.network_config;
     this.app = await load();
     this.app.network_config = networkConfig;

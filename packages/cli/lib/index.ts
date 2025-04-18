@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import process from 'node:process';
-import { Cli } from '@youcan/cli-kit';
+import { Cli, System } from '@youcan/cli-kit';
 
 process.on('uncaughtException', (err) => {
   fs.writeSync(process.stderr.fd, `${err.stack}\n`);
@@ -9,8 +9,17 @@ process.on('uncaughtException', (err) => {
 
 const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
 signals.forEach((signal) => {
-  process.on(signal, () => {
-    process.exit(1);
+  process.once(signal, async () => {
+    try {
+      await System.killPortProcess(3000);
+      setTimeout(() => {
+        console.log('Shutting down...');
+        process.exit(0);
+      }, 100);
+    }
+    catch (err) {
+      process.exit(0);
+    }
   });
 });
 

@@ -49,10 +49,44 @@ export async function exec(command: string, args: string[], options?: ExecOption
 
   let aborted = false;
 
+  process.once('SIGINT', () => {
+    if (commandProcess.pid) {
+      try {
+        commandProcess.kill('SIGTERM');
+      }
+      catch (err) {
+      }
+    }
+  });
+
+  process.once('SIGTERM', () => {
+    if (commandProcess.pid) {
+      try {
+        commandProcess.kill('SIGTERM');
+      }
+      catch (err) {
+      }
+    }
+  });
+
   options?.signal?.addEventListener('abort', () => {
     const pid = commandProcess.pid;
     if (pid) {
       aborted = true;
+      try {
+        const killProcess = () => {
+          try {
+            commandProcess.kill('SIGKILL');
+          }
+          catch (err) {
+          }
+        };
+
+        commandProcess.kill('SIGTERM');
+        setTimeout(killProcess, 500);
+      }
+      catch (err) {
+      }
     }
   });
 
