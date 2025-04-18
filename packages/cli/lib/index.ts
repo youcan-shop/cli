@@ -7,13 +7,6 @@ process.on('uncaughtException', (err) => {
   process.exit(1);
 });
 
-const signals = ['SIGINT', 'SIGTERM', 'SIGQUIT'];
-signals.forEach((signal) => {
-  process.on(signal, () => {
-    process.exit(1);
-  });
-});
-
 async function execCli(development: boolean): Promise<void> {
   await Cli.exec({
     moduleUrl: import.meta.url,
