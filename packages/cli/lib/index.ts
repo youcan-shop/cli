@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import process from 'node:process';
-import { Cli, System } from '@youcan/cli-kit';
+import { Cli } from '@youcan/cli-kit';
 
 process.on('uncaughtException', (err) => {
   fs.writeSync(process.stderr.fd, `${err.stack}\n`);
