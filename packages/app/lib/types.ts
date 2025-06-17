@@ -97,3 +97,16 @@ export interface ExtensionFileDescriptor {
 export interface ExtensionMetadata {
   [key: string]: ExtensionFileDescriptor[];
 }
+
+export interface Organization {
+  id: string;
+  short_id: string;
+  owner_id: string;
+  business_name: string;
+  business_email: string;
+  business_website: string;
+  address: string;
+  country: string;
+  city: string;
+  postal_code: string;
+};

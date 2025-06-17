@@ -1,3 +1,4 @@
+import type { Organization } from '@/types';
 import type { Cli, Worker } from '@youcan/cli-kit';
 import process from 'node:process';
 import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
@@ -81,6 +82,12 @@ class Dev extends AppCommand {
     this.session = await Session.authenticate(this);
     this.app = await load();
 
+    let organizationId: string | null = null;
+
+    if (!this.app.config.id) {
+      organizationId = await this.selectOrganization();
+    }
+
     const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
       {
         title: 'Preparing network options...',
@@ -90,7 +97,7 @@ class Dev extends AppCommand {
       },
       {
         title: 'Syncing app configuration...',
-        task: async () => { await this.syncAppConfig(); },
+        task: async () => { await this.syncAppConfig(organizationId); },
       },
       {
         title: 'Preparing dev processes...',
@@ -188,6 +195,26 @@ class Dev extends AppCommand {
     const { url } = await Http.get<{ url: string }>(endpointUrl);
 
     System.open(url);
+  }
+
+  private async selectOrganization(): Promise<string> {
+    const organizations = await Http.get<Organization[]>(`${Env.apiHostname()}/organizations`, {
+      headers: { Authorization: `Bearer ${this.session.access_token}` },
+    });
+
+    this.log('');
+
+    const response: { organization: string } = await this.prompt.prompt([
+      {
+        type: 'select',
+        name: 'organization',
+        message: 'Which organization do you want to create the app in?',
+        choices: organizations
+          .map(organization => ({ title: organization.business_name, value: organization.short_id })),
+      },
+    ]);
+
+    return response.organization;
   }
 }
 
