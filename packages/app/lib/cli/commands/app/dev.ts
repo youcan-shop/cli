@@ -198,7 +198,7 @@ class Dev extends AppCommand {
   }
 
   private async selectOrganization(): Promise<string> {
-    const organizations = await Http.get<Organization[]>(`${Env.apiHostname()}/organizations`, {
+    const organizations = await Http.get<Organization[]>(`${Env.apiHostname()}/partners-organizations`, {
       headers: { Authorization: `Bearer ${this.session.access_token}` },
     });
 
