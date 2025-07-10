@@ -197,11 +197,11 @@ export class Cloudflared {
     this.system = { platform, arch };
   }
 
-  public async tunnel(port: number, host = 'localhost') {
+  public async tunnel(port: number, host = 'localhost', signal?: AbortSignal) {
     await this.install();
     const { bin, args } = this.composeTunnelingCommand(port, host);
 
-    this.exec(bin, args);
+    this.exec(bin, args, 3, signal);
   }
 
   private async install() {
@@ -220,7 +220,7 @@ export class Cloudflared {
     };
   }
 
-  private async exec(bin: string, args: string[], maxRetries = 3) {
+  private async exec(bin: string, args: string[], maxRetries = 3, signal?: AbortSignal) {
     if (this.getUrl()) {
       return;
     }
@@ -233,8 +233,9 @@ export class Cloudflared {
     await System.exec(bin, args, {
       // Weird choice of cloudflared to write to stderr.
       stderr: this.output,
+      signal,
       errorHandler: async () => {
-        await this.exec(bin, args, maxRetries - 1);
+        await this.exec(bin, args, maxRetries - 1, signal);
       },
     });
   }
