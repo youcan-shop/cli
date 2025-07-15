@@ -6,6 +6,7 @@ import { UI } from '..';
 export interface Interface {
   run: () => Promise<void>;
   boot: () => Promise<void>;
+  cleanup: () => Promise<void>;
 }
 
 export class Logger extends Writable {
@@ -40,4 +41,8 @@ export class Logger extends Writable {
 export abstract class Abstract implements Interface {
   public abstract run(): Promise<void>;
   public abstract boot(): Promise<void>;
+
+  public async cleanup(): Promise<void> {
+
+  }
 }

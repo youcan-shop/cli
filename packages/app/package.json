@@ -17,6 +17,8 @@
   "scripts": {
     "build": "shx rm -rf dist && tsc --noEmit && rollup --config rollup.config.js",
     "dev": "shx rm -rf dist && rollup --config rollup.config.js --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "release": "pnpm publish --access public",
     "type-check": "tsc --noEmit"
   },

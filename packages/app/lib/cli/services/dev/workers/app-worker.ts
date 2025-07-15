@@ -5,6 +5,7 @@ import { Filesystem, Path, Worker } from '@youcan/cli-kit';
 
 export default class AppWorker extends Worker.Abstract {
   private logger: Worker.Logger;
+  private watcher?: ReturnType<typeof Filesystem.watch>;
 
   constructor(
     private command: DevCommand,
@@ -21,7 +22,7 @@ export default class AppWorker extends Worker.Abstract {
     await this.command.output.wait(500);
     this.logger.write('watching for config updates...');
 
-    const watcher = Filesystem.watch(Path.resolve(this.app.root, APP_CONFIG_FILENAME), {
+    this.watcher = Filesystem.watch(Path.resolve(this.app.root, APP_CONFIG_FILENAME), {
       persistent: true,
       ignoreInitial: true,
       awaitWriteFinish: {
@@ -29,12 +30,21 @@ export default class AppWorker extends Worker.Abstract {
       },
     });
 
-    watcher.once('change', async () => {
-      await watcher.close();
+    this.watcher.once('change', async () => {
+      await this.watcher?.close();
       this.logger.write('config update detected, reloading workers...');
       this.command.controller.abort();
 
       this.command.reloadWorkers();
     });
+  }
+
+  public async cleanup(): Promise<void> {
+    this.logger.write('stopping config watcher...');
+
+    if (this.watcher) {
+      await this.watcher.close();
+      this.watcher = undefined;
+    }
   }
 }

@@ -79,7 +79,7 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
     code_challenge_method: 'S256',
   };
 
-  await command.output.anykey('Press any key to open the login page on your browser..');
+  await command.output.anykey('Press any key to open the login page on your browser');
 
   const url = `http://${AUTHORIZATION_URL}/admin/oauth/authorize?${new URLSearchParams(params).toString()}`;
 

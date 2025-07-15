@@ -22,14 +22,19 @@ class Dev extends AppCommand {
   }
 
   private setupExitHandlers() {
-    const cleanupAndExit = () => {
+    const cleanupAndExit = async () => {
       try {
+        console.log('Shutting down...');
+
+        if (this.workers.length > 0) {
+          await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
+        }
+
         if (this.controller) {
           this.controller.abort();
         }
         this.workers = [];
 
-        console.log('Shutting down...');
         setTimeout(() => {
           process.exit(0);
         }, 100);
@@ -43,7 +48,10 @@ class Dev extends AppCommand {
     process.once('SIGTERM', cleanupAndExit);
     process.once('SIGQUIT', cleanupAndExit);
 
-    process.once('exit', () => {
+    process.once('exit', async () => {
+      if (this.workers.length > 0) {
+        await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
+      }
       if (this.controller) {
         this.controller.abort();
       }
@@ -59,13 +67,19 @@ class Dev extends AppCommand {
     {
       keyboardKey: 'q',
       description: 'quit',
-      handler: () => {
+      handler: async () => {
         try {
+          console.log('Shutting down...');
+
+          if (this.workers.length > 0) {
+            await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
+          }
+
           if (this.controller) {
             this.controller.abort();
           }
           this.workers = [];
-          console.log('Shutting down...');
+
           setTimeout(() => {
             process.exit(0);
           }, 100);
@@ -134,6 +148,11 @@ class Dev extends AppCommand {
   async reloadWorkers() {
     this.controller = new AbortController();
 
+    if (this.workers.length > 0) {
+      await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
+      this.workers = [];
+    }
+
     const networkConfig = this.app.network_config;
     this.app = await load();
     this.app.network_config = networkConfig;
@@ -144,6 +163,8 @@ class Dev extends AppCommand {
   }
 
   private async runWorkers(workers: Worker.Interface[]): Promise<void> {
+    this.workers = workers;
+
     await Promise.all(workers.map(worker => worker.run())).catch((_) => { });
   }
 

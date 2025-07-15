@@ -25,7 +25,7 @@ export default class TunnelWorker extends Worker.Abstract {
 
     this.logger.write('start tunneling the app');
 
-    await this.tunnelService.tunnel(this.app.network_config.app_port);
+    await this.tunnelService.tunnel(this.app.network_config.app_port, 'localhost', this.command.controller.signal);
 
     let attempts = 0;
 
@@ -49,6 +49,11 @@ export default class TunnelWorker extends Worker.Abstract {
 
   public async run(): Promise<void> {
     setInterval(() => this.checkForError, 500);
+  }
+
+  public async cleanup(): Promise<void> {
+    this.logger.write('stopping tunnel...');
+    // The abort signal passed to cloudflared will handle process termination
   }
 
   private checkForError() {
