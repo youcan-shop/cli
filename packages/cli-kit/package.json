@@ -1,7 +1,7 @@
 {
   "name": "@youcan/cli-kit",
   "type": "module",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "description": "Utilities for the YouCan CLI",
   "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
   "license": "MIT",
