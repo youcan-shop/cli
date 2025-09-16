@@ -1,7 +1,7 @@
 {
   "name": "@youcan/theme",
   "type": "module",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "OCLIF plugin for building themes",
   "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
   "license": "MIT",
