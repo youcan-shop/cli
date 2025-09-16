@@ -152,6 +152,10 @@ export async function stat(path: string): Promise<Stats> {
   return await FilesystemPromises.stat(path);
 }
 
+export async function chmod(path: string, mode: number): Promise<void> {
+  return await FilesystemPromises.chmod(path, mode);
+}
+
 export const watch = chokidar.watch;
 
 export async function decompressGzip(file: string, destination: string, mode = 0o755) {

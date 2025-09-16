@@ -91,6 +91,7 @@ async function installForLinux(url: string, destination: string): Promise<void> 
   const parentDir = Path.dirname(destination);
   await Filesystem.mkdir(parentDir);
   await downloadFromRelease(url, destination);
+  await Filesystem.chmod(destination, 0o755);
 }
 
 async function installForWindows(url: string, destination: string): Promise<void> {
@@ -173,6 +174,10 @@ class OutputStream extends Writable {
   public clearBuffer() {
     this.buffer = '';
   }
+
+  public getBuffer(): string {
+    return this.buffer;
+  }
 }
 
 export class Cloudflared {
@@ -211,6 +216,10 @@ export class Cloudflared {
 
     const downloadUrl = composeDownloadUrl(this.system.platform, this.system.arch);
     await install(this.system.platform, downloadUrl, this.bin);
+
+    if (!(await Filesystem.isExecutable(this.bin))) {
+      throw new Error(`Failed to install executable cloudflared binary at ${this.bin}. Check file permissions and platform compatibility.`);
+    }
   }
 
   private composeTunnelingCommand(port: number, host = 'localhost') {
@@ -226,7 +235,11 @@ export class Cloudflared {
     }
 
     if (maxRetries === 0) {
-      throw new Error(this.output.extractError() ?? 'cloudflared failed for unknown reason');
+      const extractedError = this.output.extractError();
+      const errorMessage = extractedError
+        ? `cloudflared failed: ${extractedError}`
+        : `cloudflared failed for unknown reason. Binary: ${bin}, Args: ${args.join(' ')}, Buffer: ${this.output.getBuffer()}`;
+      throw new Error(errorMessage);
     }
 
     this.output.clearBuffer();
@@ -234,7 +247,8 @@ export class Cloudflared {
       // Weird choice of cloudflared to write to stderr.
       stderr: this.output,
       signal,
-      errorHandler: async () => {
+      errorHandler: async (error: unknown) => {
+        console.error(`cloudflared execution error (retries left: ${maxRetries - 1}):`, error);
         await this.exec(bin, args, maxRetries - 1, signal);
       },
     });
