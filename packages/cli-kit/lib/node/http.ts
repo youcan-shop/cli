@@ -1,18 +1,17 @@
 import type { RequestInit } from 'node-fetch';
+import https from 'node:https';
+import process from 'node:process';
 import { isJson } from '@/common/string';
 import fetch from 'node-fetch';
 import { is, mergeDeepLeft } from 'ramda';
-import { Session } from '..';
-import * as Env from './env';
-
-export function scheme(): 'http' | 'https' {
-  return Env.get('HOST_ENV') === 'dev' ? 'http' : 'https';
-}
+import { Env, Session } from '..';
 
 async function agent() {
-  const { Agent } = await import(scheme());
+  if (Env.get('HOST_ENV') === 'dev') {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  }
 
-  return new Agent({ keepAlive: true, keepAliveMsecs: 5 * 60 * 1000 });
+  return new https.Agent({ keepAlive: true, keepAliveMsecs: 5 * 60 * 1000 });
 }
 
 async function defaults() {
@@ -42,9 +41,9 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 }
 
 export async function get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  return request<T>(`${scheme()}://${endpoint}`, { ...options, method: 'GET' });
+  return request<T>(`https://${endpoint}`, { ...options, method: 'GET' });
 }
 
 export async function post<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  return request<T>(`${scheme()}://${endpoint}`, { ...options, method: 'POST' });
+  return request<T>(`https://${endpoint}`, { ...options, method: 'POST' });
 }

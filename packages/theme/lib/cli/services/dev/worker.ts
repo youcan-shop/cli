@@ -1,7 +1,7 @@
 import type { Store, Theme } from '@/types';
 import type { ThemeCommand } from '@/util/theme-command';
 import { THEME_FILE_TYPES } from '@/constants';
-import { Filesystem, Http, Path, System, Worker } from '@youcan/cli-kit';
+import { Filesystem, Path, System, Worker } from '@youcan/cli-kit';
 import debounce from 'debounce';
 import { Server } from 'socket.io';
 import { execute } from './execute';
@@ -28,7 +28,7 @@ export default class ThemeWorker extends Worker.Abstract {
     try {
       this.io = new Server(7565, {
         cors: {
-          origin: `${Http.scheme()}://${this.store.domain}`,
+          origin: `https://${this.store.domain}`,
           methods: ['GET', 'POST'],
         },
       });
@@ -37,7 +37,7 @@ export default class ThemeWorker extends Worker.Abstract {
         this.previewLogger.write(`attached to preview page at ${socket.handshake.address}`);
       });
 
-      System.open(`${Http.scheme()}://${this.store.domain}/themes/${this.theme.theme_id}/preview`);
+      System.open(`https://${this.store.domain}/themes/${this.theme.theme_id}/preview`);
     }
     catch (err) {
       this.command.error(err as Error);
