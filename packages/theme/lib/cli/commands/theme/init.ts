@@ -4,7 +4,6 @@ import { ThemeCommand } from '@/util/theme-command';
 import { Args, Flags } from '@oclif/core';
 import { Cli, Env, Filesystem, Form, Git, Http, Path, Session, Tasks } from '@youcan/cli-kit';
 
-console.log(`${Env.apiHostname()}/themes/init`);
 class Init extends ThemeCommand {
   static description = 'Clones a theme template git repo';
 
