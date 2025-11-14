@@ -15,6 +15,7 @@ export interface Metadata {
   theme_version: string;
   theme_support_url: string;
   theme_documentation_url: string;
+  theme_tutorial_url: string;
   config: FileDescriptor[];
   layouts: FileDescriptor[];
   sections: FileDescriptor[];

@@ -4,6 +4,7 @@ import { ThemeCommand } from '@/util/theme-command';
 import { Args, Flags } from '@oclif/core';
 import { Cli, Env, Filesystem, Form, Git, Http, Path, Session, Tasks } from '@youcan/cli-kit';
 
+console.log(`${Env.apiHostname()}/themes/init`);
 class Init extends ThemeCommand {
   static description = 'Clones a theme template git repo';
 
@@ -141,6 +142,12 @@ async function prompt(command: ThemeCommand) {
       name: 'theme_documentation_url',
       message: 'A documentation URL for this theme.',
       initial: 'https://developer.youcan.shop',
+    },
+    {
+      type: 'text',
+      name: 'theme_tutorial_url',
+      message: 'A video tutorial URL for this theme.',
+      initial: 'https://www.youtube.com/@Youcandotshop',
     },
   ]);
 }
