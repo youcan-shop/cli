@@ -142,6 +142,12 @@ async function prompt(command: ThemeCommand) {
       message: 'A documentation URL for this theme.',
       initial: 'https://developer.youcan.shop',
     },
+    {
+      type: 'text',
+      name: 'theme_tutorial_url',
+      message: 'A video tutorial URL for this theme.',
+      initial: 'https://www.youtube.com/@Youcandotshop',
+    },
   ]);
 }
 
