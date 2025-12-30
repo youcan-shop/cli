@@ -28,7 +28,7 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
 
     await Tasks.run({}, [
       {
-        title: 'Closing app template...',
+        title: 'Cloning template...',
         skip: () => repo == null,
         task: async () => {
           const url = repo!.branch
