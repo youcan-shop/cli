@@ -5,6 +5,10 @@
   "description": "Utilities for the YouCan CLI",
   "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/youcan-shop/cli"
+  },
   "keywords": [
     "youcan",
     "youcan-cli",
