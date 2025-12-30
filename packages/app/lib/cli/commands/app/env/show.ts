@@ -1,6 +1,7 @@
+import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { Color, Session, Tasks } from '@youcan/cli-kit';
+import { Color, Env, Session, Tasks } from '@youcan/cli-kit';
 
 class EnvShow extends AppCommand {
   static description = 'Display app environment variables';
@@ -20,14 +21,12 @@ class EnvShow extends AppCommand {
   }
 
   private async printEnvironmentVariables() {
-    if (!this.app.remote_config) {
-      throw new Error('remote app config not loaded');
-    }
+    const envVars = getAppEnvironmentVariables(this.app);
 
     this.log();
-    this.log(`${Color.yellow('YOUCAN_API_KEY')}=%s`, this.app.remote_config.client_id);
-    this.log(`${Color.yellow('YOUCAN_API_SECRET')}=%s`, this.app.remote_config.client_secret);
-    this.log(`${Color.yellow('YOUCAN_API_SCOPES')}=%s`, this.app.remote_config.scopes.join(','));
+    for (const [key, value] of Object.entries(envVars)) {
+      this.log(`${Color.yellow(key)}=${value}`);
+    }
   }
 }
 

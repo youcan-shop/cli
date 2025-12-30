@@ -1,6 +1,7 @@
 import type { Cli, Worker } from '@youcan/cli-kit';
 import process from 'node:process';
 import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
+import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
 import { APP_CONFIG_FILENAME } from '@/constants';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
@@ -196,9 +197,7 @@ class Dev extends AppCommand {
     }
 
     return {
-      YOUCAN_API_KEY: this.app.remote_config.client_id,
-      YOUCAN_API_SECRET: this.app.remote_config.client_secret,
-      YOUCAN_API_SCOPES: this.app.remote_config.scopes.join(','),
+      ...getAppEnvironmentVariables(this.app),
       APP_URL: this.app.network_config.app_url,
       PORT: this.app.network_config.app_port.toString(),
     };

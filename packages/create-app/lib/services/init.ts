@@ -45,10 +45,16 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
       {
         title: 'Configuring app...',
         task: async () => {
-          await Filesystem.writeJsonFile(
-            Path.join(templateDownloadDirectory, 'youcan.app.json'),
-            { name: slug },
-          );
+          const configPath = Path.join(templateDownloadDirectory, 'youcan.app.json');
+          const configExists = await Filesystem.exists(configPath);
+
+          if (configExists) {
+            const existingConfig = await Filesystem.readJsonFile(configPath);
+            await Filesystem.writeJsonFile(configPath, { ...existingConfig, name: slug });
+          }
+          else {
+            await Filesystem.writeJsonFile(configPath, { name: slug });
+          }
         },
       },
       {
