@@ -10,7 +10,8 @@
     "lint": "eslint --fix packages/**/*.{ts,js,json}",
     "test": "pnpm -r test",
     "test:watch": "pnpm -r test:watch",
-    "release": "pnpm build && bumpp packages/*/package.json --commit \"release: v\" --push --tag && pnpm -r release"
+    "bump": "bumpp package.json packages/*/package.json --commit \"release: v\" --push --tag",
+    "release": "pnpm bump"
   },
   "workspaces": {
     "packages": [
