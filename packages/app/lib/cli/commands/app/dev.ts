@@ -199,6 +199,8 @@ class Dev extends AppCommand {
       YOUCAN_API_KEY: this.app.remote_config.client_id,
       YOUCAN_API_SECRET: this.app.remote_config.client_secret,
       YOUCAN_API_SCOPES: this.app.remote_config.scopes.join(','),
+      YOUCAN_API_URL: `https://${Env.apiHostname()}`,
+      YOUCAN_SELLER_AREA_URL: `https://${Env.sellerAreaHostname()}`,
       APP_URL: this.app.network_config.app_url,
       PORT: this.app.network_config.app_port.toString(),
     };
