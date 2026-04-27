@@ -1,11 +1,10 @@
-import type { Cli, Worker } from '@youcan/cli-kit';
+import type { Worker } from '@youcan/cli-kit';
 import process from 'node:process';
-import { bootAppWorker, bootExtensionWorker, bootTunnelWorker, bootWebWorker } from '@/cli/services/dev/workers';
-import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
-import { APP_CONFIG_FILENAME } from '@/constants';
+import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { Env, Filesystem, Http, Path, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
+import { Flags } from '@oclif/core';
+import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 
 interface Context {
   cmd: Dev;
@@ -14,7 +13,17 @@ interface Context {
 
 class Dev extends AppCommand {
   static description = 'Run the app in dev mode';
+
+  static flags = {
+    'no-tunnel': Flags.boolean({
+      description: 'Skip cloudflared tunnel and use localhost URL directly',
+      default: false,
+    }),
+  };
+
   private workers: Worker.Interface[] = [];
+  private hasWebWorker = false;
+  private useTunnel = false;
 
   constructor(argv: string[], config: any) {
     super(argv, config);
@@ -59,91 +68,78 @@ class Dev extends AppCommand {
     });
   }
 
-  private readonly hotKeys = [
-    {
-      keyboardKey: 'p',
-      description: 'preview in your dev store',
-      handler: async () => this.openAppPreview(),
-    },
-    {
-      keyboardKey: 'q',
-      description: 'quit',
-      handler: async () => {
-        try {
-          console.log('Shutting down...');
-
-          if (this.workers.length > 0) {
-            await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
-          }
-
-          if (this.controller) {
-            this.controller.abort();
-          }
-          this.workers = [];
-
-          setTimeout(() => {
-            process.exit(0);
-          }, 100);
-        }
-        catch (error) {
-          process.exit(0);
-        }
+  private get hotKeys() {
+    return [
+      {
+        keyboardKey: 'p',
+        description: this.hasWebWorker ? 'preview in your dev store' : 'open theme editor',
+        handler: async () => this.openAppPreview(),
       },
-    },
-  ];
+      {
+        keyboardKey: 'q',
+        description: 'quit',
+        handler: async () => {
+          try {
+            console.log('Shutting down...');
+
+            if (this.workers.length > 0) {
+              await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
+            }
+
+            if (this.controller) {
+              this.controller.abort();
+            }
+            this.workers = [];
+
+            setTimeout(() => {
+              process.exit(0);
+            }, 100);
+          }
+          catch (error) {
+            process.exit(0);
+          }
+        },
+      },
+    ];
+  }
 
   async run(): Promise<any> {
+    const { flags } = await this.parse(Dev);
     this.session = await Session.authenticate(this);
     this.app = await load();
 
-    const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, [
-      {
-        title: 'Preparing network options...',
-        task: async (ctx) => {
-          ctx.workers.push(await this.prepareNetworkOptions());
+    this.hasWebWorker = this.app.webs.length > 0;
+    this.useTunnel = this.hasWebWorker && !flags['no-tunnel'];
+
+    const tasks = [];
+
+    if (this.hasWebWorker) {
+      tasks.push({
+        title: this.useTunnel ? 'Preparing network options...' : 'Preparing network options (localhost)...',
+        task: async (ctx: Context) => {
+          ctx.workers.push(...await this.bootWebWorkers());
         },
-      },
+      });
+    }
+
+    tasks.push(
       {
         title: 'Syncing app configuration...',
         task: async () => { await this.syncAppConfig(); },
       },
       {
         title: 'Preparing dev processes...',
-        task: async (ctx) => {
+        task: async (ctx: Context) => {
           ctx.workers.push(...await this.prepareDevProcesses());
         },
       },
-    ]);
+    );
+
+    const { workers } = await Tasks.run<Context>({ cmd: this, workers: [] }, tasks);
 
     UI.renderDevOutput({ hotKeys: this.hotKeys, cmd: this });
 
     this.runWorkers(workers);
-  }
-
-  private async prepareNetworkOptions() {
-    const port = await System.getPortOrNextOrRandom(3000);
-
-    this.app.network_config = {
-      app_port: port,
-      app_url: `http://localhost:${port}`,
-    };
-
-    const worker = await bootTunnelWorker(this, this.app, new Services.Cloudflared());
-
-    this.app.config = {
-      ...this.app.config,
-      app_url: worker.getUrl(),
-      redirect_urls: this.app.config.redirect_urls?.length > 0
-        ? this.app.config.redirect_urls.map(r => new URL(new URL(r).pathname, worker.getUrl()).toString())
-        : [new URL('/auth/callback', worker.getUrl()).toString()],
-    };
-
-    await Filesystem.writeJsonFile(
-      Path.join(this.app.root, APP_CONFIG_FILENAME),
-      this.app.config,
-    );
-
-    return worker;
   }
 
   async reloadWorkers() {
@@ -154,13 +150,23 @@ class Dev extends AppCommand {
       this.workers = [];
     }
 
-    const networkConfig = this.app.network_config;
     this.app = await load();
-    this.app.network_config = networkConfig;
+
+    const webWorkers = this.hasWebWorker ? await this.bootWebWorkers() : [];
 
     await this.syncAppConfig();
 
-    await this.runWorkers(await this.prepareDevProcesses());
+    const devWorkers = await this.prepareDevProcesses();
+
+    await this.runWorkers([...webWorkers, ...devWorkers]);
+  }
+
+  private async bootWebWorkers(): Promise<Worker.Interface[]> {
+    return Promise.all(
+      this.app.webs.map(web =>
+        bootWebWorker(this, this.app, web, this.useTunnel ? new Services.Cloudflared() : undefined),
+      ),
+    );
   }
 
   private async runWorkers(workers: Worker.Interface[]): Promise<void> {
@@ -174,36 +180,17 @@ class Dev extends AppCommand {
       bootAppWorker(this, this.app),
     ];
 
-    this.app.webs.forEach(web => promises.unshift(
-      bootWebWorker(
-        this,
-        this.app,
-        web,
-        this.buildEnvironmentVariables(),
-      ),
-    ));
-
     this.app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(this, this.app, ext)));
 
     return Promise.all(promises);
   }
 
-  private buildEnvironmentVariables(): Record<string, string> {
-    if (!this.app.remote_config) {
-      throw new Error('remote app config not loaded');
-    }
-    if (!this.app.network_config) {
-      throw new Error('app network config is not set');
-    }
-
-    return {
-      ...getAppEnvironmentVariables(this.app),
-      APP_URL: this.app.network_config.app_url,
-      PORT: this.app.network_config.app_port.toString(),
-    };
-  }
-
   private async openAppPreview() {
+    if (!this.hasWebWorker) {
+      System.open(`https://${Env.sellerAreaHostname()}/admin/themes`);
+      return;
+    }
+
     const endpointUrl = `${Env.apiHostname()}/apps/${this.app.config.id}/authorization-url`;
     const { url } = await Http.get<{ url: string }>(endpointUrl);
 
