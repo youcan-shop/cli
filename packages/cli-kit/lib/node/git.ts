@@ -1,4 +1,5 @@
 import type { SimpleGit, TaskOptions } from 'simple-git';
+import process from 'node:process';
 import git from 'simple-git';
 import * as System from './system';
 
