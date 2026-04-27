@@ -4,7 +4,6 @@ import type { AppCommand } from '@/util/app-command';
 import type { Cli, Services, Worker } from '@youcan/cli-kit';
 import AppWorker from './app-worker';
 import ThemeExtensionWorker from './theme-extension-worker';
-import TunnelWorker from './tunnel-worker';
 import WebWorker from './web-worker';
 
 export interface ExtensionWorkerCtor {
@@ -32,16 +31,8 @@ export async function bootExtensionWorker(command: Cli.Command, app: App, extens
   return worker;
 }
 
-export async function bootWebWorker(command: Cli.Command, app: App, web: Web, env: Record<string, string>) {
-  const worker = new WebWorker(command, app, web, env);
-
-  await worker.boot();
-
-  return worker;
-}
-
-export async function bootTunnelWorker(command: AppCommand, app: App, tunnel: Services.Cloudflared) {
-  const worker = new TunnelWorker(command, app, tunnel);
+export async function bootWebWorker(command: AppCommand, app: App, web: Web, tunnelService?: Services.Cloudflared) {
+  const worker = new WebWorker(command, app, web, tunnelService);
 
   await worker.boot();
 

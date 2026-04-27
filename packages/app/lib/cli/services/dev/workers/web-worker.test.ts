@@ -9,6 +9,14 @@ vi.mock('@youcan/cli-kit', () => ({
     exec: vi.fn(),
     isPortAvailable: vi.fn(),
     killPortProcess: vi.fn(),
+    getPortOrNextOrRandom: vi.fn().mockResolvedValue(3001),
+    sleep: vi.fn().mockResolvedValue(undefined),
+  },
+  Filesystem: {
+    writeJsonFile: vi.fn().mockResolvedValue(undefined),
+  },
+  Path: {
+    join: vi.fn((...args: string[]) => args.join('/')),
   },
   Worker: {
     Logger: class MockLogger {
@@ -21,12 +29,21 @@ vi.mock('@youcan/cli-kit', () => ({
   },
 }));
 
+vi.mock('@/cli/services/environment-variables', () => ({
+  getAppEnvironmentVariables: vi.fn().mockReturnValue({
+    YOUCAN_API_KEY: 'test-key',
+    YOUCAN_API_SECRET: 'test-secret',
+    YOUCAN_API_SCOPES: 'read',
+    YOUCAN_API_URL: 'https://api.youcan.shop',
+    YOUCAN_SELLER_AREA_URL: 'https://seller-area.youcan.shop',
+  }),
+}));
+
 describe('webWorker', () => {
   let webWorker: WebWorker;
   let mockCommand: Cli.Command;
   let mockApp: App;
   let mockWeb: Web;
-  let mockEnv: Record<string, string>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -37,7 +54,32 @@ describe('webWorker', () => {
       },
     } as any;
 
-    mockApp = {} as App;
+    mockApp = {
+      root: '/test/app',
+      config: {
+        id: 'test-app',
+        name: 'Test App',
+        app_url: 'http://localhost:3001',
+        redirect_urls: [],
+        oauth: { client_id: 'id', scopes: [] },
+      },
+      webs: [],
+      extensions: [],
+      network_config: {
+        app_port: 3001,
+        app_url: 'http://localhost:3001',
+      },
+      remote_config: {
+        id: 'test-app',
+        name: 'Test App',
+        app_url: 'http://localhost:3001',
+        owner_id: '1',
+        client_id: 'test-key',
+        client_secret: 'test-secret',
+        redirect_urls: [],
+        scopes: ['read'],
+      },
+    } as App;
 
     mockWeb = {
       config: {
@@ -48,12 +90,7 @@ describe('webWorker', () => {
       },
     } as Web;
 
-    mockEnv = {
-      PORT: '3001',
-      NODE_ENV: 'development',
-    };
-
-    webWorker = new WebWorker(mockCommand, mockApp, mockWeb, mockEnv);
+    webWorker = new WebWorker(mockCommand, mockApp, mockWeb);
   });
 
   describe('cleanup', () => {
@@ -76,15 +113,11 @@ describe('webWorker', () => {
       expect(System.killPortProcess).not.toHaveBeenCalled();
     });
 
-    it('should handle missing PORT environment variable gracefully', async () => {
-      const webWorkerWithoutPort = new WebWorker(
-        mockCommand,
-        mockApp,
-        mockWeb,
-        { NODE_ENV: 'development' },
-      );
+    it('should handle missing network_config gracefully', async () => {
+      const appWithoutNetwork = { ...mockApp, network_config: undefined };
+      const workerWithoutNetwork = new WebWorker(mockCommand, appWithoutNetwork as App, mockWeb);
 
-      await expect(webWorkerWithoutPort.cleanup()).resolves.toBeUndefined();
+      await expect(workerWithoutNetwork.cleanup()).resolves.toBeUndefined();
       expect(System.isPortAvailable).not.toHaveBeenCalled();
       expect(System.killPortProcess).not.toHaveBeenCalled();
     });
@@ -110,7 +143,7 @@ describe('webWorker', () => {
   });
 
   describe('run', () => {
-    it('should execute the web command with correct parameters', async () => {
+    it('should execute the web command with env computed from app', async () => {
       vi.mocked(System.exec).mockResolvedValue();
 
       await webWorker.run();
@@ -119,7 +152,11 @@ describe('webWorker', () => {
         stdout: expect.any(Object),
         signal: mockCommand.controller.signal,
         stderr: expect.any(Object),
-        env: mockEnv,
+        env: expect.objectContaining({
+          APP_URL: 'http://localhost:3001',
+          PORT: '3001',
+          YOUCAN_API_KEY: 'test-key',
+        }),
       });
     });
   });
