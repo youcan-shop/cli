@@ -39,17 +39,17 @@
     "relink": "pnpm link --global"
   },
   "dependencies": {
-    "@oclif/core": "^2.15.0",
-    "@oclif/plugin-commands": "^2.2.26",
-    "@oclif/plugin-help": "^5.2.19",
-    "@oclif/plugin-plugins": "^3.8.2",
+    "@oclif/core": "^2.16.0",
+    "@oclif/plugin-commands": "^2.2.28",
+    "@oclif/plugin-help": "^5.2.20",
+    "@oclif/plugin-plugins": "^3.10.1",
     "@youcan/app": "workspace:*",
     "@youcan/cli-kit": "workspace:*",
     "@youcan/theme": "workspace:*"
   },
   "devDependencies": {
-    "@oclif/plugin-legacy": "^1.3.0",
-    "@types/node": "^18.18.0",
+    "@oclif/plugin-legacy": "^1.3.6",
+    "@types/node": "^18.19.130",
     "shx": "^0.3.4"
   },
   "oclif": {
