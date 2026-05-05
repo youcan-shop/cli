@@ -1,13 +1,17 @@
 {
   "name": "@youcan/create-app",
   "type": "module",
-  "version": "2.6.4",
+  "version": "2.6.5",
   "description": "A CLI for creating YouCan Shop apps",
   "author": "YouCan <contact@youcan.shop> (https://youcan.shop)",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/youcan-shop/cli"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "keywords": [
     "youcan",

@@ -33,10 +33,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - run: npm i -g npm@10
-      - run: |
-          pnpm --filter @youcan/cli-kit --no-git-checks publish --access public --provenance
-          pnpm --filter @youcan/app --no-git-checks publish --access public --provenance
-          pnpm --filter @youcan/theme --no-git-checks publish --access public --provenance
-          pnpm --filter @youcan/create-app --no-git-checks publish --access public --provenance
-          pnpm --filter @youcan/cli --no-git-checks publish --access public --provenance
+      - run: npm i -g npm@latest
+      - run: pnpm -r --dir packages --workspace-concurrency=1 --no-git-checks publish
