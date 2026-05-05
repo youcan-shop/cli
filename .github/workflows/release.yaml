@@ -33,4 +33,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
+      - run: npm i -g npm@10
       - run: pnpm -r --dir packages --no-git-checks publish --access public --provenance
