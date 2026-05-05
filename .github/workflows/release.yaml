@@ -33,4 +33,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - run: pnpm -r --dir packages --workspace-concurrency=1 --no-git-checks publish
+      - run: pnpm -r --dir packages --no-git-checks publish
