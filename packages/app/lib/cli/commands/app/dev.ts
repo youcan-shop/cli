@@ -76,6 +76,11 @@ class Dev extends AppCommand {
         handler: async () => this.openAppPreview(),
       },
       {
+        keyboardKey: 'i',
+        description: 'install app',
+        handler: async () => this.openAppPreview(),
+      },
+      {
         keyboardKey: 'q',
         description: 'quit',
         handler: async () => {
