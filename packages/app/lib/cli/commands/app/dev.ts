@@ -1,10 +1,10 @@
 import type { Worker } from '@youcan/cli-kit';
 import process from 'node:process';
+import { Flags } from '@oclif/core';
+import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { Flags } from '@oclif/core';
-import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 
 interface Context {
   cmd: Dev;
@@ -73,12 +73,12 @@ class Dev extends AppCommand {
       {
         keyboardKey: 'p',
         description: this.hasWebWorker ? 'preview in your dev store' : 'open theme editor',
-        handler: async () => this.openAppPreview(),
+        handler: async () => this.openPreview(),
       },
       {
         keyboardKey: 'i',
         description: 'install app',
-        handler: async () => this.openAppPreview(),
+        handler: async () => this.openInstall(),
       },
       {
         keyboardKey: 'q',
@@ -190,12 +190,16 @@ class Dev extends AppCommand {
     return Promise.all(promises);
   }
 
-  private async openAppPreview() {
-    if (!this.hasWebWorker) {
-      System.open(`https://${Env.sellerAreaHostname()}/admin/themes`);
+  private openPreview() {
+    if (this.hasWebWorker) {
+      System.open(`https://${Env.sellerAreaHostname()}/admin/apps/${this.app.config.id}/app`);
       return;
     }
 
+    System.open(`https://${Env.sellerAreaHostname()}/admin/themes`);
+  }
+
+  private async openInstall() {
     const endpointUrl = `${Env.apiHostname()}/apps/${this.app.config.id}/authorization-url`;
     const { url } = await Http.get<{ url: string }>(endpointUrl);
 
