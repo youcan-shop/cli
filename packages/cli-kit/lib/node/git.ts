@@ -49,8 +49,10 @@ export async function clone(cloneOptions: CloneOptions): Promise<void> {
     options['--depth'] = 1;
   }
 
+  const { GIT_ASKPASS, SSH_ASKPASS, ...env } = process.env;
+
   await git({ config: [] })
-    .env({ ...process.env, GIT_TERMINAL_PROMPT: '0' })
+    .env({ ...env, GIT_TERMINAL_PROMPT: '0' })
     .clone(repository!, destination, options);
 
   if (latestTag) {
