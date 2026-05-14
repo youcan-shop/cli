@@ -1,6 +1,7 @@
-import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 import type { Cli } from '@youcan/cli-kit';
+import type { App, Extension, ExtensionFileDescriptor, ExtensionMetadata } from '@/types';
 import { Env, Filesystem, Form, Http, Path, Session, Worker } from '@youcan/cli-kit';
+import { EXTENSION_CONFIG_FILENAME } from '@/constants';
 
 export default class ThemeExtensionWorker extends Worker.Abstract {
   private logger: Worker.Logger;
@@ -24,6 +25,13 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
   }
 
   public async boot(): Promise<void> {
+    const existingId = this.extension.config.id as string | undefined;
+    if (existingId) {
+      this.extension.id = existingId;
+      this.extension.metadata = {};
+      return;
+    }
+
     const session = await Session.authenticate(this.command);
 
     try {
@@ -37,6 +45,11 @@ export default class ThemeExtensionWorker extends Worker.Abstract {
 
       this.extension.id = res.id;
       this.extension.metadata = res.metadata;
+
+      await Filesystem.writeJsonFile(
+        Path.join(this.extension.root, EXTENSION_CONFIG_FILENAME),
+        { ...this.extension.config, id: res.id },
+      );
     }
     catch (err) {
       this.command.error(err as Error);
