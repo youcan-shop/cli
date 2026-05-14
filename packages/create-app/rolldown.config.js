@@ -5,7 +5,7 @@ import { glob } from 'glob';
 export default {
   input: glob.sync('lib/**/*.ts').map(f => fileURLToPath(new URL(f, import.meta.url))),
   external(id) {
-    return !id.startsWith('.') && !id.startsWith('/') && !/^[A-Za-z]:/.test(id);
+    return !id.startsWith('.') && !id.startsWith('/') && !/^[A-Z]:/i.test(id);
   },
   output: {
     dir: 'dist',
