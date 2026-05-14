@@ -36,8 +36,8 @@
     "/oclif.manifest.json"
   ],
   "scripts": {
-    "build": "shx rm -rf dist && tsc --noEmit && rollup --config rollup.config.js",
-    "dev": "shx rm -rf dist && rollup --config rollup.config.js --watch",
+    "build": "shx rm -rf dist && tsc --emitDeclarationOnly --outDir dist && rolldown --config rolldown.config.js",
+    "dev": "shx rm -rf dist && rolldown --config rolldown.config.js --watch",
     "release": "pnpm publish --access public",
     "type-check": "tsc --noEmit",
     "relink": "pnpm link --global"
