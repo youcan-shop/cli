@@ -1,16 +1,20 @@
-import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 import { glob } from 'glob';
+import { defineConfig } from 'rolldown';
 
-/** @type {import('rolldown').RolldownOptions} */
-export default {
-  input: glob.sync('lib/**/*.ts').map(f => fileURLToPath(new URL(f, import.meta.url))),
-  external(id) {
-    return !id.startsWith('.') && !id.startsWith('/') && !/^[A-Z]:/i.test(id);
-  },
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
+
+export default defineConfig({
+  input: glob.sync('lib/**/*.ts'),
+  external: [
+    ...Object.keys(pkg.dependencies ?? {}),
+    ...Object.keys(pkg.peerDependencies ?? {}),
+    /^node:/,
+  ],
   output: {
     dir: 'dist',
     exports: 'named',
     format: 'esm',
     preserveModules: true,
   },
-};
+});
