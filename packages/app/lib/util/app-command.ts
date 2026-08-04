@@ -24,6 +24,7 @@ export abstract class AppCommand extends Cli.Command {
     this.app.config = {
       name: res.name,
       id: res.id,
+      handle: res.handle,
       app_url: res.app_url,
       redirect_urls: res.redirect_urls,
       oauth: {
