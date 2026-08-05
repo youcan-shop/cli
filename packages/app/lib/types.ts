@@ -5,7 +5,7 @@ export interface InitialAppConfig {
 
 export type AppConfig = {
   id: string;
-  handle?: string;
+  handle: string;
   app_url: string;
   redirect_urls: string[];
 
@@ -17,7 +17,7 @@ export type AppConfig = {
 
 export interface RemoteAppConfig {
   id: string;
-  handle?: string;
+  handle: string;
   name: string;
   app_url: string;
   owner_id: string;
