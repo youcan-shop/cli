@@ -58,6 +58,7 @@ describe('webWorker', () => {
       root: '/test/app',
       config: {
         id: 'test-app',
+        handle: 'test-app',
         name: 'Test App',
         app_url: 'http://localhost:3001',
         redirect_urls: [],
@@ -71,6 +72,7 @@ describe('webWorker', () => {
       },
       remote_config: {
         id: 'test-app',
+        handle: 'test-app',
         name: 'Test App',
         app_url: 'http://localhost:3001',
         owner_id: '1',
