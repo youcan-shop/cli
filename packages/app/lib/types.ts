@@ -87,6 +87,50 @@ export interface App {
   extensions: Extension[];
 }
 
+export interface ManifestFile {
+  type: string;
+  name: string;
+  extension: string;
+  size: number;
+  hash: string;
+}
+
+export interface ManifestExtension {
+  id: string;
+  handle: string;
+  type: string;
+  files: ManifestFile[];
+}
+
+export interface Manifest {
+  app: {
+    name: string;
+    handle?: string;
+    app_url?: string;
+    redirect_urls?: string[];
+    scopes?: string[];
+  };
+  extensions: ManifestExtension[];
+  source?: { commit: string };
+}
+
+export interface Blob {
+  type: string;
+  hash: string;
+  path: string;
+}
+
+export interface AppVersion {
+  id: string;
+  app_id: string;
+  version: number;
+  name: string | null;
+  message: string | null;
+  created_by: string;
+  released_at: number | null;
+  created_at: number;
+}
+
 export interface ExtensionFileDescriptor {
   id: string;
   type: string;
