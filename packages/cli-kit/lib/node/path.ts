@@ -20,3 +20,13 @@ export function dirname(filepath: string) {
 export function basename(filepath: string) {
   return path.basename(filepath);
 }
+
+export function extname(filepath: string) {
+  return path.extname(filepath);
+}
+
+export function relative(from: string, to: string) {
+  return path.relative(from, to);
+}
+
+export const sep = path.sep;
