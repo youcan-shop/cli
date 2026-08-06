@@ -1,7 +1,9 @@
+import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 import kleur from 'kleur';
 import fetch from 'node-fetch';
-import { Config, System } from '..';
+import { Config, Path, System } from '..';
 
 const PACKAGE = '@youcan/cli';
 const CHECK_INTERVAL = 24 * 60 * 60 * 1000;
@@ -26,6 +28,28 @@ export async function notify(current: string): Promise<void> {
   }
   catch {
   }
+}
+
+export function packageManager(modulePath: string): System.PackageManagerType {
+  if (process.env.npm_config_user_agent) {
+    return System.inferUserPackageManager();
+  }
+
+  const segments = modulePath.split(path.sep);
+
+  if (segments.includes('.pnpm') || segments.includes('pnpm')) {
+    return 'pnpm';
+  }
+
+  if (segments.includes('.yarn') || segments.includes('yarn')) {
+    return 'yarn';
+  }
+
+  return 'npm';
+}
+
+export function isLocalInstall(modulePath: string, cwd: string): boolean {
+  return modulePath.startsWith(path.join(cwd, 'node_modules') + path.sep);
 }
 
 export function isNewer(latest: string, current: string): boolean {
@@ -72,13 +96,22 @@ async function refresh(): Promise<UpdateCheck | null> {
 }
 
 function banner(current: string, latest: string): void {
-  const commands: Record<System.PackageManagerType, string> = {
-    npm: `npm i -g ${PACKAGE}`,
-    pnpm: `pnpm add -g ${PACKAGE}`,
-    yarn: `yarn global add ${PACKAGE}`,
-  };
+  const modulePath = fileURLToPath(import.meta.url);
+  const local = isLocalInstall(modulePath, Path.cwd());
 
-  const command = commands[System.inferUserPackageManager()];
+  const commands: Record<System.PackageManagerType, string> = local
+    ? {
+        npm: `npm update ${PACKAGE}`,
+        pnpm: `pnpm up ${PACKAGE}`,
+        yarn: `yarn upgrade ${PACKAGE}`,
+      }
+    : {
+        npm: `npm i -g ${PACKAGE}`,
+        pnpm: `pnpm add -g ${PACKAGE}`,
+        yarn: `yarn global add ${PACKAGE}`,
+      };
+
+  const command = commands[packageManager(modulePath)];
 
   const lines: Array<[string, string]> = [
     [`Update available! ${current} \u2192 ${latest}`, `Update available! ${kleur.red(current)} \u2192 ${kleur.green(latest)}`],
