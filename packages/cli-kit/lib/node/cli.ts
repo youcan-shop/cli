@@ -1,7 +1,7 @@
 import process from 'node:process';
 import { Command as BaseCommand, Flags, ux } from '@oclif/core';
 import prompts from 'prompts';
-import { UI } from '..';
+import { UI, Updates } from '..';
 import { truthy } from './context/helpers';
 import { isDevelopment } from './context/local';
 
@@ -93,6 +93,11 @@ export abstract class Command extends BaseCommand {
   public output = ux;
   public prompt = prompts;
   public controller = new AbortController();
+
+  public async init(): Promise<void> {
+    await super.init();
+    await Updates.notify(this.config.version);
+  }
 
   public clear() {
     console.clear();
