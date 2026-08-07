@@ -60,8 +60,7 @@
     "simple-git": "^3.36.0",
     "tar": "^7.5.15",
     "tcp-port-used": "^1.0.2",
-    "tempy": "^3.2.0",
-    "worker": "^0.4.0"
+    "tempy": "^3.2.0"
   },
   "devDependencies": {
     "@types/archiver": "^5.3.4",
