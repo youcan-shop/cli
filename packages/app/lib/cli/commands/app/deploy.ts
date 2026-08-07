@@ -1,9 +1,9 @@
-import type { AppVersion, ExtensionMetadata, Manifest } from '@/types';
+import type { AppVersion, Manifest } from '@/types';
 import { Flags } from '@oclif/core';
-import { Env, Filesystem, Http, Path, Session } from '@youcan/cli-kit';
+import { Env, Http, Session } from '@youcan/cli-kit';
 import { buildManifest } from '@/cli/services/deploy/manifest';
 import { uploadMissingBlobs } from '@/cli/services/deploy/upload';
-import { EXTENSION_CONFIG_FILENAME } from '@/constants';
+import { ensureExtensionIds } from '@/cli/services/extensions';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
@@ -33,7 +33,7 @@ export default class Deploy extends AppCommand {
       );
     }
 
-    await this.ensureExtensionIds();
+    await ensureExtensionIds(this.app);
 
     const { manifest, blobs } = await buildManifest(this.app);
 
@@ -60,26 +60,6 @@ export default class Deploy extends AppCommand {
     }
     catch (err) {
       this.printValidationErrors(err as Error);
-    }
-  }
-
-  private async ensureExtensionIds(): Promise<void> {
-    for (const extension of this.app.extensions) {
-      if (extension.config.id) {
-        continue;
-      }
-
-      const res = await Http.post<{ id: string; metadata: ExtensionMetadata }>(
-        `${Env.apiHostname()}/apps/${this.app.config.id}/extensions/create`,
-        { body: JSON.stringify({ ...extension.config }) },
-      );
-
-      extension.config.id = res.id;
-
-      await Filesystem.writeJsonFile(
-        Path.join(extension.root, EXTENSION_CONFIG_FILENAME),
-        { ...extension.config },
-      );
     }
   }
 

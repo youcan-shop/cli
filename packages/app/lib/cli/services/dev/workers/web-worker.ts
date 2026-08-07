@@ -1,7 +1,6 @@
 import type { App, Web } from '@/types';
 import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
-import { APP_CONFIG_FILENAME } from '@/constants';
-import { type Cli, Filesystem, Path, type Services, System, Worker } from '@youcan/cli-kit';
+import { type Cli, type Services, System, Worker } from '@youcan/cli-kit';
 
 export default class WebWorker extends Worker.Abstract {
   private logger: Worker.Logger;
@@ -59,11 +58,6 @@ export default class WebWorker extends Worker.Abstract {
         ? this.app.config.redirect_urls.map(r => new URL(new URL(r).pathname, appUrl).toString())
         : [new URL('/auth/callback', appUrl).toString()],
     };
-
-    await Filesystem.writeJsonFile(
-      Path.join(this.app.root, APP_CONFIG_FILENAME),
-      this.app.config,
-    );
   }
 
   public async run(): Promise<void> {
