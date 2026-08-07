@@ -1,18 +1,10 @@
-import type DevCommand from '@/cli/commands/app/dev';
-import type { App, Extension, Web } from '@/types';
-import type { AppCommand } from '@/util/app-command';
 import type { Cli, Services, Worker } from '@youcan/cli-kit';
+import type DevCommand from '@/cli/commands/app/dev';
+import type { App, Web } from '@/types';
+import type { AppCommand } from '@/util/app-command';
 import AppWorker from './app-worker';
-import ThemeExtensionWorker from './theme-extension-worker';
+import DevSessionWorker from './dev-session-worker';
 import WebWorker from './web-worker';
-
-export interface ExtensionWorkerCtor {
-  new(command: Cli.Command, app: App, extension: Extension): Worker.Interface;
-}
-
-const EXTENSION_WORKERS: Record<string, ExtensionWorkerCtor> = {
-  theme: ThemeExtensionWorker,
-};
 
 export async function bootAppWorker(command: DevCommand, app: App) {
   const worker = new AppWorker(command, app);
@@ -22,9 +14,8 @@ export async function bootAppWorker(command: DevCommand, app: App) {
   return worker;
 }
 
-export async function bootExtensionWorker(command: Cli.Command, app: App, extension: Extension) {
-  const Ctor = EXTENSION_WORKERS[extension.config.type as keyof typeof EXTENSION_WORKERS];
-  const worker = new Ctor(command, app, extension);
+export async function bootDevSessionWorker(command: Cli.Command, app: App): Promise<Worker.Interface> {
+  const worker = new DevSessionWorker(command, app);
 
   await worker.boot();
 

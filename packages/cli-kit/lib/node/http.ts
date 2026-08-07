@@ -47,3 +47,11 @@ export async function get<T>(endpoint: string, options: RequestInit = {}): Promi
 export async function post<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   return request<T>(`https://${endpoint}`, { ...options, method: 'POST' });
 }
+
+export async function put<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  return request<T>(`https://${endpoint}`, { ...options, method: 'PUT' });
+}
+
+export async function del<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  return request<T>(`https://${endpoint}`, { ...options, method: 'DELETE' });
+}

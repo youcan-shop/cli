@@ -2,7 +2,7 @@ import type { Worker } from '@youcan/cli-kit';
 import process from 'node:process';
 import { Flags } from '@oclif/core';
 import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
-import { bootAppWorker, bootExtensionWorker, bootWebWorker } from '@/cli/services/dev/workers';
+import { bootAppWorker, bootDevSessionWorker, bootWebWorker } from '@/cli/services/dev/workers';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
@@ -185,7 +185,9 @@ class Dev extends AppCommand {
       bootAppWorker(this, this.app),
     ];
 
-    this.app.extensions.forEach(ext => promises.unshift(bootExtensionWorker(this, this.app, ext)));
+    if (this.app.extensions.length) {
+      promises.unshift(bootDevSessionWorker(this, this.app));
+    }
 
     return Promise.all(promises);
   }

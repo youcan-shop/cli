@@ -1,14 +1,16 @@
-import type { App, RemoteAppConfig } from '@/types';
 import type { Session } from '@youcan/cli-kit';
-import { APP_CONFIG_FILENAME } from '@/constants';
+import type { App, AppConfig, RemoteAppConfig } from '@/types';
 import { Cli, Env, Filesystem, Http, Path } from '@youcan/cli-kit';
+import { APP_CONFIG_FILENAME } from '@/constants';
 
 export abstract class AppCommand extends Cli.Command {
   protected app!: App;
   protected session!: Session.StoreSession;
 
   public async syncAppConfig(): Promise<App> {
-    const endpoint = this.app.config.id == null
+    const created = this.app.config.id == null;
+
+    const endpoint = created
       ? `${Env.apiHostname()}/apps/create`
       : `${Env.apiHostname()}/apps/${this.app.config.id}/update`;
 
@@ -33,13 +35,28 @@ export abstract class AppCommand extends Cli.Command {
       },
     };
 
-    await Filesystem.writeJsonFile(
-      Path.join(this.app.root, APP_CONFIG_FILENAME),
-      this.app.config,
-    );
+    if (created) {
+      await this.persistIdentity(res);
+    }
 
     this.app.remote_config = res;
 
     return this.app;
+  }
+
+  private async persistIdentity(res: RemoteAppConfig): Promise<void> {
+    const path = Path.join(this.app.root, APP_CONFIG_FILENAME);
+    const disk = await Filesystem.readJsonFile<Partial<AppConfig>>(path).catch(() => ({}));
+
+    await Filesystem.writeJsonFile(path, {
+      ...disk,
+      name: res.name,
+      id: res.id,
+      handle: res.handle,
+      oauth: {
+        scopes: res.scopes,
+        client_id: res.client_id,
+      },
+    });
   }
 }
