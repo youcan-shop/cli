@@ -19,6 +19,23 @@ vi.mock('@/cli/services/deploy/manifest', () => ({
   buildManifest: vi.fn().mockResolvedValue({ manifest: { app: { name: 'x' }, extensions: [] }, blobs: [] }),
 }));
 
+function manifestWith(files: Array<{ name: string; hash: string; size?: number }>) {
+  return {
+    manifest: {
+      app: { name: 'x' },
+      extensions: [
+        {
+          id: 'ext_1',
+          handle: 'rating',
+          type: 'theme',
+          files: files.map(f => ({ type: 'blocks', name: f.name, extension: 'liquid', size: f.size ?? 10, hash: f.hash })),
+        },
+      ],
+    },
+    blobs: [],
+  };
+}
+
 vi.mock('@/cli/services/deploy/upload', () => ({
   uploadMissingBlobs: vi.fn().mockResolvedValue(0),
 }));
@@ -65,6 +82,44 @@ describe('devSessionWorker', () => {
     await worker.cleanup();
 
     expect(Http.del).toHaveBeenCalledWith('api.test/apps/app_1/dev-session');
+  });
+
+  it('logs every file on the first sync and only the diff after', async () => {
+    const { buildManifest } = await import('@/cli/services/deploy/manifest');
+    const logger = (worker as any).logger;
+
+    vi.mocked(buildManifest).mockResolvedValueOnce(
+      manifestWith([{ name: 'star', hash: 'a' }, { name: 'banner', hash: 'b' }]) as any,
+    );
+    await (worker as any).sync();
+
+    expect(logger.write).toHaveBeenCalledWith(expect.stringContaining('[pushed] rating/blocks/star.liquid'));
+    expect(logger.write).toHaveBeenCalledWith(expect.stringContaining('[pushed] rating/blocks/banner.liquid'));
+
+    logger.write.mockClear();
+
+    vi.mocked(buildManifest).mockResolvedValueOnce(
+      manifestWith([{ name: 'star', hash: 'a2', size: 20 }, { name: 'footer', hash: 'c' }]) as any,
+    );
+    await (worker as any).sync();
+
+    expect(logger.write).toHaveBeenCalledWith(expect.stringContaining('[updated] rating/blocks/star.liquid'));
+    expect(logger.write).toHaveBeenCalledWith(expect.stringContaining('[added] rating/blocks/footer.liquid'));
+    expect(logger.write).toHaveBeenCalledWith(expect.stringContaining('[removed] rating/blocks/banner.liquid'));
+  });
+
+  it('logs nothing when nothing changed', async () => {
+    const { buildManifest } = await import('@/cli/services/deploy/manifest');
+    const logger = (worker as any).logger;
+
+    vi.mocked(buildManifest).mockResolvedValue(manifestWith([{ name: 'star', hash: 'a' }]) as any);
+
+    await (worker as any).sync();
+    logger.write.mockClear();
+
+    await (worker as any).sync();
+
+    expect(logger.write).not.toHaveBeenCalled();
   });
 
   it('resyncs after a change that lands mid sync', async () => {
