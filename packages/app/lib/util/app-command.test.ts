@@ -1,3 +1,4 @@
+import type { Config } from '@oclif/core';
 import type { App } from '@/types';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppCommand } from './app-command';
@@ -46,7 +47,7 @@ describe('syncAppConfig', () => {
     vi.clearAllMocks();
     post.mockResolvedValue(remote);
 
-    command = new TestCommand();
+    command = new TestCommand([], {} as Config);
     (command as any).session = { access_token: 'token' };
   });
 
