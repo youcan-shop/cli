@@ -1,8 +1,8 @@
 import type { AppVersion } from '@/types';
-import { AppCommand } from '@/util/app-command';
-import { load } from '@/util/app-loader';
 import { Flags } from '@oclif/core';
 import { Env, Http, Session } from '@youcan/cli-kit';
+import { AppCommand } from '@/util/app-command';
+import { load } from '@/util/app-loader';
 
 export default class Release extends AppCommand {
   static description = 'Release an existing app version';

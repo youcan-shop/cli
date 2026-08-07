@@ -1,3 +1,4 @@
+import type { Buffer } from 'node:buffer';
 import type { App, Blob, Extension, Manifest, ManifestExtension, ManifestFile } from '@/types';
 import { Crypto, Filesystem, Path, System } from '@youcan/cli-kit';
 

@@ -4,8 +4,8 @@ import crypto from 'node:crypto';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { buildManifest } from '@/cli/services/deploy/manifest';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { buildManifest } from '@/cli/services/deploy/manifest';
 
 describe('buildManifest', () => {
   let root: string;

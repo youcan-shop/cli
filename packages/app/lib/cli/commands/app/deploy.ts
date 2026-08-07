@@ -1,11 +1,11 @@
 import type { AppVersion, ExtensionMetadata, Manifest } from '@/types';
+import { Flags } from '@oclif/core';
+import { Env, Filesystem, Http, Path, Session } from '@youcan/cli-kit';
 import { buildManifest } from '@/cli/services/deploy/manifest';
 import { uploadMissingBlobs } from '@/cli/services/deploy/upload';
 import { EXTENSION_CONFIG_FILENAME } from '@/constants';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { Flags } from '@oclif/core';
-import { Env, Filesystem, Http, Path, Session } from '@youcan/cli-kit';
 
 export default class Deploy extends AppCommand {
   static description = 'Create a new app version and release it';

@@ -1,7 +1,7 @@
 import type { AppVersion } from '@/types';
+import { Env, Http, Session } from '@youcan/cli-kit';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { Env, Http, Session } from '@youcan/cli-kit';
 
 export default class Versions extends AppCommand {
   static description = 'List the app versions';
