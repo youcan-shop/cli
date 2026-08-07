@@ -45,6 +45,9 @@
     "topics": {
       "app:env": {
         "description": "Manage app environment variables"
+      },
+      "app:config": {
+        "description": "Manage the local app configuration"
       }
     }
   }
