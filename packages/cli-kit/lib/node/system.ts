@@ -36,6 +36,12 @@ function buildExec(command: string, args: string[], options?: ExecOptions): Exec
   return commandProcess;
 }
 
+export async function output(command: string, args: string[], options?: ExecOptions): Promise<string> {
+  const { stdout } = await buildExec(command, args, options);
+
+  return stdout;
+}
+
 export async function exec(command: string, args: string[], options?: ExecOptions): Promise<void> {
   const commandProcess = buildExec(command, args, options);
 
