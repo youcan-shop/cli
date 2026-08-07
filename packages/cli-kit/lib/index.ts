@@ -13,6 +13,7 @@ export * as Path from './node/path';
 export * as Session from './node/session';
 export * as System from './node/system';
 export * as Tasks from './node/tasks';
+export * as Updates from './node/updates';
 export * as Worker from './node/worker';
 export * as Services from './services';
 
