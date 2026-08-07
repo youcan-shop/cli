@@ -8,7 +8,7 @@ export default class Release extends AppCommand {
   static description = 'Release an existing app version';
 
   static flags = {
-    version: Flags.integer({ description: 'Version number to release', required: true }),
+    version: Flags.string({ description: 'Version number or name to release', required: true }),
   };
 
   async run() {
@@ -22,7 +22,7 @@ export default class Release extends AppCommand {
     }
 
     const version = await Http.post<AppVersion>(
-      `${Env.apiHostname()}/apps/${this.app.config.id}/versions/${flags.version}/release`,
+      `${Env.apiHostname()}/apps/${this.app.config.id}/versions/${encodeURIComponent(flags.version)}/release`,
     );
 
     this.output.info(`Version ${version.name} (#${version.version}) released.`);
