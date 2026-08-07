@@ -18,8 +18,8 @@ export abstract class AppCommand extends Cli.Command {
       headers: { Authorization: `Bearer ${this.session.access_token}` },
       body: JSON.stringify({
         name: this.app.config.name,
-        app_url: this.app.config.app_url,
         redirect_urls: this.app.config.redirect_urls,
+        ...(created ? { app_url: this.app.config.app_url } : {}),
       }),
     });
 
@@ -27,7 +27,7 @@ export abstract class AppCommand extends Cli.Command {
       name: res.name,
       id: res.id,
       handle: res.handle,
-      app_url: res.app_url,
+      app_url: created ? res.app_url : this.app.config.app_url,
       redirect_urls: res.redirect_urls,
       oauth: {
         scopes: res.scopes,

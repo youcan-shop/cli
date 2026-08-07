@@ -181,15 +181,10 @@ class Dev extends AppCommand {
   }
 
   private async prepareDevProcesses(): Promise<Worker.Interface[]> {
-    const promises: Promise<Worker.Interface>[] = [
+    return Promise.all([
+      bootDevSessionWorker(this, this.app),
       bootAppWorker(this, this.app),
-    ];
-
-    if (this.app.extensions.length) {
-      promises.unshift(bootDevSessionWorker(this, this.app));
-    }
-
-    return Promise.all(promises);
+    ]);
   }
 
   private openPreview() {
