@@ -1,13 +1,14 @@
 import type { AppVersion } from '@/types';
 import { Flags } from '@oclif/core';
 import { Env, Http, Session } from '@youcan/cli-kit';
-import { AppCommand } from '@/util/app-command';
+import { AppCommand, configFlag } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
 export default class Release extends AppCommand {
   static description = 'Release an existing app version';
 
   static flags = {
+    ...configFlag,
     version: Flags.string({ description: 'Version number or name to release', required: true }),
   };
 

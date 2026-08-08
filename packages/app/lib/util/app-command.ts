@@ -3,11 +3,11 @@ import type { App, AppConfig, RemoteAppConfig } from '@/types';
 import { Flags } from '@oclif/core';
 import { Cli, Env, Filesystem, Http, Path } from '@youcan/cli-kit';
 
-export abstract class AppCommand extends Cli.Command {
-  static baseFlags = {
-    config: Flags.string({ char: 'c', description: 'Config environment, resolves youcan.app.<env>.json' }),
-  };
+export const configFlag = {
+  config: Flags.string({ char: 'c', description: 'Config environment, resolves youcan.app.<env>.json' }),
+};
 
+export abstract class AppCommand extends Cli.Command {
   protected app!: App;
   protected session!: Session.StoreSession;
 

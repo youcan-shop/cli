@@ -1,10 +1,14 @@
 import { Color, Session, Tasks } from '@youcan/cli-kit';
 import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
-import { AppCommand } from '@/util/app-command';
+import { AppCommand, configFlag } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
 class EnvShow extends AppCommand {
   static description = 'Display app environment variables';
+
+  static flags = {
+    ...configFlag,
+  };
 
   async run(): Promise<any> {
     const { flags } = await this.parse(EnvShow);

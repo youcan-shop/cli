@@ -4,13 +4,14 @@ import { Env, Http, Session } from '@youcan/cli-kit';
 import { buildManifest } from '@/cli/services/deploy/manifest';
 import { uploadMissingBlobs } from '@/cli/services/deploy/upload';
 import { ensureExtensionIds } from '@/cli/services/extensions';
-import { AppCommand } from '@/util/app-command';
+import { AppCommand, configFlag } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
 export default class Deploy extends AppCommand {
   static description = 'Create a new app version and release it';
 
   static flags = {
+    ...configFlag,
     'message': Flags.string({ char: 'm', description: 'Version description' }),
     'version': Flags.string({ description: 'Version name, generated when omitted' }),
     'no-release': Flags.boolean({ description: 'Create the version without releasing it', default: false }),

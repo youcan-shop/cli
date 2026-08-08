@@ -1,13 +1,14 @@
 import { Flags } from '@oclif/core';
 import { Color, Filesystem, Path, Session, Tasks } from '@youcan/cli-kit';
 import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
-import { AppCommand } from '@/util/app-command';
+import { AppCommand, configFlag } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
 class EnvPull extends AppCommand {
   static description = 'Create or update a .env file with app environment variables';
 
   static flags = {
+    ...configFlag,
     'env-file': Flags.string({
       description: 'Path to the .env file to create or update',
       default: '.env',

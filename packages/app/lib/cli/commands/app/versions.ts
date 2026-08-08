@@ -1,10 +1,14 @@
 import type { AppVersion } from '@/types';
 import { Env, Http, Session } from '@youcan/cli-kit';
-import { AppCommand } from '@/util/app-command';
+import { AppCommand, configFlag } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
 export default class Versions extends AppCommand {
   static description = 'List the app versions';
+
+  static flags = {
+    ...configFlag,
+  };
 
   async run() {
     const { flags } = await this.parse(Versions);
