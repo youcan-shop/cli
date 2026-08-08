@@ -19,6 +19,7 @@ export async function buildManifest(app: App): Promise<{ manifest: Manifest; blo
       app_url: app.config.app_url,
       redirect_urls: app.config.redirect_urls,
       scopes: app.config.oauth?.scopes ?? [],
+      webhooks: app.config.webhooks ?? [],
     },
     extensions,
   };

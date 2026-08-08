@@ -3,11 +3,17 @@ export interface InitialAppConfig {
   name: string;
 }
 
+export interface AppWebhook {
+  topic: string;
+  address: string;
+}
+
 export type AppConfig = {
   id: string;
   handle: string;
   app_url: string;
   redirect_urls: string[];
+  webhooks?: AppWebhook[];
 
   oauth: {
     client_id: string;
@@ -109,6 +115,7 @@ export interface Manifest {
     app_url?: string;
     redirect_urls?: string[];
     scopes?: string[];
+    webhooks?: AppWebhook[];
   };
   extensions: ManifestExtension[];
   source?: { commit: string };

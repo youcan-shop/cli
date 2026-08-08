@@ -33,6 +33,7 @@ export default class ConfigPull extends AppCommand {
       handle: config.handle ?? disk.handle,
       app_url: config.app_url ?? null,
       redirect_urls: config.redirect_urls ?? [],
+      webhooks: config.webhooks ?? [],
       oauth: {
         ...disk.oauth,
         scopes: config.scopes ?? disk.oauth?.scopes ?? [],
