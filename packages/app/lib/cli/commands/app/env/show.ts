@@ -1,19 +1,25 @@
+import { Color, Session, Tasks } from '@youcan/cli-kit';
 import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { Color, Env, Session, Tasks } from '@youcan/cli-kit';
 
 class EnvShow extends AppCommand {
   static description = 'Display app environment variables';
 
   async run(): Promise<any> {
-    this.app = await load();
+    const { flags } = await this.parse(EnvShow);
+
+    this.app = await load(flags.config);
     this.session = await Session.authenticate(this);
+
+    if (!this.app.config.id) {
+      this.output.error('This app has no remote counterpart yet, run `youcan app dev` first.');
+    }
 
     await Tasks.run({}, [
       {
-        title: 'Syncing app configuration..',
-        task: async () => { await this.syncAppConfig(); },
+        title: 'Fetching app configuration..',
+        task: async () => { await this.fetchRemoteConfig(); },
       },
     ]);
 

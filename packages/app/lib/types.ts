@@ -14,12 +14,19 @@ export type AppConfig = {
   app_url: string;
   redirect_urls: string[];
   webhooks?: AppWebhook[];
+  extension_ids?: Record<string, string>;
 
   oauth: {
     client_id: string;
     scopes: string[];
   };
 } & InitialAppConfig;
+
+export interface RemoteAppSummary {
+  id: string;
+  handle: string;
+  name: string;
+}
 
 export interface RemoteAppConfig {
   id: string;
@@ -85,6 +92,7 @@ export interface App {
   root: string;
   webs: Web[];
   config: AppConfig;
+  configFilename: string;
   remote_config?: RemoteAppConfig;
   network_config?: {
     app_url: string;

@@ -1,6 +1,6 @@
 import type DevCommand from '@/cli/commands/app/dev';
 import type { App } from '@/types';
-import { Filesystem, Path, Worker } from '@youcan/cli-kit';
+import { Filesystem, Path } from '@youcan/cli-kit';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AppWorker from './app-worker';
 
@@ -51,6 +51,7 @@ describe('appWorker', () => {
 
     mockApp = {
       root: '/path/to/app',
+      configFilename: 'youcan.app.json',
     } as App;
 
     appWorker = new AppWorker(mockCommand, mockApp);

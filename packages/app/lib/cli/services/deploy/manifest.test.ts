@@ -13,6 +13,7 @@ describe('buildManifest', () => {
   const app = (): App => ({
     root,
     webs: [],
+    configFilename: 'youcan.app.json',
     extensions: [
       {
         root: path.join(root, 'extensions', 'rating'),

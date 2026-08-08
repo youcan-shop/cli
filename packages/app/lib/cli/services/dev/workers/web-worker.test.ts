@@ -1,6 +1,6 @@
-import type { App, Web } from '@/types';
 import type { Cli } from '@youcan/cli-kit';
-import { System, Worker } from '@youcan/cli-kit';
+import type { App, Web } from '@/types';
+import { System } from '@youcan/cli-kit';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import WebWorker from './web-worker';
 
@@ -65,6 +65,7 @@ describe('webWorker', () => {
         oauth: { client_id: 'id', scopes: [] },
       },
       webs: [],
+      configFilename: 'youcan.app.json',
       extensions: [],
       network_config: {
         app_port: 3001,

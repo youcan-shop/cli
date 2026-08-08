@@ -1,15 +1,16 @@
 import type { AppConfig, AppVersion, Manifest } from '@/types';
 import { Color, Env, Filesystem, Http, Path, Session } from '@youcan/cli-kit';
-import { APP_CONFIG_FILENAME } from '@/constants';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
 export default class ConfigPull extends AppCommand {
-  static description = 'Update youcan.app.json from the active released version';
+  static description = 'Update the app config file from the active released version';
 
   async run() {
+    const { flags } = await this.parse(ConfigPull);
+
     this.session = await Session.authenticate(this);
-    this.app = await load();
+    this.app = await load(flags.config);
 
     if (!this.app.config.id) {
       this.output.error('This app has no remote counterpart yet, run `youcan app dev` first.');
@@ -23,7 +24,7 @@ export default class ConfigPull extends AppCommand {
       return this.output.error('This app has no active version yet, run `youcan app deploy` to create one.');
     }
 
-    const path = Path.join(this.app.root, APP_CONFIG_FILENAME);
+    const path = Path.join(this.app.root, this.app.configFilename);
     const disk = await Filesystem.readJsonFile<AppConfig>(path);
     const config = version.manifest.app;
 
@@ -41,7 +42,7 @@ export default class ConfigPull extends AppCommand {
     });
 
     this.log();
-    this.log(`${Color.green('[OK]')} ${Color.cyan(APP_CONFIG_FILENAME)} synced from version ${version.name} (#${version.version}).`);
+    this.log(`${Color.green('[OK]')} ${Color.cyan(this.app.configFilename)} synced from version ${version.name} (#${version.version}).`);
     this.log();
   }
 }

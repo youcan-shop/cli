@@ -1,6 +1,6 @@
 import type { App, Web } from '@/types';
-import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
 import { type Cli, type Services, System, Worker } from '@youcan/cli-kit';
+import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
 
 export default class WebWorker extends Worker.Abstract {
   private logger: Worker.Logger;
