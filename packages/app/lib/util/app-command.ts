@@ -24,6 +24,7 @@ export abstract class AppCommand extends Cli.Command {
     });
 
     this.app.config = {
+      ...this.app.config,
       name: res.name,
       id: res.id,
       handle: res.handle,
