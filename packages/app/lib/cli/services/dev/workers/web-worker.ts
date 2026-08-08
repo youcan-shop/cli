@@ -1,9 +1,11 @@
 import type { App, Web } from '@/types';
+import process from 'node:process';
 import { type Cli, type Services, System, Worker } from '@youcan/cli-kit';
 import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
 
 export default class WebWorker extends Worker.Abstract {
   private logger: Worker.Logger;
+  private child?: ReturnType<typeof System.spawn>;
 
   public constructor(
     private readonly command: Cli.Command,
@@ -69,27 +71,53 @@ export default class WebWorker extends Worker.Abstract {
 
     const [cmd, ...args] = this.web.config.commands.dev.split(' ');
 
-    return System.exec(cmd, args, {
-      stdout: this.logger,
-      signal: this.command.controller.signal,
-      stderr: new Worker.Logger(this.web.config.name || 'web', 'red'),
+    const child = System.spawn(cmd, args, {
       env,
+      detached: process.platform !== 'win32',
+      stdout: this.logger,
+      stderr: new Worker.Logger(this.web.config.name || 'web', 'red'),
     });
+
+    this.child = child;
+
+    const signal = this.command.controller.signal;
+    signal.addEventListener('abort', () => {
+      System.killTree(child);
+      setTimeout(() => System.killTree(child, 'SIGKILL'), 800).unref();
+    });
+
+    process.once('exit', () => System.killTree(child, 'SIGKILL'));
+
+    try {
+      await child;
+    }
+    catch (err) {
+      if (signal.aborted || child.killed) {
+        return;
+      }
+
+      throw err;
+    }
   }
 
   public async cleanup(): Promise<void> {
     this.logger.write('stopping web server...');
 
-    if (this.app.network_config) {
-      try {
-        if (!await System.isPortAvailable(this.app.network_config.app_port)) {
-          await System.killPortProcess(this.app.network_config.app_port);
-          this.logger.write(`killed process on port ${this.app.network_config.app_port}`);
-        }
-      }
-      catch {
-        // ignore errors when killing port process
-      }
+    if (this.child) {
+      System.killTree(this.child);
+    }
+
+    const port = this.app.network_config?.app_port;
+    if (!port) {
+      return;
+    }
+
+    try {
+      await System.waitUntilPortFree(port, 3000);
+    }
+    catch {
+      await System.killPortProcess(port).catch(() => {});
+      this.logger.write(`killed process on port ${port}`);
     }
   }
 }

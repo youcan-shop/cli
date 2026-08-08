@@ -1,13 +1,15 @@
 import type { Cli } from '@youcan/cli-kit';
 import type { App, Web } from '@/types';
+import process from 'node:process';
 import { System } from '@youcan/cli-kit';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import WebWorker from './web-worker';
 
 vi.mock('@youcan/cli-kit', () => ({
   System: {
-    exec: vi.fn(),
-    isPortAvailable: vi.fn(),
+    spawn: vi.fn(),
+    killTree: vi.fn(),
+    waitUntilPortFree: vi.fn(),
     killPortProcess: vi.fn(),
     getPortOrNextOrRandom: vi.fn().mockResolvedValue(3001),
     sleep: vi.fn().mockResolvedValue(undefined),
@@ -97,23 +99,29 @@ describe('webWorker', () => {
   });
 
   describe('cleanup', () => {
-    it('should kill process on the assigned port when port is not available', async () => {
-      vi.mocked(System.isPortAvailable).mockResolvedValue(false);
+    it('should kill the process tree and wait for the port', async () => {
+      const child = { pid: 42 };
+      (webWorker as any).child = child;
+      vi.mocked(System.waitUntilPortFree).mockResolvedValue();
+
+      await webWorker.cleanup();
+
+      expect(System.killTree).toHaveBeenCalledWith(child);
+      expect(System.waitUntilPortFree).toHaveBeenCalledWith(3001, 3000);
+      expect(System.killPortProcess).not.toHaveBeenCalled();
+    });
+
+    it('should fall back to killing the port holder when the port stays busy', async () => {
+      vi.mocked(System.waitUntilPortFree).mockRejectedValue(new Error('timeout'));
       vi.mocked(System.killPortProcess).mockResolvedValue();
 
       await webWorker.cleanup();
 
-      expect(System.isPortAvailable).toHaveBeenCalledWith(3001);
       expect(System.killPortProcess).toHaveBeenCalledWith(3001);
-    });
 
-    it('should not kill process when port is already available', async () => {
-      vi.mocked(System.isPortAvailable).mockResolvedValue(true);
-
-      await webWorker.cleanup();
-
-      expect(System.isPortAvailable).toHaveBeenCalledWith(3001);
-      expect(System.killPortProcess).not.toHaveBeenCalled();
+      const logger = (webWorker as any).logger;
+      expect(logger.write).toHaveBeenCalledWith('stopping web server...');
+      expect(logger.write).toHaveBeenCalledWith('killed process on port 3001');
     });
 
     it('should handle missing network_config gracefully', async () => {
@@ -121,39 +129,29 @@ describe('webWorker', () => {
       const workerWithoutNetwork = new WebWorker(mockCommand, appWithoutNetwork as App, mockWeb);
 
       await expect(workerWithoutNetwork.cleanup()).resolves.toBeUndefined();
-      expect(System.isPortAvailable).not.toHaveBeenCalled();
+      expect(System.waitUntilPortFree).not.toHaveBeenCalled();
       expect(System.killPortProcess).not.toHaveBeenCalled();
     });
 
     it('should handle killPortProcess errors gracefully', async () => {
-      vi.mocked(System.isPortAvailable).mockResolvedValue(false);
+      vi.mocked(System.waitUntilPortFree).mockRejectedValue(new Error('timeout'));
       vi.mocked(System.killPortProcess).mockRejectedValue(new Error('Process not found'));
 
       await expect(webWorker.cleanup()).resolves.toBeUndefined();
       expect(System.killPortProcess).toHaveBeenCalledWith(3001);
     });
-
-    it('should log cleanup messages', async () => {
-      vi.mocked(System.isPortAvailable).mockResolvedValue(false);
-      vi.mocked(System.killPortProcess).mockResolvedValue();
-
-      await webWorker.cleanup();
-
-      const logger = (webWorker as any).logger;
-      expect(logger.write).toHaveBeenCalledWith('stopping web server...');
-      expect(logger.write).toHaveBeenCalledWith('killed process on port 3001');
-    });
   });
 
   describe('run', () => {
-    it('should execute the web command with env computed from app', async () => {
-      vi.mocked(System.exec).mockResolvedValue();
+    it('should spawn the web command detached with env computed from app', async () => {
+      const child = Object.assign(Promise.resolve(), { pid: 42, killed: false });
+      vi.mocked(System.spawn).mockReturnValue(child as any);
 
       await webWorker.run();
 
-      expect(System.exec).toHaveBeenCalledWith('npm', ['start'], {
+      expect(System.spawn).toHaveBeenCalledWith('npm', ['start'], {
+        detached: process.platform !== 'win32',
         stdout: expect.any(Object),
-        signal: mockCommand.controller.signal,
         stderr: expect.any(Object),
         env: expect.objectContaining({
           APP_URL: 'http://localhost:3001',
@@ -161,6 +159,16 @@ describe('webWorker', () => {
           YOUCAN_API_KEY: 'test-key',
         }),
       });
+    });
+
+    it('should swallow the spawn error when aborted', async () => {
+      const controller = new AbortController();
+      (mockCommand as any).controller = controller;
+
+      const child = Object.assign(Promise.reject(new Error('killed')), { pid: 42, killed: true });
+      vi.mocked(System.spawn).mockReturnValue(child as any);
+
+      await expect(webWorker.run()).resolves.toBeUndefined();
     });
   });
 });

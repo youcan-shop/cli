@@ -66,6 +66,13 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
     }
 
     await System.killPortProcess(LS_PORT);
+
+    try {
+      await System.waitUntilPortFree(LS_PORT);
+    }
+    catch {
+      throw new Error(`Port ${LS_PORT} is still busy, close the process that holds it and retry.`);
+    }
   }
 
   const [verifier, challenge] = await generatePkcePair(64);
