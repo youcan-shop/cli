@@ -9,6 +9,7 @@ import tpu from 'tcp-port-used';
 
 export interface ExecOptions {
   cwd?: string;
+  detached?: boolean;
   env?: { [key: string]: string | undefined };
   stdin?: Readable | 'inherit';
   stdout?: Writable | 'inherit';
@@ -31,9 +32,41 @@ function buildExec(command: string, args: string[], options?: ExecOptions): Exec
     stdout: options?.stdout === 'inherit' ? 'inherit' : undefined,
     stderr: options?.stderr === 'inherit' ? 'inherit' : undefined,
     windowsHide: false,
+    detached: options?.detached,
+    cleanup: !options?.detached,
   });
 
   return commandProcess;
+}
+
+export function spawn(command: string, args: string[], options?: ExecOptions): ExecaChildProcess<string> {
+  const commandProcess = buildExec(command, args, options);
+
+  if (options?.stderr && options.stderr !== 'inherit') {
+    commandProcess.stderr?.pipe(options.stderr, { end: false });
+  }
+
+  if (options?.stdout && options.stdout !== 'inherit') {
+    commandProcess.stdout?.pipe(options.stdout, { end: false });
+  }
+
+  return commandProcess;
+}
+
+export function killTree(child: ExecaChildProcess<string>, signal: NodeJS.Signals = 'SIGTERM'): void {
+  if (!child.pid) {
+    return;
+  }
+
+  try {
+    process.kill(-child.pid, signal);
+  }
+  catch {
+    try {
+      child.kill(signal);
+    }
+    catch {}
+  }
 }
 
 export async function output(command: string, args: string[], options?: ExecOptions): Promise<string> {
@@ -132,6 +165,10 @@ export async function killPortProcess(port: number): Promise<void> {
   const { killPortProcess: kill } = await import('kill-port-process');
 
   await kill(port);
+}
+
+export async function waitUntilPortFree(port: number, timeoutMs = 5000): Promise<void> {
+  await tpu.waitUntilFree(port, 250, timeoutMs);
 }
 
 export async function open(url: string): Promise<void> {

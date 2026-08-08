@@ -25,6 +25,7 @@ class Dev extends AppCommand {
   private configEnv?: string;
   private hasWebWorker = false;
   private useTunnel = false;
+  private exiting = false;
 
   constructor(argv: string[], config: any) {
     super(argv, config);
@@ -32,41 +33,31 @@ class Dev extends AppCommand {
     this.setupExitHandlers();
   }
 
+  private async shutdown(): Promise<void> {
+    if (this.exiting) {
+      return;
+    }
+
+    this.exiting = true;
+
+    try {
+      console.log('Shutting down...');
+
+      const cleanup = Promise.allSettled(this.workers.map(worker => worker.cleanup()));
+      await Promise.race([cleanup, System.sleep(5)]);
+
+      this.controller?.abort();
+      this.workers = [];
+    }
+    finally {
+      process.exit(0);
+    }
+  }
+
   private setupExitHandlers() {
-    const cleanupAndExit = async () => {
-      try {
-        console.log('Shutting down...');
-
-        if (this.workers.length > 0) {
-          await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
-        }
-
-        if (this.controller) {
-          this.controller.abort();
-        }
-        this.workers = [];
-
-        setTimeout(() => {
-          process.exit(0);
-        }, 100);
-      }
-      catch (error) {
-        process.exit(0);
-      }
-    };
-
-    process.once('SIGINT', cleanupAndExit);
-    process.once('SIGTERM', cleanupAndExit);
-    process.once('SIGQUIT', cleanupAndExit);
-
-    process.once('exit', async () => {
-      if (this.workers.length > 0) {
-        await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
-      }
-      if (this.controller) {
-        this.controller.abort();
-      }
-    });
+    process.on('SIGINT', () => void this.shutdown());
+    process.on('SIGTERM', () => void this.shutdown());
+    process.on('SIGQUIT', () => void this.shutdown());
   }
 
   private get hotKeys() {
@@ -84,27 +75,7 @@ class Dev extends AppCommand {
       {
         keyboardKey: 'q',
         description: 'quit',
-        handler: async () => {
-          try {
-            console.log('Shutting down...');
-
-            if (this.workers.length > 0) {
-              await Promise.allSettled(this.workers.map(worker => worker.cleanup()));
-            }
-
-            if (this.controller) {
-              this.controller.abort();
-            }
-            this.workers = [];
-
-            setTimeout(() => {
-              process.exit(0);
-            }, 100);
-          }
-          catch (error) {
-            process.exit(0);
-          }
-        },
+        handler: async () => this.shutdown(),
       },
     ];
   }
