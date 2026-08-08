@@ -1,10 +1,14 @@
 import type { AppConfig, AppVersion, Manifest } from '@/types';
 import { Color, Env, Filesystem, Http, Path, Session } from '@youcan/cli-kit';
-import { AppCommand } from '@/util/app-command';
+import { AppCommand, configFlag } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
 export default class ConfigPull extends AppCommand {
   static description = 'Update the app config file from the active released version';
+
+  static flags = {
+    ...configFlag,
+  };
 
   async run() {
     const { flags } = await this.parse(ConfigPull);

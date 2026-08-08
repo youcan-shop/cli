@@ -3,7 +3,7 @@ import process from 'node:process';
 import { Flags } from '@oclif/core';
 import { Env, Http, Services, Session, System, Tasks, UI } from '@youcan/cli-kit';
 import { bootAppWorker, bootDevSessionWorker, bootWebWorker } from '@/cli/services/dev/workers';
-import { AppCommand } from '@/util/app-command';
+import { AppCommand, configFlag } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
 interface Context {
@@ -15,6 +15,7 @@ class Dev extends AppCommand {
   static description = 'Run the app in dev mode';
 
   static flags = {
+    ...configFlag,
     'no-tunnel': Flags.boolean({
       description: 'Skip cloudflared tunnel and use localhost URL directly',
       default: false,

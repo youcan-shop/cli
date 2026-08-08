@@ -1,7 +1,7 @@
-import type { RemoteAppConfig, RemoteAppSummary } from '@/types';
+import type { AppConfig, RemoteAppConfig, RemoteAppSummary } from '@/types';
 import { Args, Flags } from '@oclif/core';
 import { Color, Env, Filesystem, Http, Path, Session } from '@youcan/cli-kit';
-import { appConfigFilename } from '@/constants';
+import { APP_CONFIG_FILENAME, appConfigFilename } from '@/constants';
 import { AppCommand } from '@/util/app-command';
 
 export default class ConfigLink extends AppCommand {
@@ -29,12 +29,17 @@ export default class ConfigLink extends AppCommand {
 
     const filename = appConfigFilename(args.env);
 
+    const base = await Filesystem
+      .readJsonFile<Partial<AppConfig>>(Path.resolve(Path.cwd(), APP_CONFIG_FILENAME))
+      .catch(() => ({} as Partial<AppConfig>));
+
     await Filesystem.writeJsonFile(Path.resolve(Path.cwd(), filename), {
       name: remote.name,
       id: remote.id,
       handle: remote.handle,
       app_url: remote.app_url,
       redirect_urls: remote.redirect_urls,
+      webhooks: base.webhooks ?? [],
       oauth: {
         scopes: remote.scopes,
         client_id: remote.client_id,
