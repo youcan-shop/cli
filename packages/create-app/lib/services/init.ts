@@ -74,6 +74,19 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
           });
         },
       },
+      {
+        title: 'Updating youcan packages...',
+        loadable: false,
+        task: async () => {
+          const update = options.packageManager === 'yarn' ? 'up' : 'update';
+
+          await System.exec(options.packageManager, [update, '@youcan/cli', '@youcan/app'], {
+            stdout: 'inherit',
+            stderr: 'inherit',
+            cwd: outdir,
+          }).catch(() => {});
+        },
+      },
     ]);
   });
 
