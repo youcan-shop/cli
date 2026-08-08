@@ -19,9 +19,18 @@ export const TEMPLATES: Record<string, { label: string; url?: string }> = {
   },
 };
 
+const ADJECTIVES = ['Amber', 'Bold', 'Coral', 'Crimson', 'Golden', 'Indigo', 'Jade', 'Lively', 'Lunar', 'Mellow', 'Nimble', 'Polar', 'Rapid', 'Scarlet', 'Silent', 'Solar', 'Swift', 'Velvet', 'Vivid', 'Zesty'];
+const NOUNS = ['Anchor', 'Beacon', 'Canyon', 'Comet', 'Falcon', 'Harbor', 'Heron', 'Lantern', 'Meadow', 'Nectar', 'Orchid', 'Otter', 'Pebble', 'Quill', 'Reef', 'Sparrow', 'Summit', 'Thicket', 'Tide', 'Willow'];
+
+function suggestName(): string {
+  const pick = (list: string[]) => list[Math.floor(Math.random() * list.length)];
+
+  return `${pick(ADJECTIVES)} ${pick(NOUNS)}`;
+}
+
 async function initPrompt(command: Cli.Command): Promise<InitOutput> {
   const defaults = {
-    name: 'my-youcan-shop-app',
+    name: suggestName(),
     template: TEMPLATES.nuxt.url,
   } as const;
 

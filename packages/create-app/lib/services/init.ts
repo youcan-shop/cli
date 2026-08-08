@@ -50,10 +50,10 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
 
           if (configExists) {
             const existingConfig = await Filesystem.readJsonFile(configPath);
-            await Filesystem.writeJsonFile(configPath, { ...existingConfig, name: slug });
+            await Filesystem.writeJsonFile(configPath, { ...existingConfig, name: options.name });
           }
           else {
-            await Filesystem.writeJsonFile(configPath, { name: slug });
+            await Filesystem.writeJsonFile(configPath, { name: options.name });
           }
         },
       },
