@@ -27,10 +27,8 @@ export default class Deploy extends AppCommand {
       this.output.error('This app has no remote counterpart yet, run `youcan app dev` first.');
     }
 
-    if (!flags.force && this.app.config.app_url?.includes('trycloudflare.com')) {
-      this.output.error(
-        `The app url points at a dev tunnel (${this.app.config.app_url}), releasing would break the live app. Fix youcan.app.json or pass --force.`,
-      );
+    if (!flags.force) {
+      this.assertReleasableAppUrl();
     }
 
     await ensureExtensionIds(this.app);
@@ -60,6 +58,23 @@ export default class Deploy extends AppCommand {
     }
     catch (err) {
       this.printValidationErrors(err as Error);
+    }
+  }
+
+  private assertReleasableAppUrl(): void {
+    const url = this.app.config.app_url;
+
+    if (!url && this.app.webs.length) {
+      this.output.error(
+        'This app has no app_url, releasing would leave merchants without a working app. Set it in youcan.app.json or pass --force.',
+      );
+    }
+
+    const tunnels = ['trycloudflare.com', 'ngrok-free.app', 'ngrok.io'];
+    if (url && tunnels.some(host => url.includes(host))) {
+      this.output.error(
+        `The app url points at a dev tunnel (${url}), releasing would break the live app. Fix youcan.app.json or pass --force.`,
+      );
     }
   }
 
