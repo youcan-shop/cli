@@ -1,4 +1,5 @@
 import type { Cli } from '@youcan/cli-kit';
+import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 interface InitOutput {
   name?: string;
@@ -19,13 +20,14 @@ export const TEMPLATES: Record<string, { label: string; url?: string }> = {
   },
 };
 
-const ADJECTIVES = ['Amber', 'Bold', 'Coral', 'Crimson', 'Golden', 'Indigo', 'Jade', 'Lively', 'Lunar', 'Mellow', 'Nimble', 'Polar', 'Rapid', 'Scarlet', 'Silent', 'Solar', 'Swift', 'Velvet', 'Vivid', 'Zesty'];
-const NOUNS = ['Anchor', 'Beacon', 'Canyon', 'Comet', 'Falcon', 'Harbor', 'Heron', 'Lantern', 'Meadow', 'Nectar', 'Orchid', 'Otter', 'Pebble', 'Quill', 'Reef', 'Sparrow', 'Summit', 'Thicket', 'Tide', 'Willow'];
-
 function suggestName(): string {
-  const pick = (list: string[]) => list[Math.floor(Math.random() * list.length)];
+  const name = uniqueNamesGenerator({
+    dictionaries: [adjectives, animals],
+    separator: ' ',
+    style: 'capital',
+  });
 
-  return `${pick(ADJECTIVES)} ${pick(NOUNS)}`;
+  return name.length <= 32 ? name : suggestName();
 }
 
 async function initPrompt(command: Cli.Command): Promise<InitOutput> {
