@@ -22,6 +22,7 @@ class Dev extends AppCommand {
   };
 
   private workers: Worker.Interface[] = [];
+  private configEnv?: string;
   private hasWebWorker = false;
   private useTunnel = false;
 
@@ -110,8 +111,9 @@ class Dev extends AppCommand {
 
   async run(): Promise<any> {
     const { flags } = await this.parse(Dev);
+    this.configEnv = flags.config;
     this.session = await Session.authenticate(this);
-    this.app = await load();
+    this.app = await load(this.configEnv);
 
     this.hasWebWorker = this.app.webs.length > 0;
     this.useTunnel = this.hasWebWorker && !flags['no-tunnel'];
@@ -155,7 +157,7 @@ class Dev extends AppCommand {
       this.workers = [];
     }
 
-    this.app = await load();
+    this.app = await load(this.configEnv);
 
     const webWorkers = this.hasWebWorker ? await this.bootWebWorkers() : [];
 

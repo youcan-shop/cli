@@ -21,7 +21,7 @@ export default class Deploy extends AppCommand {
     const { flags } = await this.parse(Deploy);
 
     this.session = await Session.authenticate(this);
-    this.app = await load();
+    this.app = await load(flags.config);
 
     if (!this.app.config.id) {
       this.output.error('This app has no remote counterpart yet, run `youcan app dev` first.');

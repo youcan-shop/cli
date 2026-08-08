@@ -1,8 +1,8 @@
+import { Flags } from '@oclif/core';
+import { Color, Filesystem, Path, Session, Tasks } from '@youcan/cli-kit';
 import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
 import { AppCommand } from '@/util/app-command';
 import { load } from '@/util/app-loader';
-import { Flags } from '@oclif/core';
-import { Color, Filesystem, Path, Session, Tasks, UI } from '@youcan/cli-kit';
 
 class EnvPull extends AppCommand {
   static description = 'Create or update a .env file with app environment variables';
@@ -18,13 +18,17 @@ class EnvPull extends AppCommand {
     const { flags } = await this.parse(EnvPull);
     const envFilePath = Path.resolve(flags['env-file']);
 
-    this.app = await load();
+    this.app = await load(flags.config);
     this.session = await Session.authenticate(this);
+
+    if (!this.app.config.id) {
+      this.output.error('This app has no remote counterpart yet, run `youcan app dev` first.');
+    }
 
     await Tasks.run({}, [
       {
-        title: 'Syncing app configuration..',
-        task: async () => { await this.syncAppConfig(); },
+        title: 'Fetching app configuration..',
+        task: async () => { await this.fetchRemoteConfig(); },
       },
     ]);
 

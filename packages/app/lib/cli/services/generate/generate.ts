@@ -1,6 +1,6 @@
 import type { ExtensionFlavor, ExtensionTemplateType, InitialAppConfig } from '@/types';
-import { EXTENSION_CONFIG_FILENAME } from '@/constants';
 import { Filesystem, Git, Path } from '@youcan/cli-kit';
+import { EXTENSION_CONFIG_FILENAME } from '@/constants';
 
 export async function ensureExtensionDirectoryExists(name: string) {
   const dir = Path.join(Path.cwd(), 'extensions', name);
