@@ -1,4 +1,5 @@
 import type { Cli } from '@youcan/cli-kit';
+import { adjectives, animals, uniqueNamesGenerator } from 'unique-names-generator';
 
 interface InitOutput {
   name?: string;
@@ -19,9 +20,19 @@ export const TEMPLATES: Record<string, { label: string; url?: string }> = {
   },
 };
 
+function suggestName(): string {
+  const name = uniqueNamesGenerator({
+    dictionaries: [adjectives, animals],
+    separator: ' ',
+    style: 'capital',
+  });
+
+  return name.length <= 32 ? name : suggestName();
+}
+
 async function initPrompt(command: Cli.Command): Promise<InitOutput> {
   const defaults = {
-    name: 'my-youcan-shop-app',
+    name: suggestName(),
     template: TEMPLATES.nuxt.url,
   } as const;
 
