@@ -8,3 +8,5 @@ export const EXTENSION_CONFIG_FILENAME = 'youcan.extension.json';
 
 export const DEFAULT_WEBS_DIR = '.';
 export const DEFAULT_EXTENSIONS_DIR = 'extensions/';
+
+export const TUNNEL_HOSTS = ['trycloudflare.com', 'ngrok-free.app', 'ngrok.io'];

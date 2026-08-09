@@ -2,6 +2,7 @@ import type { App, Web } from '@/types';
 import process from 'node:process';
 import { type Cli, type Services, System, Worker } from '@youcan/cli-kit';
 import { getAppEnvironmentVariables } from '@/cli/services/environment-variables';
+import { TUNNEL_HOSTS } from '@/constants';
 
 export default class WebWorker extends Worker.Abstract {
   private logger: Worker.Logger;
@@ -53,12 +54,21 @@ export default class WebWorker extends Worker.Abstract {
 
     const appUrl = this.app.network_config.app_url;
 
+    const ephemeral = [...TUNNEL_HOSTS, 'localhost', '127.0.0.1'];
+    const existing = this.app.config.redirect_urls ?? [];
+    const kept = existing.filter(url => !ephemeral.some(host => url.includes(host)));
+
+    const paths = new Set(existing.map(url => new URL(url).pathname));
+    if (!paths.size) {
+      paths.add('/auth/callback');
+    }
+
+    const tunneled = [...paths].map(path => new URL(path, appUrl).toString());
+
     this.app.config = {
       ...this.app.config,
       app_url: appUrl,
-      redirect_urls: this.app.config.redirect_urls?.length > 0
-        ? this.app.config.redirect_urls.map(r => new URL(new URL(r).pathname, appUrl).toString())
-        : [new URL('/auth/callback', appUrl).toString()],
+      redirect_urls: [...new Set([...tunneled, ...kept])].slice(0, 5),
     };
   }
 
