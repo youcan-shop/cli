@@ -4,11 +4,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppCommand } from './app-command';
 
 const post = vi.fn();
+const get = vi.fn();
 
 vi.mock('@youcan/cli-kit', () => ({
   Cli: { Command: class {} },
   Env: { apiHostname: () => 'api.test' },
-  Http: { post: (...args: unknown[]) => post(...args) },
+  Http: {
+    post: (...args: unknown[]) => post(...args),
+    get: (...args: unknown[]) => get(...args),
+  },
   Filesystem: {
     readJsonFile: vi.fn().mockResolvedValue({}),
     writeJsonFile: vi.fn(),
@@ -46,6 +50,7 @@ describe('syncAppConfig', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     post.mockResolvedValue(remote);
+    get.mockResolvedValue(remote);
 
     command = new TestCommand([], {} as Config);
     (command as any).session = { access_token: 'token' };
@@ -83,6 +88,23 @@ describe('syncAppConfig', () => {
 
     expect(app.config.app_url).toBe(remote.app_url);
     expect(app.config.id).toBe(remote.id);
+  });
+
+  it('bootstraps app_url on update when the remote app has none', async () => {
+    get.mockResolvedValue({ ...remote, app_url: null });
+
+    (command as any).app = makeApp({
+      id: 'app_1',
+      name: 'Test App',
+      app_url: 'https://tunnel.trycloudflare.com',
+      redirect_urls: ['https://tunnel.trycloudflare.com/auth/callback'],
+    });
+
+    await command.syncAppConfig();
+
+    const [endpoint, options] = post.mock.calls[0];
+    expect(endpoint).toBe('api.test/apps/app_1/update');
+    expect(JSON.parse(options.body).app_url).toBe('https://tunnel.trycloudflare.com');
   });
 
   it('still registers redirect urls on update', async () => {

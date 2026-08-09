@@ -26,12 +26,16 @@ export abstract class AppCommand extends Cli.Command {
       ? `${Env.apiHostname()}/apps/create`
       : `${Env.apiHostname()}/apps/${this.app.config.id}/update`;
 
+    const sendUrl = created || (
+      !!this.app.config.app_url && !(await this.fetchRemoteConfig()).app_url
+    );
+
     const res = await Http.post<RemoteAppConfig>(endpoint, {
       headers: { Authorization: `Bearer ${this.session.access_token}` },
       body: JSON.stringify({
         name: this.app.config.name,
         redirect_urls: this.app.config.redirect_urls,
-        ...(created ? { app_url: this.app.config.app_url } : {}),
+        ...(sendUrl ? { app_url: this.app.config.app_url } : {}),
       }),
     });
 
