@@ -142,6 +142,31 @@ describe('webWorker', () => {
     });
   });
 
+  describe('boot', () => {
+    it('keeps real redirect urls and prunes stale tunnel ones', async () => {
+      mockApp.config.redirect_urls = [
+        'https://myapp.example.com/auth/callback',
+        'https://old.trycloudflare.com/auth/callback',
+      ];
+
+      await webWorker.boot();
+
+      expect(mockApp.config.redirect_urls).toEqual([
+        'http://localhost:3001/auth/callback',
+        'https://myapp.example.com/auth/callback',
+      ]);
+      expect(mockApp.config.app_url).toBe('http://localhost:3001');
+    });
+
+    it('defaults to the callback path when no redirect urls exist', async () => {
+      mockApp.config.redirect_urls = [];
+
+      await webWorker.boot();
+
+      expect(mockApp.config.redirect_urls).toEqual(['http://localhost:3001/auth/callback']);
+    });
+  });
+
   describe('run', () => {
     it('should spawn the web command detached with env computed from app', async () => {
       const child = Object.assign(Promise.resolve(), { pid: 42, killed: false });

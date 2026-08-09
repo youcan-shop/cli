@@ -4,6 +4,7 @@ import { Env, Http, Session } from '@youcan/cli-kit';
 import { buildManifest } from '@/cli/services/deploy/manifest';
 import { uploadMissingBlobs } from '@/cli/services/deploy/upload';
 import { ensureExtensionIds } from '@/cli/services/extensions';
+import { TUNNEL_HOSTS } from '@/constants';
 import { AppCommand, configFlag } from '@/util/app-command';
 import { load } from '@/util/app-loader';
 
@@ -71,8 +72,7 @@ export default class Deploy extends AppCommand {
       );
     }
 
-    const tunnels = ['trycloudflare.com', 'ngrok-free.app', 'ngrok.io'];
-    if (url && tunnels.some(host => url.includes(host))) {
+    if (url && TUNNEL_HOSTS.some(host => url.includes(host))) {
       this.output.error(
         `The app url points at a dev tunnel (${url}), releasing would break the live app. Fix youcan.app.json or pass --force.`,
       );
