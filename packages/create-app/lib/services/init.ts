@@ -90,7 +90,7 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
     ]);
   });
 
-  command.output.info(`${slug} is ready for your to develop! Head to the docs for more information`);
+  command.output.info(`${slug} is ready for you to build! Head to the docs for more information`);
   command.output.info('   Developer Docs: https://developer.youcan.shop\n\n');
 
   command.output.info('   To preview your app, run');
