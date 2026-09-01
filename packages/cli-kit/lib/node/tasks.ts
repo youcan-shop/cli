@@ -33,7 +33,7 @@ export async function run<T = unknown>(ctx: T, tasks: Task<T>[]): Promise<T> {
       process.stdout.write(`${task.title}\n`);
       await runner();
 
-      return ctx;
+      continue;
     }
 
     await Loader.exec(task.title, async (loader) => {

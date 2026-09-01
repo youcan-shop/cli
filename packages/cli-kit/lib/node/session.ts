@@ -1,3 +1,4 @@
+import process from 'node:process';
 import { Callback, type Cli, Config, Crypto, Env, Http, System } from '..';
 
 const LS_PORT = 3000;
@@ -65,6 +66,13 @@ async function authorize(command: Cli.Command, state: string = Crypto.randomHex(
     }
 
     await System.killPortProcess(LS_PORT);
+
+    try {
+      await System.waitUntilPortFree(LS_PORT);
+    }
+    catch {
+      throw new Error(`Port ${LS_PORT} is still busy, close the process that holds it and retry.`);
+    }
   }
 
   const [verifier, challenge] = await generatePkcePair(64);
@@ -100,12 +108,24 @@ export interface StoreSession {
   access_token: string;
 }
 
+function envSession(): StoreSession | null {
+  const token = process.env.YC_CLI_ACCESS_TOKEN;
+
+  return token ? { id: '', slug: 'ci', access_token: token } : null;
+}
+
 export async function get(): Promise<StoreSession | null> {
-  return Config.manager({ projectName: 'youcan-cli' })
-    .get('store_session') ?? null;
+  return envSession()
+    ?? Config.manager({ projectName: 'youcan-cli' }).get('store_session')
+    ?? null;
 }
 
 export async function authenticate(command: Cli.Command): Promise<StoreSession> {
+  const fromEnv = envSession();
+  if (fromEnv) {
+    return fromEnv;
+  }
+
   const existingSession = Config
     .manager({ projectName: 'youcan-cli' })
     .get('store_session');

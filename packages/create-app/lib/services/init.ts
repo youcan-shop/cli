@@ -50,10 +50,10 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
 
           if (configExists) {
             const existingConfig = await Filesystem.readJsonFile(configPath);
-            await Filesystem.writeJsonFile(configPath, { ...existingConfig, name: slug });
+            await Filesystem.writeJsonFile(configPath, { ...existingConfig, name: options.name });
           }
           else {
-            await Filesystem.writeJsonFile(configPath, { name: slug });
+            await Filesystem.writeJsonFile(configPath, { name: options.name });
           }
         },
       },
@@ -74,10 +74,23 @@ async function initService(command: Cli.Command, options: InitServiceOptions) {
           });
         },
       },
+      {
+        title: 'Updating youcan packages...',
+        loadable: false,
+        task: async () => {
+          const update = options.packageManager === 'yarn' ? 'up' : 'update';
+
+          await System.exec(options.packageManager, [update, '@youcan/cli', '@youcan/app'], {
+            stdout: 'inherit',
+            stderr: 'inherit',
+            cwd: outdir,
+          }).catch(() => {});
+        },
+      },
     ]);
   });
 
-  command.output.info(`${slug} is ready for your to develop! Head to the docs for more information`);
+  command.output.info(`${slug} is ready for you to build! Head to the docs for more information`);
   command.output.info('   Developer Docs: https://developer.youcan.shop\n\n');
 
   command.output.info('   To preview your app, run');

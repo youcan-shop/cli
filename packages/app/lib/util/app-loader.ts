@@ -1,17 +1,22 @@
 import type { App, AppConfig, Extension, ExtensionConfig, Web, WebConfig } from '@/types';
-import { APP_CONFIG_FILENAME, DEFAULT_EXTENSIONS_DIR, DEFAULT_WEBS_DIR, EXTENSION_CONFIG_FILENAME, WEB_CONFIG_FILENAME } from '@/constants';
 import { Filesystem, Path } from '@youcan/cli-kit';
+import { appConfigFilename, DEFAULT_EXTENSIONS_DIR, DEFAULT_WEBS_DIR, EXTENSION_CONFIG_FILENAME, WEB_CONFIG_FILENAME } from '@/constants';
 
-export async function load() {
-  const path = Path.resolve(Path.cwd(), APP_CONFIG_FILENAME);
+export async function load(env?: string) {
+  const filename = appConfigFilename(env);
+
+  const path = Path.resolve(Path.cwd(), filename);
   if (!await Filesystem.exists(path)) {
-    throw new Error(`app config not found at ${path}`);
+    throw new Error(env
+      ? `app config not found at ${path}, run \`youcan app config link ${env}\` to create it`
+      : `app config not found at ${path}`);
   }
 
   const config = await Filesystem.readJsonFile<AppConfig>(path);
 
   const app: App = {
     config,
+    configFilename: filename,
     webs: [],
     extensions: [],
     root: Path.cwd(),

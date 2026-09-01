@@ -23,6 +23,7 @@ vi.mock('@youcan/cli-kit', () => ({
   },
   System: {
     getPortOrNextOrRandom: vi.fn().mockResolvedValue(3000),
+    sleep: vi.fn().mockResolvedValue(undefined),
   },
   Services: {
     Cloudflared: vi.fn(),
@@ -56,7 +57,7 @@ vi.mock('@youcan/cli-kit', () => ({
 }));
 
 vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
-const mockOnce = vi.spyOn(process, 'once').mockImplementation(() => process);
+const mockOn = vi.spyOn(process, 'on').mockImplementation(() => process);
 
 describe('dev Command', () => {
   let devCommand: Dev;
@@ -86,29 +87,35 @@ describe('dev Command', () => {
     it('should register signal handlers for graceful shutdown', () => {
       (devCommand as any).setupExitHandlers();
 
-      expect(mockOnce).toHaveBeenCalledWith('SIGINT', expect.any(Function));
-      expect(mockOnce).toHaveBeenCalledWith('SIGTERM', expect.any(Function));
-      expect(mockOnce).toHaveBeenCalledWith('SIGQUIT', expect.any(Function));
-      expect(mockOnce).toHaveBeenCalledWith('exit', expect.any(Function));
+      expect(mockOn).toHaveBeenCalledWith('SIGINT', expect.any(Function));
+      expect(mockOn).toHaveBeenCalledWith('SIGTERM', expect.any(Function));
+      expect(mockOn).toHaveBeenCalledWith('SIGQUIT', expect.any(Function));
     });
   });
 
   describe('cleanup functionality', () => {
-    it('should cleanup all workers when cleanupAndExit is called', async () => {
+    it('should cleanup all workers on shutdown', async () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-      (devCommand as any).setupExitHandlers();
-
-      const sigintCall = mockOnce.mock.calls.find(call => call[0] === 'SIGINT');
-      const cleanupAndExit = sigintCall?.[1];
-
-      if (cleanupAndExit) {
-        await cleanupAndExit();
-      }
+      await (devCommand as any).shutdown();
 
       expect(consoleSpy).toHaveBeenCalledWith('Shutting down...');
       expect(mockWorkers[0].cleanup).toHaveBeenCalled();
       expect(mockWorkers[1].cleanup).toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should only shut down once when called repeatedly', async () => {
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      await Promise.all([
+        (devCommand as any).shutdown(),
+        (devCommand as any).shutdown(),
+        (devCommand as any).shutdown(),
+      ]);
+
+      expect(mockWorkers[0].cleanup).toHaveBeenCalledTimes(1);
 
       consoleSpy.mockRestore();
     });
@@ -123,13 +130,7 @@ describe('dev Command', () => {
 
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-      (devCommand as any).setupExitHandlers();
-      const sigintCall = mockOnce.mock.calls.find(call => call[0] === 'SIGINT');
-      const cleanupAndExit = sigintCall?.[1];
-
-      if (cleanupAndExit) {
-        await expect(cleanupAndExit()).resolves.toBeUndefined();
-      }
+      await expect((devCommand as any).shutdown()).resolves.toBeUndefined();
 
       expect(failingWorker.cleanup).toHaveBeenCalled();
 

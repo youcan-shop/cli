@@ -3,10 +3,18 @@ export interface InitialAppConfig {
   name: string;
 }
 
+export interface AppWebhook {
+  topic: string;
+  address: string;
+}
+
 export type AppConfig = {
   id: string;
+  handle: string;
   app_url: string;
   redirect_urls: string[];
+  webhooks?: AppWebhook[];
+  extension_ids?: Record<string, string>;
 
   oauth: {
     client_id: string;
@@ -14,8 +22,15 @@ export type AppConfig = {
   };
 } & InitialAppConfig;
 
+export interface RemoteAppSummary {
+  id: string;
+  handle: string;
+  name: string;
+}
+
 export interface RemoteAppConfig {
   id: string;
+  handle: string;
   name: string;
   app_url: string;
   owner_id: string;
@@ -77,12 +92,58 @@ export interface App {
   root: string;
   webs: Web[];
   config: AppConfig;
+  configFilename: string;
   remote_config?: RemoteAppConfig;
   network_config?: {
     app_url: string;
     app_port: number;
   };
   extensions: Extension[];
+}
+
+export interface ManifestFile {
+  type: string;
+  name: string;
+  extension: string;
+  size: number;
+  hash: string;
+}
+
+export interface ManifestExtension {
+  id: string;
+  handle: string;
+  type: string;
+  files: ManifestFile[];
+}
+
+export interface Manifest {
+  app: {
+    name: string;
+    handle?: string;
+    app_url?: string;
+    redirect_urls?: string[];
+    scopes?: string[];
+    webhooks?: AppWebhook[];
+  };
+  extensions: ManifestExtension[];
+  source?: { commit: string };
+}
+
+export interface Blob {
+  type: string;
+  hash: string;
+  path: string;
+}
+
+export interface AppVersion {
+  id: string;
+  app_id: string;
+  version: number;
+  name: string | null;
+  message: string | null;
+  created_by: string;
+  released_at: number | null;
+  created_at: number;
 }
 
 export interface ExtensionFileDescriptor {

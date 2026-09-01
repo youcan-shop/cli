@@ -22,7 +22,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
       - run: pnpm install --frozen-lockfile
@@ -33,5 +33,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - run: npm i -g npm@latest
-      - run: pnpm -r --dir packages --no-git-checks publish --access public --provenance
+      - run: pnpm -r --dir packages --no-git-checks publish

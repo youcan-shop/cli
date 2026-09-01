@@ -1,5 +1,8 @@
 import type { SimpleGit, TaskOptions } from 'simple-git';
+import process from 'node:process';
 import git from 'simple-git';
+import * as Filesystem from './filesystem';
+import * as Path from './path';
 import * as System from './system';
 
 export async function binaryExists(): Promise<boolean> {
@@ -19,6 +22,7 @@ export interface CloneOptions {
   progressUpdater?: (statusString: string) => void;
   shallow?: boolean;
   latestTag?: boolean;
+  degit?: boolean;
 }
 
 export async function assertGitExists(): Promise<void> {
@@ -30,7 +34,7 @@ export async function assertGitExists(): Promise<void> {
 export async function clone(cloneOptions: CloneOptions): Promise<void> {
   await assertGitExists();
 
-  const { url, destination, shallow, latestTag } = cloneOptions;
+  const { url, destination, shallow, latestTag, degit = true } = cloneOptions;
 
   const [repository, branch] = url.split('#');
   const options: TaskOptions = { '--recurse-submodules': null };
@@ -48,11 +52,10 @@ export async function clone(cloneOptions: CloneOptions): Promise<void> {
     options['--depth'] = 1;
   }
 
-  const simpleGitOptions = {
-    config: ['core.askpass=true'],
-  };
+  const { GIT_ASKPASS, SSH_ASKPASS, ...env } = process.env;
 
-  await git(simpleGitOptions)
+  await git({ config: [] })
+    .env({ ...env, GIT_TERMINAL_PROMPT: '0' })
     .clone(repository!, destination, options);
 
   if (latestTag) {
@@ -60,6 +63,10 @@ export async function clone(cloneOptions: CloneOptions): Promise<void> {
     const latestTag = await getLocalLatestTag(localRepo, url);
 
     await localRepo.checkout(latestTag);
+  }
+
+  if (degit) {
+    await Filesystem.rm(Path.join(destination, '.git'));
   }
 }
 
