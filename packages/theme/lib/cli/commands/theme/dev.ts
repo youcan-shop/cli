@@ -66,7 +66,8 @@ export default class Dev extends ThemeCommand {
             for (const descriptor of descriptors) {
               const path = Path.resolve(directory, descriptor.file_name);
               if ((await Filesystem.isDirectory(path)) || !(await Filesystem.exists(path))) {
-                return await execute(theme, 'delete', type, descriptor.file_name);
+                await execute(theme, 'delete', type, descriptor.file_name);
+                continue;
               }
 
               const buffer = await Filesystem.readFile(path);

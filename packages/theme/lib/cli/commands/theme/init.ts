@@ -67,7 +67,7 @@ class Init extends ThemeCommand {
             if (flags.inplace && await Filesystem.exists(configPath)) {
               throw new Error(`
                 This directory is already linked to a remote theme,
-                please delete youcan.app.json if you wish to create a new one
+                please delete ${THEME_CONFIG_FILENAME} if you wish to create a new one
               `);
             }
 
