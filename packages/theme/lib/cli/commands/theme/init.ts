@@ -115,7 +115,9 @@ async function writeThemeInfo(dest: string, answers: Record<string, string>) {
     return;
   }
 
-  const schema = JSON.parse(await Filesystem.readFile(path, { encoding: 'utf8' }) as string) as Record<string, unknown>[];
+  const raw = await Filesystem.readFile(path, { encoding: 'utf8' }) as string;
+  const schema = JSON.parse(raw) as Record<string, unknown>[];
+  const indent = raw.match(/^[ \t]+/m)?.[0] ?? 2;
   const info = {
     name: 'theme_info',
     theme_name: answers.theme_name,
@@ -126,7 +128,7 @@ async function writeThemeInfo(dest: string, answers: Record<string, string>) {
   };
 
   const rest = schema.filter(entry => entry.name !== 'theme_info');
-  await Filesystem.writeFile(path, `${JSON.stringify([info, ...rest], null, 2)}\n`);
+  await Filesystem.writeFile(path, `${JSON.stringify([info, ...rest], null, indent)}\n`);
 }
 
 async function prompt(command: ThemeCommand) {
