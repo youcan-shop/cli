@@ -55,6 +55,12 @@ class Init extends ThemeCommand {
           },
         },
         {
+          title: 'Declaring theme info...',
+          task: async () => {
+            await writeThemeInfo(dest, answers);
+          },
+        },
+        {
           title: 'Initializing development theme...',
           task: async (ctx) => {
             const path = await Filesystem.archived(dest, answers.theme_name);
@@ -99,6 +105,30 @@ class Init extends ThemeCommand {
   }
 }
 
+function isUrl(v: string): true | string {
+  return /^https?:\/\/\S+$/.test(v) || 'Enter a full URL, e.g. https://example.com';
+}
+
+async function writeThemeInfo(dest: string, answers: Record<string, string>) {
+  const path = Path.join(dest, 'config', 'settings_schema.json');
+  if (!(await Filesystem.exists(path))) {
+    return;
+  }
+
+  const schema = JSON.parse(await Filesystem.readFile(path, { encoding: 'utf8' }) as string) as Record<string, unknown>[];
+  const info = {
+    name: 'theme_info',
+    theme_name: answers.theme_name,
+    theme_author: answers.theme_author,
+    theme_version: answers.theme_version,
+    theme_documentation_url: answers.theme_documentation_url,
+    theme_support_url: answers.theme_support_url,
+  };
+
+  const rest = schema.filter(entry => entry.name !== 'theme_info');
+  await Filesystem.writeFile(path, `${JSON.stringify([info, ...rest], null, 2)}\n`);
+}
+
 async function prompt(command: ThemeCommand) {
   return command.prompt([
     {
@@ -123,24 +153,28 @@ async function prompt(command: ThemeCommand) {
       name: 'theme_author',
       message: 'The theme\'s author',
       initial: 'YouCan',
+      validate: (v: string) => (v.length > 0 && v.length <= 32) || 'Author must be 1 to 32 characters',
     },
     {
       type: 'text',
       name: 'theme_version',
       message: 'The theme\'s current version',
       initial: '1.0.0',
+      validate: (v: string) => /^\d+\.\d+\.\d+$/.test(v) || 'Use semantic versioning, e.g. 1.0.0',
     },
     {
       type: 'text',
       name: 'theme_support_url',
       message: 'A support URL for this theme.',
       initial: 'https://developer.youcan.shop',
+      validate: isUrl,
     },
     {
       type: 'text',
       name: 'theme_documentation_url',
       message: 'A documentation URL for this theme.',
       initial: 'https://developer.youcan.shop',
+      validate: isUrl,
     },
     {
       type: 'text',
