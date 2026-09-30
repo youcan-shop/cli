@@ -3,6 +3,7 @@ import { THEME_FLAGS } from '@/flags';
 import { ThemeCommand } from '@/util/theme-command';
 import { Args, Flags } from '@oclif/core';
 import { Cli, Env, Filesystem, Form, Git, Http, Path, Session, Tasks } from '@youcan/cli-kit';
+import * as Jsonc from 'jsonc-parser';
 
 class Init extends ThemeCommand {
   static description = 'Clones a theme template git repo';
@@ -116,8 +117,9 @@ async function writeThemeInfo(dest: string, answers: Record<string, string>) {
   }
 
   const raw = await Filesystem.readFile(path, { encoding: 'utf8' }) as string;
-  const schema = JSON.parse(raw) as Record<string, unknown>[];
-  const indent = raw.match(/^[ \t]+/m)?.[0] ?? 2;
+  const schema = Jsonc.parse(raw) as Record<string, unknown>[];
+  const existing = schema.findIndex(entry => entry.name === 'theme_info');
+
   const info = {
     name: 'theme_info',
     theme_name: answers.theme_name,
@@ -127,8 +129,12 @@ async function writeThemeInfo(dest: string, answers: Record<string, string>) {
     theme_support_url: answers.theme_support_url,
   };
 
-  const rest = schema.filter(entry => entry.name !== 'theme_info');
-  await Filesystem.writeFile(path, `${JSON.stringify([info, ...rest], null, indent)}\n`);
+  const edits = Jsonc.modify(raw, [existing === -1 ? 0 : existing], info, {
+    isArrayInsertion: existing === -1,
+    formattingOptions: { insertSpaces: true, tabSize: raw.match(/^( +)\S/m)?.[1].length ?? 2 },
+  });
+
+  await Filesystem.writeFile(path, Jsonc.applyEdits(raw, edits));
 }
 
 async function prompt(command: ThemeCommand) {
