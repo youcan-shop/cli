@@ -11,3 +11,7 @@ export const THEME_FILE_TYPES: Array<keyof Metadata> = [
   'config',
   'templates',
 ];
+
+export const THEME_FOLDER_ALIASES: Record<string, typeof THEME_FILE_TYPES[number]> = {
+  layout: 'layouts',
+};

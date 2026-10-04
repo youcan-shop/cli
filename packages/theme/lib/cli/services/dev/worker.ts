@@ -1,6 +1,6 @@
 import type { Store, Theme } from '@/types';
 import type { ThemeCommand } from '@/util/theme-command';
-import { THEME_FILE_TYPES } from '@/constants';
+import { THEME_FILE_TYPES, THEME_FOLDER_ALIASES } from '@/constants';
 import { Filesystem, Path, System, Worker } from '@youcan/cli-kit';
 import debounce from 'debounce';
 import { Server } from 'socket.io';
@@ -45,7 +45,8 @@ export default class ThemeWorker extends Worker.Abstract {
   }
 
   async run(): Promise<void> {
-    const directories = THEME_FILE_TYPES.map(t => Path.resolve(this.theme.root, t));
+    const directories = [...THEME_FILE_TYPES, ...Object.keys(THEME_FOLDER_ALIASES)]
+      .map(t => Path.resolve(this.theme.root, t));
 
     const watcher = Filesystem.watch(directories, {
       awaitWriteFinish: { stabilityThreshold: 50 },
@@ -63,19 +64,18 @@ export default class ThemeWorker extends Worker.Abstract {
         return;
       }
 
-      const [filetype, filename] = [
-        Path.basename(Path.dirname(path)) as typeof THEME_FILE_TYPES[number],
-        Path.basename(path),
-      ];
+      const folder = Path.basename(Path.dirname(path));
+      const filetype = THEME_FOLDER_ALIASES[folder] ?? folder as typeof THEME_FILE_TYPES[number];
+      const filename = Path.basename(path);
 
       switch (event) {
         case 'add':
         case 'change':
-          this.enqueue('save', filetype, filename);
+          this.enqueue('save', filetype, filename, folder);
 
           break;
         case 'unlink':
-          this.enqueue('delete', filetype, filename);
+          this.enqueue('delete', filetype, filename, folder);
 
           break;
       }
@@ -94,18 +94,14 @@ export default class ThemeWorker extends Worker.Abstract {
     }, 10);
   }
 
-  private enqueue(op: 'save' | 'delete', type: typeof THEME_FILE_TYPES[number], name: string): void {
+  private enqueue(op: 'save' | 'delete', type: typeof THEME_FILE_TYPES[number], name: string, folder: string): void {
     this.queue.push(async () => {
-      await this.execute(op, type, name);
+      await execute(this.theme, op, type, name, this.logger, folder);
 
       debounce(() => {
         this.io.emit('theme:update');
         this.previewLogger.write('reloading preview...');
       }, 100)();
     });
-  }
-
-  private async execute(op: 'save' | 'delete', type: typeof THEME_FILE_TYPES[number], name: string): Promise<void> {
-    return execute(this.theme, op, type, name, this.logger);
   }
 }

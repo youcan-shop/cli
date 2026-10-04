@@ -9,9 +9,10 @@ export async function execute(
   type: typeof THEME_FILE_TYPES[number],
   name: string,
   logger: Worker.Logger | null = null,
+  folder: string = type,
 ): Promise<void> {
   try {
-    const path = Path.join(theme.root, type, name);
+    const path = Path.join(theme.root, folder, name);
 
     const payload: Record<string, Form.FormDataResolvable> = {
       file_name: name,
