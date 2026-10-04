@@ -1,4 +1,4 @@
-import type { Metadata } from '@/types';
+import { THEME_FILE_TYPES, THEME_FOLDER_ALIASES } from '@/constants';
 import { ThemeCommand } from '@/util/theme-command';
 import { load } from '@/util/theme-loader';
 import { Filesystem, Path, Session, Tasks } from '@youcan/cli-kit';
@@ -9,16 +9,6 @@ const formatter = Intl.NumberFormat('en', {
   unit: 'byte',
   unitDisplay: 'narrow',
 });
-
-const FILE_TYPES: Array<keyof Metadata> = [
-  'layouts',
-  'sections',
-  'locales',
-  'assets',
-  'snippets',
-  'config',
-  'templates',
-];
 
 export function date() {
   const date = new Date();
@@ -46,7 +36,7 @@ export default class Pack extends ThemeCommand {
         async task(ctx) {
           const name = `${Path.basename(theme.root)}-${date()}`;
 
-          ctx.path = await Filesystem.archived(theme.root, name, `{${FILE_TYPES.join(',')}}/*`);
+          ctx.path = await Filesystem.archived(theme.root, name, `{${[...THEME_FILE_TYPES, ...Object.keys(THEME_FOLDER_ALIASES)].join(',')}}/*`);
         },
       },
     ]);

@@ -2,7 +2,7 @@ import type { FileDescriptor, Metadata, Store } from '@/types';
 import type { Worker } from '@youcan/cli-kit';
 import { execute } from '@/cli/services/dev/execute';
 import ThemeWorker from '@/cli/services/dev/worker';
-import { THEME_FILE_TYPES } from '@/constants';
+import { THEME_FILE_TYPES, THEME_FOLDER_ALIASES } from '@/constants';
 import { ThemeCommand } from '@/util/theme-command';
 import { load } from '@/util/theme-loader';
 import { Crypto, Env, Filesystem, Http, Path, Session, Tasks, UI } from '@youcan/cli-kit';
@@ -41,7 +41,9 @@ export default class Dev extends ThemeCommand {
         async task() {
           for (const type of THEME_FILE_TYPES) {
             const descriptors = theme.metadata![type] as FileDescriptor[] ?? [];
-            const directory = Path.resolve(theme.root, type);
+            const alias = Object.keys(THEME_FOLDER_ALIASES).find(a => THEME_FOLDER_ALIASES[a] === type);
+            const folder = alias && !(await Filesystem.exists(Path.resolve(theme.root, type))) ? alias : type;
+            const directory = Path.resolve(theme.root, folder);
 
             const present = await Filesystem.exists(directory)
               ? await Filesystem.readdir(directory)
@@ -60,13 +62,13 @@ export default class Dev extends ThemeCommand {
                 continue;
               }
 
-              await execute(theme, 'save', type, file);
+              await execute(theme, 'save', type, file, null, folder);
             }
 
             for (const descriptor of descriptors) {
               const path = Path.resolve(directory, descriptor.file_name);
               if ((await Filesystem.isDirectory(path)) || !(await Filesystem.exists(path))) {
-                await execute(theme, 'delete', type, descriptor.file_name);
+                await execute(theme, 'delete', type, descriptor.file_name, null, folder);
                 continue;
               }
 
@@ -74,7 +76,7 @@ export default class Dev extends ThemeCommand {
               const hash = Crypto.sha1(buffer);
 
               if (hash !== descriptor.hash) {
-                await execute(theme, 'save', type, descriptor.file_name);
+                await execute(theme, 'save', type, descriptor.file_name, null, folder);
               }
             }
           }
