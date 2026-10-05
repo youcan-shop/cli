@@ -54,7 +54,19 @@ export async function clone(cloneOptions: CloneOptions): Promise<void> {
 
   const { GIT_ASKPASS, SSH_ASKPASS, ...env } = process.env;
 
-  await git({ config: [] })
+  await git({
+    config: [],
+    unsafe: {
+      allowUnsafeConfigEnvCount: true,
+      allowUnsafeConfigPaths: true,
+      allowUnsafeDiffExternal: true,
+      allowUnsafeEditor: true,
+      allowUnsafeGitProxy: true,
+      allowUnsafePager: true,
+      allowUnsafeSshCommand: true,
+      allowUnsafeTemplateDir: true,
+    },
+  })
     .env({ ...env, GIT_TERMINAL_PROMPT: '0' })
     .clone(repository!, destination, options);
 
