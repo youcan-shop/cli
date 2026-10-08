@@ -17,7 +17,7 @@ You can initialize a YouCan Shop app template using your package manager of choi
 - `npm init @youcan/app@latest`
 - `pnpm create @youcan/create-app@latest`
 
-Learn more in the docs: [Apps: Getting started](https://developer.youcan.shop/apps/introduction.html)
+Learn more in the docs: [Apps: Getting started](https://docs.youcan.shop/apps/introduction.html)
 
 ### Developing themes
 
@@ -29,7 +29,7 @@ To initialize a starter theme, run the following command:
 
 - `youcan theme init`
 
-To learn more about developing themes for YouCan Shop, refer to [Themes: Getting started](https://developer.youcan.shop/themes/introduction.html)
+To learn more about developing themes for YouCan Shop, refer to [Themes: Getting started](https://docs.youcan.shop/themes/introduction.html)
 
 ## Help
 

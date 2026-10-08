@@ -174,14 +174,14 @@ async function prompt(command: ThemeCommand) {
       type: 'text',
       name: 'theme_support_url',
       message: 'A support URL for this theme.',
-      initial: 'https://developer.youcan.shop',
+      initial: 'https://docs.youcan.shop',
       validate: isUrl,
     },
     {
       type: 'text',
       name: 'theme_documentation_url',
       message: 'A documentation URL for this theme.',
-      initial: 'https://developer.youcan.shop',
+      initial: 'https://docs.youcan.shop',
       validate: isUrl,
     },
     {
