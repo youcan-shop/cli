@@ -10,6 +10,7 @@ export const THEME_FILE_TYPES: Array<keyof Metadata> = [
   'snippets',
   'config',
   'templates',
+  'blocks',
 ];
 
 export const THEME_FOLDER_ALIASES: Record<string, typeof THEME_FILE_TYPES[number]> = {
