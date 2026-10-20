@@ -23,6 +23,7 @@ export interface Metadata {
   locales: FileDescriptor[];
   snippets: FileDescriptor[];
   assets: FileDescriptor[];
+  blocks: FileDescriptor[];
 }
 
 export interface Theme {
