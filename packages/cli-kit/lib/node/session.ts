@@ -1,5 +1,5 @@
 import process from 'node:process';
-import { type Cli, Config, Env, Http, System } from '..';
+import { type Cli, Config, Env, Http, String, System } from '..';
 
 const DEVICE_GRANT = 'urn:ietf:params:oauth:grant-type:device_code';
 const EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange';
@@ -67,7 +67,7 @@ async function poll(device: DeviceCode): Promise<TokenResponse> {
       }));
     }
     catch (err) {
-      const { error } = JSON.parse((err as Error).message) as { error?: string };
+      const error = String.isJson((err as Error).message) ? JSON.parse((err as Error).message).error : undefined;
 
       if (error === 'slow_down') {
         interval += 5;
