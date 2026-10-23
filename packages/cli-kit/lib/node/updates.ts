@@ -116,7 +116,7 @@ async function refresh(): Promise<UpdateCheck | null> {
   const cached = manager.get('update_check') as UpdateCheck | undefined;
 
   if (cached && Date.now() - cached.checked_at < CHECK_INTERVAL) {
-    return cached;
+    return null;
   }
 
   const controller = new AbortController();
