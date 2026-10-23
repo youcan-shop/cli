@@ -94,9 +94,9 @@ export abstract class Command extends BaseCommand {
   public prompt = prompts;
   public controller = new AbortController();
 
-  public async init(): Promise<void> {
-    await super.init();
-    await Updates.notify(this.config.version);
+  public async finally(error: Error | undefined): Promise<void> {
+    await super.finally(error);
+    !error && await Updates.upgrade(this.config.version);
   }
 
   public clear() {

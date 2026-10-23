@@ -1,6 +1,6 @@
 import process from 'node:process';
-import { isLocalInstall, isNewer, packageManager } from '@/node/updates';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { isGlobalInstall, isNewer, packageManager } from '@/node/updates';
 
 describe('isNewer', () => {
   it('compares semver numerically', () => {
@@ -30,14 +30,16 @@ describe('packageManager', () => {
 
   it('detects the installer from the module path', () => {
     expect(packageManager('/Users/x/Library/pnpm/global/5/.pnpm/@youcan+cli-kit@2.9.0/node_modules/@youcan/cli-kit/dist/node/updates.js')).toBe('pnpm');
+    expect(packageManager('/Users/x/.bun/install/global/node_modules/@youcan/cli-kit/dist/node/updates.js')).toBe('bun');
     expect(packageManager('/Users/x/.config/yarn/global/node_modules/@youcan/cli-kit/dist/node/updates.js')).toBe('yarn');
     expect(packageManager('/usr/local/lib/node_modules/@youcan/cli/node_modules/@youcan/cli-kit/dist/node/updates.js')).toBe('npm');
   });
 });
 
-describe('isLocalInstall', () => {
-  it('matches modules under the working directory', () => {
-    expect(isLocalInstall('/work/shop/node_modules/.pnpm/@youcan+cli-kit@2.9.0/node_modules/@youcan/cli-kit/dist/node/updates.js', '/work/shop')).toBe(true);
-    expect(isLocalInstall('/usr/local/lib/node_modules/@youcan/cli-kit/dist/node/updates.js', '/work/shop')).toBe(false);
+describe('isGlobalInstall', () => {
+  it('excludes project installs and source checkouts', () => {
+    expect(isGlobalInstall('/usr/local/lib/node_modules/@youcan/cli-kit/dist/node/updates.js', '/work/shop')).toBe(true);
+    expect(isGlobalInstall('/work/shop/node_modules/.pnpm/@youcan+cli-kit@2.9.0/node_modules/@youcan/cli-kit/dist/node/updates.js', '/work/shop')).toBe(false);
+    expect(isGlobalInstall('/work/cli/packages/cli-kit/dist/node/updates.js', '/work/shop')).toBe(false);
   });
 });

@@ -186,7 +186,8 @@ export async function sleep(seconds: number): Promise<void> {
 export type PackageManagerType =
   | 'pnpm'
   | 'npm'
-  | 'yarn';
+  | 'yarn'
+  | 'bun';
 
 export function inferUserPackageManager(): PackageManagerType {
   const defaultPackageManager = 'npm';
@@ -194,6 +195,7 @@ export function inferUserPackageManager(): PackageManagerType {
     '^npm/.*': 'npm',
     '^pnpm/.*': 'pnpm',
     '^yarn/.*': 'yarn',
+    '^bun/.*': 'bun',
   };
 
   const packageManagerUserAgent = process.env.npm_config_user_agent as string;

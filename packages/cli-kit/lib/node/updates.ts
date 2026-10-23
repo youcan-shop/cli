@@ -4,26 +4,63 @@ import { fileURLToPath } from 'node:url';
 import kleur from 'kleur';
 import fetch from 'node-fetch';
 import { Config, Path, System } from '..';
+import { isDevelopment } from './context/local';
 
 const PACKAGE = '@youcan/cli';
 const CHECK_INTERVAL = 24 * 60 * 60 * 1000;
 const FETCH_TIMEOUT = 2000;
+
+const INSTALL_ARGS: Record<System.PackageManagerType, string[]> = {
+  npm: ['install', '-g'],
+  pnpm: ['add', '-g'],
+  yarn: ['global', 'add'],
+  bun: ['add', '-g'],
+};
 
 interface UpdateCheck {
   latest: string;
   checked_at: number;
 }
 
-export async function notify(current: string): Promise<void> {
-  if (process.env.CI || process.env.YC_CLI_SKIP_UPDATE_CHECK || !process.stdout.isTTY) {
+export async function upgrade(current: string): Promise<void> {
+  const modulePath = fileURLToPath(import.meta.url);
+
+  if (
+    process.env.CI
+    || process.env.YC_CLI_ACCESS_TOKEN
+    || process.env.YC_CLI_NO_AUTO_UPGRADE
+    || process.env.YC_CLI_SKIP_UPDATE_CHECK
+    || !process.stdout.isTTY
+    || isDevelopment()
+    || !isGlobalInstall(modulePath, Path.cwd())
+  ) {
     return;
   }
 
   try {
     const check = await refresh();
 
-    if (check && isNewer(check.latest, current)) {
-      banner(current, check.latest);
+    if (!check || !isNewer(check.latest, current)) {
+      return;
+    }
+
+    const pm = packageManager(modulePath);
+    const args = [...INSTALL_ARGS[pm], `${PACKAGE}@latest`];
+    const command = kleur.cyan([pm, ...args].join(' '));
+
+    if (major(check.latest) !== major(current)) {
+      process.stderr.write(`\nNew major version of YouCan CLI available (${current} -> ${check.latest}). Run ${command} to upgrade.\n`);
+
+      return;
+    }
+
+    process.stderr.write(`\nNew version of YouCan CLI available (${current} -> ${check.latest}). Upgrading with ${command}...\n`);
+
+    try {
+      await System.exec(pm, args, { stdout: 'inherit', stderr: 'inherit' });
+    }
+    catch {
+      process.stderr.write(`Upgrade failed. Run ${command} to upgrade manually.\n`);
     }
   }
   catch {
@@ -37,6 +74,10 @@ export function packageManager(modulePath: string): System.PackageManagerType {
 
   const segments = modulePath.split(path.sep);
 
+  if (segments.includes('.bun') || path.basename(process.execPath).startsWith('bun')) {
+    return 'bun';
+  }
+
   if (segments.includes('.pnpm') || segments.includes('pnpm')) {
     return 'pnpm';
   }
@@ -48,8 +89,9 @@ export function packageManager(modulePath: string): System.PackageManagerType {
   return 'npm';
 }
 
-export function isLocalInstall(modulePath: string, cwd: string): boolean {
-  return modulePath.startsWith(path.join(cwd, 'node_modules') + path.sep);
+export function isGlobalInstall(modulePath: string, cwd: string): boolean {
+  return modulePath.split(path.sep).includes('node_modules')
+    && !modulePath.startsWith(path.join(cwd, 'node_modules') + path.sep);
 }
 
 export function isNewer(latest: string, current: string): boolean {
@@ -65,12 +107,16 @@ export function isNewer(latest: string, current: string): boolean {
   return false;
 }
 
+function major(version: string): string {
+  return version.split('.')[0];
+}
+
 async function refresh(): Promise<UpdateCheck | null> {
   const manager = Config.manager({ projectName: 'youcan-cli' });
   const cached = manager.get('update_check') as UpdateCheck | undefined;
 
   if (cached && Date.now() - cached.checked_at < CHECK_INTERVAL) {
-    return cached;
+    return null;
   }
 
   const controller = new AbortController();
@@ -93,39 +139,4 @@ async function refresh(): Promise<UpdateCheck | null> {
   finally {
     clearTimeout(timer);
   }
-}
-
-function banner(current: string, latest: string): void {
-  const modulePath = fileURLToPath(import.meta.url);
-  const local = isLocalInstall(modulePath, Path.cwd());
-
-  const commands: Record<System.PackageManagerType, string> = local
-    ? {
-        npm: `npm update ${PACKAGE}`,
-        pnpm: `pnpm up ${PACKAGE}`,
-        yarn: `yarn upgrade ${PACKAGE}`,
-      }
-    : {
-        npm: `npm i -g ${PACKAGE}`,
-        pnpm: `pnpm add -g ${PACKAGE}`,
-        yarn: `yarn global add ${PACKAGE}`,
-      };
-
-  const command = commands[packageManager(modulePath)];
-
-  const lines: Array<[string, string]> = [
-    [`Update available! ${current} \u2192 ${latest}`, `Update available! ${kleur.red(current)} \u2192 ${kleur.green(latest)}`],
-    [`Run ${command} to update.`, `Run ${kleur.cyan(command)} to update.`],
-  ];
-
-  const width = Math.max(...lines.map(([plain]) => plain.length));
-  const border = kleur.yellow;
-
-  process.stderr.write([
-    '',
-    border(`\u256D${'\u2500'.repeat(width + 4)}\u256E`),
-    ...lines.map(([plain, colored]) => `${border('\u2502')}  ${colored}${' '.repeat(width - plain.length)}  ${border('\u2502')}`),
-    border(`\u2570${'\u2500'.repeat(width + 4)}\u256F`),
-    '',
-  ].join('\n'));
 }
