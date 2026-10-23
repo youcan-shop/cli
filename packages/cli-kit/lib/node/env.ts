@@ -8,12 +8,12 @@ export function get(key: keyof typeof ENV_VARS) {
 export function oauthClientId(): string {
   switch (get('HOST_ENV')) {
     case 'dev':
-      return '1';
+      return 'cl_3L4iBNamihyVyE7wZ9Nr23jIdLy';
     case 'test':
-      return '11';
+      return 'cl_3L4tSKG88SJ3mhwz8Toonx0pKPK';
     case 'prod':
     default:
-      return '398';
+      return 'cl_3L4jjE7uYRuKms0cmr3xsbGICLo';
   }
 }
 
@@ -26,6 +26,18 @@ export function sellerAreaHostname(): string {
     case 'prod':
     default:
       return 'seller-area.youcan.shop';
+  }
+}
+
+export function idpHostname(): string {
+  switch (get('HOST_ENV')) {
+    case 'dev':
+      return 'id.dotshop.com';
+    case 'test':
+      return 'accounts.testyoucan.shop';
+    case 'prod':
+    default:
+      return 'accounts.youcan.shop';
   }
 }
 
