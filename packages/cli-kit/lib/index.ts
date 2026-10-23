@@ -1,5 +1,4 @@
 export * as String from './common/string';
-export * as Callback from './node/callback';
 export * as Cli from './node/cli';
 export * as Config from './node/config';
 export * as Crypto from './node/crypto';
