@@ -29,6 +29,18 @@ export function sellerAreaHostname(): string {
   }
 }
 
+export function storeDomain(): string {
+  switch (get('HOST_ENV')) {
+    case 'dev':
+      return 'dotshop.com';
+    case 'test':
+      return 'testyoucan.shop';
+    case 'prod':
+    default:
+      return 'youcan.store';
+  }
+}
+
 export function idpHostname(): string {
   switch (get('HOST_ENV')) {
     case 'dev':

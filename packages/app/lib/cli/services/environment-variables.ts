@@ -12,5 +12,6 @@ export function getAppEnvironmentVariables(app: App): Record<string, string> {
     YOUCAN_API_SCOPES: app.remote_config.scopes.join(','),
     YOUCAN_API_URL: `https://${Env.apiHostname()}`,
     YOUCAN_SELLER_AREA_URL: `https://${Env.sellerAreaHostname()}`,
+    YOUCAN_STORE_DOMAIN: Env.storeDomain(),
   };
 }
