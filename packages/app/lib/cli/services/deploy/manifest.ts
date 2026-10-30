@@ -2,14 +2,18 @@ import type { Buffer } from 'node:buffer';
 import type { App, Blob, Extension, Manifest, ManifestExtension, ManifestFile } from '@/types';
 import { Crypto, Filesystem, Path, System } from '@youcan/cli-kit';
 
-const FILE_TYPES = ['assets', 'blocks', 'locales', 'snippets'];
+const THEME_FILE_TYPES = ['assets', 'blocks', 'locales', 'snippets'];
+const WEB_PIXEL_CONFIG = ['runtime_context', 'customer_privacy', 'settings'];
 
 export async function buildManifest(app: App): Promise<{ manifest: Manifest; blobs: Blob[] }> {
   const blobs: Blob[] = [];
   const extensions: ManifestExtension[] = [];
 
   for (const extension of app.extensions) {
-    extensions.push(await extensionManifest(extension, blobs));
+    const { manifest, blobs: extensionBlobs } = await extensionManifest(extension);
+
+    extensions.push(manifest);
+    blobs.push(...extensionBlobs);
   }
 
   const manifest: Manifest = {
@@ -32,10 +36,37 @@ export async function buildManifest(app: App): Promise<{ manifest: Manifest; blo
   return { manifest, blobs };
 }
 
-async function extensionManifest(extension: Extension, blobs: Blob[]): Promise<ManifestExtension> {
-  const files: ManifestFile[] = [];
+type ExtensionContent = Pick<ManifestExtension, 'files' | 'config'> & { blobs: Blob[] };
 
-  for (const type of FILE_TYPES) {
+const CONTENT: Record<string, (extension: Extension) => Promise<ExtensionContent>> = {
+  theme: themeContent,
+  web_pixel: webPixelContent,
+};
+
+async function extensionManifest(extension: Extension): Promise<{ manifest: ManifestExtension; blobs: Blob[] }> {
+  const builder = CONTENT[extension.config.type];
+  if (!builder) {
+    throw new Error(`Unknown extension type '${extension.config.type}' in ${Path.relative(Path.cwd(), extension.root)}`);
+  }
+
+  const { blobs, ...content } = await builder(extension);
+
+  return {
+    manifest: {
+      id: extension.config.id as string,
+      handle: (extension.config.handle as string | undefined) ?? Path.basename(extension.root),
+      type: extension.config.type,
+      ...content,
+    },
+    blobs,
+  };
+}
+
+async function themeContent(extension: Extension): Promise<ExtensionContent> {
+  const files: ManifestFile[] = [];
+  const blobs: Blob[] = [];
+
+  for (const type of THEME_FILE_TYPES) {
     const dir = Path.resolve(extension.root, type);
     if (!await Filesystem.exists(dir)) {
       continue;
@@ -52,28 +83,49 @@ async function extensionManifest(extension: Extension, blobs: Blob[]): Promise<M
     }
 
     for (const path of paths.sort()) {
-      const content = await Filesystem.readFile(path, {}) as Buffer;
-      const hash = Crypto.sha256(content).toString('hex');
-      const name = Path.basename(path);
-      const extname = Path.extname(name);
+      const { file, blob } = await manifestFile(type, path);
 
-      files.push({
-        type,
-        name: name.slice(0, name.length - extname.length),
-        extension: extname.slice(1),
-        size: content.byteLength,
-        hash,
-      });
-
-      blobs.push({ type, hash, path });
+      files.push(file);
+      blobs.push(blob);
     }
   }
 
+  return { files, blobs };
+}
+
+async function webPixelContent(extension: Extension): Promise<ExtensionContent> {
+  const output = Path.resolve(extension.root, 'dist', 'pixel.js');
+  const { build } = await import('rolldown');
+
+  await build({
+    input: Path.resolve(extension.root, 'src', 'index.js'),
+    output: { file: output, format: 'iife', minify: true },
+  });
+
+  const { file, blob } = await manifestFile('assets', output);
+
   return {
-    id: extension.config.id as string,
-    handle: (extension.config.handle as string | undefined) ?? Path.basename(extension.root),
-    type: extension.config.type,
-    files,
+    files: [file],
+    blobs: [blob],
+    config: Object.fromEntries(Object.entries(extension.config).filter(([key]) => WEB_PIXEL_CONFIG.includes(key))),
+  };
+}
+
+async function manifestFile(type: string, path: string): Promise<{ file: ManifestFile; blob: Blob }> {
+  const content = await Filesystem.readFile(path, {}) as Buffer;
+  const hash = Crypto.sha256(content).toString('hex');
+  const name = Path.basename(path);
+  const extname = Path.extname(name);
+
+  return {
+    file: {
+      type,
+      name: name.slice(0, name.length - extname.length),
+      extension: extname.slice(1),
+      size: content.byteLength,
+      hash,
+    },
+    blob: { type, hash, path },
   };
 }
 

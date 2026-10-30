@@ -1,6 +1,6 @@
 import type { Cli } from '@youcan/cli-kit';
 import type { App, Manifest, ManifestFile } from '@/types';
-import { Env, Filesystem, Http, Worker } from '@youcan/cli-kit';
+import { Env, Filesystem, Http, Path, Worker } from '@youcan/cli-kit';
 import { buildManifest } from '@/cli/services/deploy/manifest';
 import { uploadMissingBlobs } from '@/cli/services/deploy/upload';
 import { ensureExtensionIds } from '@/cli/services/extensions';
@@ -49,6 +49,7 @@ export default class DevSessionWorker extends Worker.Abstract {
     this.watcher = Filesystem.watch(paths, {
       persistent: true,
       ignoreInitial: true,
+      ignored: path => path.split(Path.sep).includes('dist'),
       awaitWriteFinish: {
         stabilityThreshold: 50,
       },

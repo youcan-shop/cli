@@ -49,7 +49,7 @@ export interface ExtensionConfig {
 export interface ExtensionFlavor {
   name: string;
   path?: string;
-  value: 'liquid';
+  value: 'liquid' | 'javascript';
 }
 
 export interface ExtensionTemplateType {
@@ -114,6 +114,7 @@ export interface ManifestExtension {
   handle: string;
   type: string;
   files: ManifestFile[];
+  config?: Record<string, unknown>;
 }
 
 export interface Manifest {

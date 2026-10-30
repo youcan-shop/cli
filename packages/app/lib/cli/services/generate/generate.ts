@@ -21,7 +21,7 @@ export interface InitExtensionOptions {
   flavor?: ExtensionFlavor;
 }
 
-export async function initThemeExtension(options: InitExtensionOptions) {
+export async function initExtension(options: InitExtensionOptions) {
   return Filesystem.tapIntoTmp(async (tmp) => {
     const directory = Path.join(tmp, 'download');
     await Filesystem.mkdir(directory);
@@ -39,9 +39,9 @@ export async function initThemeExtension(options: InitExtensionOptions) {
 
     await Filesystem.move(flavorPath, options.directory, { overwrite: true });
 
-    await Filesystem.writeJsonFile(
-      Path.join(options.directory, EXTENSION_CONFIG_FILENAME),
-      { name: options.name, type: options.type.type },
-    );
+    const config = Path.join(options.directory, EXTENSION_CONFIG_FILENAME);
+    const defaults = await Filesystem.exists(config) ? await Filesystem.readJsonFile<object>(config) : {};
+
+    await Filesystem.writeJsonFile(config, { ...defaults, name: options.name, type: options.type.type });
   });
 }
