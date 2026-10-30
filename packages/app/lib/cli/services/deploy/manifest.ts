@@ -1,7 +1,6 @@
 import type { Buffer } from 'node:buffer';
 import type { App, Blob, Extension, Manifest, ManifestExtension, ManifestFile } from '@/types';
 import { Crypto, Filesystem, Path, System } from '@youcan/cli-kit';
-import { build } from 'rolldown';
 
 const THEME_FILE_TYPES = ['assets', 'blocks', 'locales', 'snippets'];
 const WEB_PIXEL_CONFIG = ['runtime_context', 'customer_privacy', 'settings'];
@@ -78,6 +77,7 @@ async function themeContent(extension: Extension, blobs: Blob[]): Promise<Extens
 
 async function webPixelContent(extension: Extension, blobs: Blob[]): Promise<ExtensionContent> {
   const output = Path.resolve(extension.root, 'dist', 'pixel.js');
+  const { build } = await import('rolldown');
 
   await build({
     input: Path.resolve(extension.root, 'src', 'index.js'),
