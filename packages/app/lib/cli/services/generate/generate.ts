@@ -34,7 +34,7 @@ export async function initExtension(options: InitExtensionOptions) {
 
     const flavorPath = Path.join(directory, options.flavor?.path || '');
     if (!await Filesystem.exists(flavorPath)) {
-      throw new Error(`Extension flavor '${options.flavor?.name}' is unavailble`);
+      throw new Error(`Extension flavor '${options.flavor?.name}' is unavailable`);
     }
 
     await Filesystem.move(flavorPath, options.directory, { overwrite: true });
