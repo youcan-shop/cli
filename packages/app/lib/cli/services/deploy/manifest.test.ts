@@ -102,6 +102,13 @@ describe('buildManifest', () => {
     expect(manifest.extensions[0]).toMatchObject({ id: 'ext_1', handle: 'rating', type: 'theme' });
   });
 
+  it('rejects unknown extension types', async () => {
+    const unknown = app();
+    unknown.extensions[0].config.type = 'checkout_ui';
+
+    await expect(buildManifest(unknown)).rejects.toThrow('checkout_ui');
+  });
+
   it('keeps config out of theme extensions', async () => {
     const { manifest } = await buildManifest(app());
 
